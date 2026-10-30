@@ -98,6 +98,9 @@ def main():
         "generate": {"budget": 3.0, "perSlot": 4},
         "lexicon": lexicon.LEXICON,
     }
+    # app/data is generated and gitignored, so a fresh checkout has no
+    # directory to write into.
+    OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(tables, ensure_ascii=False, separators=(",", ":")),
                    encoding="utf-8")
     print(f"{OUT.relative_to(ROOT)}  {OUT.stat().st_size / 1024:.1f} KB")
