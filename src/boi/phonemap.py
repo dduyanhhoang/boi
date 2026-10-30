@@ -143,14 +143,16 @@ CODA_L = {
     "ê": [("u", 0)],             # sale -> sêu
     "â": [("u", 0)],
     "e": [("o", 0)],             # email -> i meo, hotel -> hô theo
-    "o": [("", 0), ("n", 1)],    # mall -> mô
-    "ô": [("", 0), ("n", 1)],    # control -> con tờ rôn
-    "ơ": [("", 0), ("n", 1)],
-    "u": [("", 0), ("n", 1)],    # cool -> cu / school -> sờ cun
     "ư": [("", 0)],
     "a": [("", 0), ("u", 1)],
     "ă": [("", 0)],
 }
+# After a back vowel there is no glide to take, so the l either becomes n or
+# goes. Which one depends on the English vowel: a stressed one keeps the n
+# (con trôn, sờ cun), a schwa drops it (gu gồ, mo đồ, le vồ, ai đồ).
+CODA_L_BACK_STRESSED = [("n", 0), ("", 1)]
+CODA_L_BACK_SCHWA = [("", 0), ("n", 1)]
+_BACK = "oôơu"
 # c vs ch and ng vs nh are not predictable from the nucleus (bác and bách both
 # exist), so the gold decides the default: ch after a and ê (sờ nách, bờ lách,
 # con tếch), c after i (cờ líc), nh after i and ê (pinh, linh).
@@ -185,11 +187,13 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     return table.get(phone, [("ơ", 3)])
 
 
-def coda_options(phones, nucleus):
+def coda_options(phones, nucleus, schwa=False):
     if not phones:
         return [("", 0)]
     key = tuple(phones)
     if key == ("L",):
+        if nucleus in _BACK:
+            return CODA_L_BACK_SCHWA if schwa else CODA_L_BACK_STRESSED
         return CODA_L.get(nucleus, [("", 0)])
     options = CODA_RUNS.get(key)
     if options is None:

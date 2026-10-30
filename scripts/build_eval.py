@@ -197,7 +197,7 @@ drama|đờ ra ma||cluster|h
 trend|tren|tờ ren|cluster;coda_nd|m
 travel|tra vồ|tờ ra ven|cluster;coda_l|l
 credit|cờ re đít||cluster;coda_t|m
-control|con tờ rôn|con trôn|cluster3;stress2;coda_l|m
+control|con trôn|con tờ rôn|cluster3;stress2;coda_l|m
 event|i ven||stress2;coda_nt|h
 image|i mịt|im mịt|coda_dj|m
 think|thinh||coda_nk|h
@@ -213,7 +213,7 @@ tiktok|tíc tóc||coda_k|h
 """.strip()
 
 CORRECTED = set("""
-action algorithm baby budget concert crush database deadline design donut education family fashion folder follow hardware hotel icecream keyboard learning login machine mall manager office okay party player position presentation python report sale sauce shop shopping show singer software speaker super ticket training trend version website white wifi
+action algorithm baby budget concert control crush database deadline design donut education family fashion folder follow hardware hotel icecream keyboard learning login machine mall manager office okay party player position presentation python report sale sauce shop shopping show singer software speaker super ticket training trend version website white wifi
 """.split())
 
 

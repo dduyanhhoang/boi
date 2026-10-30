@@ -167,7 +167,7 @@ id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
 166,trend,T R EH1 N D,tren,tờ ren,,cluster;coda_nd,m,corrected
 167,travel,T R AE1 V AH0 L,tra vồ,tờ ra ven,,cluster;coda_l,l,approved
 168,credit,K R EH1 D AH0 T,cờ re đít,,,cluster;coda_t,m,approved
-169,control,K AH0 N T R OW1 L,con tờ rôn,con trôn,,cluster3;stress2;coda_l,m,approved
+169,control,K AH0 N T R OW1 L,con trôn,con tờ rôn,,cluster3;stress2;coda_l,m,corrected
 170,event,IH0 V EH1 N T,i ven,,,stress2;coda_nt,h,approved
 171,image,IH1 M AH0 JH,i mịt,im mịt,,coda_dj,m,approved
 172,think,TH IH1 NG K,thinh,,,coda_nk,h,approved

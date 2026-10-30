@@ -120,7 +120,7 @@ id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
 164,group,G R UW1 P,gờ rúp,,,cluster;coda_p,h,approved
 165,drama,D R AA1 M AH0,đờ ra ma,,,cluster,h,approved
 166,trend,T R EH1 N D,tren,tờ ren,,cluster;coda_nd,m,corrected
-169,control,K AH0 N T R OW1 L,con tờ rôn,con trôn,,cluster3;stress2;coda_l,m,approved
+169,control,K AH0 N T R OW1 L,con trôn,con tờ rôn,,cluster3;stress2;coda_l,m,corrected
 171,image,IH1 M AH0 JH,i mịt,im mịt,,coda_dj,m,approved
 172,think,TH IH1 NG K,thinh,,,coda_nk,h,approved
 173,box,B AA1 K S,bóc,,,coda_ks,h,approved

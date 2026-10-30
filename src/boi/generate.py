@@ -4,7 +4,7 @@ import argparse
 import itertools
 import sys
 
-from . import g2p, phonemap, rank, syllabify, tone, vi
+from . import g2p, lexicon, phonemap, rank, syllabify, tone, vi
 
 BUDGET = 3.0        # how far above the best table penalty to keep exploring
 PER_SLOT = 4        # options kept per syllable
@@ -39,7 +39,9 @@ def _slot_options(slot):
                 # Two codas are illegal, so the English coda goes.
                 codas = [(offglide, 1 if slot.coda else 0)]
             else:
-                codas = phonemap.coda_options(slot.coda, nucleus)
+                codas = phonemap.coda_options(
+                    slot.coda, nucleus,
+                    schwa=slot.nucleus == "AH" and slot.stress == "0")
             for coda, p_co in codas:
                 # Standard quốc ngữ: gh before a front vowel, but a w-glide
                 # puts an o or u in between, so g stays g (sóp goe).
@@ -59,9 +61,10 @@ def _slot_options(slot):
 
 def candidates(word, limit=5):
     """Ranked readings for one word. Empty list if the word has no phones."""
+    fixed = lexicon.LEXICON.get(word.lower())
     phones = g2p.phones(word)
     if phones is None:
-        return []
+        return [fixed] if fixed else []
 
     scored = {}
     for slots, structural in syllabify.variants(phones):
@@ -80,7 +83,10 @@ def candidates(word, limit=5):
             if text not in scored or total < scored[text]:
                 scored[text] = total
 
-    return [t for t, _ in sorted(scored.items(), key=lambda kv: (kv[1], kv[0]))][:limit]
+    ranked = [t for t, _ in sorted(scored.items(), key=lambda kv: (kv[1], kv[0]))]
+    if fixed:
+        ranked = [fixed] + [t for t in ranked if t != fixed]
+    return ranked[:limit]
 
 
 def read(word):

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from boi import generate, g2p, syllabify, tone, vi
+from boi import generate, g2p, lexicon, syllabify, tone, vi
 
 DEV = Path(__file__).resolve().parents[1] / "data" / "splits" / "dev.csv"
 DEV_EXACT_FLOOR = 0.70
@@ -27,7 +27,8 @@ DEV_EXACT_FLOOR = 0.70
     ("pizza", "pi da"),             # ts -> d, no coda
     ("computer", "com piu tơ"),     # yod after a labial survives
     ("sale", "sêu"),                # final l becomes the u glide
-    ("google", "gu gồ"),            # final schwa + l -> ồ
+    ("google", "gu gồ"),            # final schwa + l drops
+    ("control", "con trôn"),        # final l after a stressed vowel -> n
     ("sport", "sờ pọt"),            # nặng on a final -rt
     ("snack", "sờ nách"),           # k after a is spelled ch
 ])
@@ -41,6 +42,8 @@ def test_known_reading(word, expected):
 #   report -> ri pọt,  gold rì pọt  (boi.md's pre-stress huyền, which the dev
 #                                    rows contradict five times over)
 #   game   -> ghêm,    gold gêm     (the gold ignores the gh spelling rule)
+#   cool   -> cun,     gold cu      (school -> sờ cun has the same vowel and
+#                                    stress, so no rule separates the two)
 
 
 def test_every_candidate_is_a_legal_syllable():
@@ -48,6 +51,13 @@ def test_every_candidate_is_a_legal_syllable():
         for form in generate.candidates(word, limit=5):
             for syl in vi.parse_word(form):
                 assert vi.is_legal(syl), f"{word} -> {form}"
+
+
+def test_lexicon_entries_are_legal_and_reachable():
+    for word, form in lexicon.LEXICON.items():
+        for syl in vi.parse_word(form):
+            assert vi.is_legal(syl), f"{word} -> {form}"
+        assert generate.read(word) == form
 
 
 def test_inserted_syllable_takes_huyen():
