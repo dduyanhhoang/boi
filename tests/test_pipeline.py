@@ -74,13 +74,39 @@ def test_unknown_word_without_g2p_en_is_none():
     ("logitech", "lô di tếch"),     # read off the spelling: lo-gi-tech
     ("lazada", "la da đa"),         # open a takes its continental value
     ("zalopay", "da lô pây"),
-    ("vinfast", "vin phát"),
     ("canva", "can va"),
     ("figma", "phíc ma"),
 ])
-def test_word_outside_cmudict(word, expected):
+def test_word_read_off_its_spelling(word, expected):
     assert g2p.source(word) == "spelling"
     assert expected in generate.candidates(word, limit=3)
+
+
+@pytest.mark.parametrize("word,pieces,expected", [
+    ("poweroff", ["power", "off"], "pao ơ óp"),
+    ("vinfast", ["vin", "fast"], "vin phát"),
+    ("blackpink", ["black", "pink"], "bờ lách pinh"),
+    ("grabfood", ["grab", "food"], "gờ ráp phút"),
+    ("techcombank", ["tech", "com", "bank"], "tếch com bang"),
+])
+def test_compound_splits_into_known_words(word, pieces, expected):
+    """Real phones for each half beat reading the letters."""
+    assert g2p._split(word) == pieces
+    assert expected in generate.candidates(word, limit=3)
+
+
+@pytest.mark.parametrize("word,phones", [
+    ("off", ["AA1", "F"]),          # a doubled letter at a word end is one sound
+    ("ball", ["B", "AE1", "L"]),
+    ("egg", ["EH1", "G"]),          # c and g only soften before a real e, i or y
+    ("music", ["M", "UW1", "S", "IH2", "K"]),
+    ("power", ["P", "AW1", "ER2", "R"]),   # ow is a vowel group, not o plus w
+    ("slow", ["S", "L", "OW1"]),           # and it is /oʊ/ at a word end
+    ("day", ["D", "EY1"]),
+    ("new", ["N", "UW1"]),
+])
+def test_spelling_grapheme_rules(word, phones):
+    assert spell.phones(word) == phones
 
 
 def test_every_word_gets_a_reading():

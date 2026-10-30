@@ -19,7 +19,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from boi import generate, spell, syllabify, tone, vi  # noqa: E402
+from boi import g2p, generate, spell, syllabify, tone, vi  # noqa: E402
 from boi import rank as rank_mod  # noqa: E402
 
 TABLES = ROOT / "app" / "data" / "tables.json"
@@ -67,7 +67,10 @@ def sample_words():
     words = rng.sample(real, SAMPLE)
     words += ["logitech", "lazada", "zalopay", "vinfast", "momo", "shopee",
               "grabfood", "techcombank", "baemin", "gojek", "canva", "figma",
-              "hmm", "shh", "zzz", "brrr", "qwerty", "xyzzy"]
+              "hmm", "shh", "zzz", "brrr", "qwerty", "xyzzy",
+              # compounds, which exercise splitInto
+              "poweroff", "blackpink", "airpod", "facetime", "skincare",
+              "screensaver", "keyboardwarrior", "icecream", "sunflower"]
     for _ in range(300):
         n = rng.randint(2, 11)
         words.append("".join(rng.choice(string.ascii_lowercase) for _ in range(n)))
@@ -77,8 +80,11 @@ def sample_words():
 def test_browser_pipeline_matches_python():
     assert TABLES.exists(), "run: uv run scripts/build_tables.py"
     words = sample_words()
+    import cmudict
+
+    known = sorted(w for w in cmudict.dict() if w.isalpha() and len(w) >= 3)
     payload = {"tables": json.loads(TABLES.read_text(encoding="utf-8")),
-               "words": words}
+               "words": words, "known": known}
 
     done = subprocess.run(
         ["node", str(RUNNER)],
@@ -93,6 +99,9 @@ def test_browser_pipeline_matches_python():
         if (got["phones"] or None) != phones or got["readings"] != readings:
             mismatches.append(
                 f"{word}\n  py {phones} {readings}\n  js {got['phones']} {got['readings']}")
+        if got["split"] != g2p._split(word):
+            mismatches.append(
+                f"{word} split\n  py {g2p._split(word)}\n  js {got['split']}")
         if len(mismatches) >= 8:
             break
 

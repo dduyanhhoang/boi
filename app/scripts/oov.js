@@ -32,6 +32,11 @@ function graphemes(word, T) {
         i += 1;
         continue;
       }
+      // A w or y after a vowel belongs to the vowel group.
+      if (j < word.length && T.spell.glideLetters.includes(word[j])
+          && word.slice(i, j + 1) in T.spell.digraphs) {
+        j += 1;
+      }
       out.push(["v", word.slice(i, j)]);
       i = j;
       continue;
@@ -42,13 +47,16 @@ function graphemes(word, T) {
       const piece = word.slice(i, i + size);
       if (piece in T.spell.consonants) {
         let phones = T.spell.consonants[piece];
-        const next = word.slice(i + size, i + size + 1);
-        if (piece in T.spell.soft && "eiy".includes(next)) {
+        const next = word.slice(i + piece.length, i + piece.length + 1);
+        // "" is a substring of everything, so a real letter is required or
+        // egg comes out as G JH.
+        if (piece in T.spell.soft && next && "eiy".includes(next)) {
           phones = [T.spell.soft[piece]];
         }
-        const doubled = size === 1 && i > 0 && word[i - 1] === piece;
+        // piece.length, not size: near the end of a word the slice is shorter.
+        const doubled = piece.length === 1 && i > 0 && word[i - 1] === piece;
         if (!doubled) out.push(["c", phones]);
-        i += size;
+        i += piece.length;
         matched = true;
         break;
       }
@@ -106,7 +114,10 @@ export function spellPhones(word, T) {
 
     let vowel;
     if (letters in T.spell.irregular) vowel = T.spell.irregular[letters];
-    else if (letters in T.spell.digraphs) vowel = T.spell.digraphs[letters];
+    else if (letters === "ow") {
+      vowel = T.spell.ow[(n === syllables.length - 1 && !flatCoda.length)
+        ? "final" : "other"];
+    } else if (letters in T.spell.digraphs) vowel = T.spell.digraphs[letters];
     else if (flatCoda.length && flatCoda[0] === "R" && base in T.spell.rColoured)
       vowel = T.spell.rColoured[base];
     else if (base in T.spell.single) vowel = T.spell.single[base][open ? 0 : 1];
@@ -444,6 +455,46 @@ export function candidatesFromPhones(phones, T, limit = 5) {
     .sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
     .slice(0, limit)
     .map(([text]) => text);
+}
+
+// g2p.py's _MIN_PIECE. Anything shorter makes junk splits: shopee is not
+// shop plus ee.
+const MIN_PIECE = 3;
+
+/**
+ * Fewest, longest known words this word is made of, or null.
+ * Mirrors g2p._split; tests/test_js_conformance.py pins the two together.
+ */
+export function splitInto(word, known) {
+  const go = (i, depth) => {
+    if (i === word.length) return [];
+    if (depth > 3) return null;
+    let best = null;
+    for (let j = word.length; j >= i + MIN_PIECE; j -= 1) {
+      const piece = word.slice(i, j);
+      if (!known.has(piece)) continue;
+      const rest = go(j, depth + 1);
+      if (rest !== null && (best === null || rest.length + 1 < best.length)) {
+        best = [piece, ...rest];
+      }
+    }
+    return best;
+  };
+  const pieces = go(0, 1);
+  return pieces && pieces.length > 1 ? pieces : null;
+}
+
+/** Phones for a split; only the first piece keeps primary stress. */
+export function compoundPhones(pieces, phonesOf) {
+  const out = [];
+  pieces.forEach((piece, n) => {
+    const phones = phonesOf(piece);
+    if (!phones) return;
+    for (const phone of phones) {
+      out.push(n && phone.endsWith("1") ? phone.replace("1", "2") : phone);
+    }
+  });
+  return out;
 }
 
 /** Read a word the shards do not have, off its spelling. */

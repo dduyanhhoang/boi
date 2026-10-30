@@ -31,7 +31,14 @@ DIGRAPHS = {
     "ai": "EY", "ay": "EY", "oi": "OY", "oy": "OY", "au": "AO", "aw": "AO",
     "ie": "IY", "ei": "EY", "eu": "UW", "ue": "UW", "ui": "UW", "oa": "OW",
     "oe": "OW", "ya": "AA", "yo": "OW", "ye": "IY", "ae": "EY",
+    "aw": "AO", "ay": "EY", "ey": "EY", "oy": "OY", "ew": "UW", "uy": "AY",
+    "ow": "OW",   # see _OW below: /aʊ/ unless it ends the word
 }
+# A w or y after a vowel belongs to the vowel group, not to the consonants.
+_GLIDE_LETTERS = "wy"
+# ow is /oʊ/ at the end of a word (slow, know, yellow) and /aʊ/ before a
+# consonant (power, down, flower). Neither reading is rare, so position picks.
+_OW = {"final": "OW", "other": "AW"}
 # A single vowel letter: open syllable, then closed syllable. Open a is /eɪ/
 # in English (name, data) but a reader meeting an unfamiliar word gives it the
 # continental value, which is what the Vietnamese readings of brands show:
@@ -74,6 +81,10 @@ def _graphemes(word):
                 out.append(("c", "Y"))
                 i += 1
                 continue
+            # Absorb a following w or y when it completes a vowel digraph.
+            if j < len(word) and word[j] in _GLIDE_LETTERS \
+                    and word[i : j + 1] in DIGRAPHS:
+                j += 1
             out.append(("v", word[i:j]))
             i = j
             continue
@@ -82,14 +93,19 @@ def _graphemes(word):
             piece = word[i : i + size]
             if piece in CONSONANTS:
                 phones = CONSONANTS[piece]
-                nxt = word[i + size : i + size + 1]
-                if piece in _SOFT and nxt in "eiy":
+                nxt = word[i + len(piece) : i + len(piece) + 1]
+                # nxt is "" at the end of a word, and "" is a substring of
+                # everything, so this has to test for a real letter first or
+                # egg comes out as G JH.
+                if piece in _SOFT and nxt and nxt in "eiy":
                     phones = _SOFT[piece]
-                # A doubled letter is one sound: shopee, momo, hmm.
-                doubled = size == 1 and i and word[i - 1] == piece
+                # A doubled letter is one sound: off, ball, kiss, shopee.
+                # len(piece), not size: near the end of a word the slice is
+                # shorter than size, and size would never read as 1.
+                doubled = len(piece) == 1 and i and word[i - 1] == piece
                 if not doubled:
                     out.append(("c", phones))
-                i += size
+                i += len(piece)
                 break
         else:
             i += 1  # a letter with no rule
@@ -154,6 +170,9 @@ def phones(word):
 
         if letters in IRREGULAR:
             vowel = IRREGULAR[letters]
+        elif letters == "ow":
+            vowel = _OW["final" if n == len(syllables) - 1 and not flat_coda
+                        else "other"]
         elif letters in DIGRAPHS:
             vowel = DIGRAPHS[letters]
         elif flat_coda and flat_coda[0] == "R" and base in R_COLOURED:

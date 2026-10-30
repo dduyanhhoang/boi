@@ -44,7 +44,9 @@ async function loadOov() {
     oov = Promise.all([
       import("./oov.js"),
       fetch("./data/tables.json").then((r) => r.json()),
-    ]).then(([module, tables]) => ({ readUnknown: module.readUnknown, tables }));
+      fetch("./data/words.txt").then((r) => r.text())
+        .then((t) => new Set(t.split("\n"))),
+    ]).then(([module, tables, known]) => ({ module, tables, known }));
   }
   return oov;
 }
@@ -95,7 +97,7 @@ function renderLoading() {
   el.result.innerHTML = '<div class="skeleton"></div>';
 }
 
-function renderResult(word, phones, readings, spelled = false) {
+function renderResult(word, phones, readings, spelled = false, pieces = null) {
   const [best, ...alts] = readings;
   const syllables = best.split(" ");
   const g = gold[word];
@@ -104,6 +106,9 @@ function renderResult(word, phones, readings, spelled = false) {
   if (spelled) {
     note = `<p class="note note--spelled"><span class="note-label">Read off the
       spelling</span> CMUdict does not list this word</p>`;
+  } else if (pieces) {
+    note = `<p class="note note--spelled"><span class="note-label">Read as a
+      compound</span> ${escapeHtml(pieces.join(" + "))}</p>`;
   } else if (g) {
     const matches = [g.vi, ...g.alt].includes(best);
     note = matches
@@ -114,7 +119,8 @@ function renderResult(word, phones, readings, spelled = false) {
 
   const rows = [
     ["Phones", `<span class="phones">${escapeHtml(phones)}</span>`],
-    ["From", spelled ? "the spelling, letter by letter" : "CMUdict"],
+    ["From", spelled ? "the spelling, letter by letter"
+      : pieces ? `${escapeHtml(pieces.join(" + "))}, from CMUdict` : "CMUdict"],
     alts.length
       ? ["Also", `<span class="alts">${alts
           .map((a) => `<button type="button" data-swap="${escapeHtml(a)}">${escapeHtml(a)}</button>`)
@@ -174,8 +180,27 @@ async function show(word, { push = true } = {}) {
   } else {
     // Not one of the precomputed words, so run the pipeline here instead.
     renderLoading();
-    const { readUnknown, tables } = await loadOov();
-    const { phones, readings } = readUnknown(w, tables, 5);
+    const { module, tables, known } = await loadOov();
+
+    // A compound of known words beats reading the letters: poweroff is
+    // power plus off, with real phones for each half.
+    const pieces = module.splitInto(w, known);
+    if (pieces) {
+      const shardsFor = await Promise.all(pieces.map((p) => shardFor(p[0])));
+      const phonesOf = (piece) => {
+        const found = shardsFor[pieces.indexOf(piece)][piece];
+        return found ? found.split("|")[0].split(" ") : null;
+      };
+      const phones = module.compoundPhones(pieces, phonesOf);
+      const readings = module.candidatesFromPhones(phones, tables, 5);
+      if (readings.length) {
+        renderResult(w, phones.join(" "), readings, false, pieces);
+        if (push) setUrl(w);
+        return;
+      }
+    }
+
+    const { phones, readings } = module.readUnknown(w, tables, 5);
     if (!readings.length) renderMissing(w);
     else renderResult(w, (phones || []).join(" "), readings, true);
   }

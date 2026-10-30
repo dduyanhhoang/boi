@@ -42,6 +42,8 @@ def main():
             "rColoured": spell.R_COLOURED,
             "irregular": spell.IRREGULAR,
             "onsetClusters": sorted(key(t) for t in spell.ONSET_CLUSTERS),
+            "glideLetters": spell._GLIDE_LETTERS,
+            "ow": spell._OW,
         },
         "syllabify": {
             "phoneVowels": sorted(syllabify.VOWELS),

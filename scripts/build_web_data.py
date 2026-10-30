@@ -56,6 +56,13 @@ def main():
         size += write(OUT / f"{letter}.json", words)
         counts[letter] = len(words)
 
+    # Membership index for compound splitting in the browser. Words only, no
+    # phones, so it is smaller than a single shard and one fetch covers every
+    # split. app/scripts/oov.js runs the same algorithm as g2p._split.
+    index = sorted(w for w in vocabulary if len(w) >= 3)
+    (OUT / "words.txt").write_text("\n".join(index), encoding="utf-8")
+    size += (OUT / "words.txt").stat().st_size
+
     split_of = {}
     for name in ("dev", "test"):
         with open(SPLITS / f"{name}.csv", encoding="utf-8") as f:
