@@ -31,8 +31,11 @@ uv run boi website laptop wifi
 uv run boi --all database          # the ranked alternatives
 ```
 
-`uv sync --extra oov` adds `g2p_en`, which predicts phones for a word CMUdict
-does not have. Without it an unknown word returns nothing rather than a guess.
+Any word works. CMUdict covers 117,496 of them; anything else is read off its
+spelling, which is what a Vietnamese speaker does with unfamiliar written
+English: `logitech` becomes lo-gi-tech becomes `lô di tếch`. `uv sync --extra
+oov` adds `g2p_en`, which predicts phones more accurately than the spelling
+rules and is tried first when it is installed.
 
 ## How well it works
 
@@ -84,6 +87,12 @@ GitHub Actions rebuilds `app/data` and deploys `app/` to Pages on every push
 that touches the rules or the page, so the published readings always match the
 rules in `src/boi` at that commit.
 
+A word the shards do not have is worked out in the browser by
+`app/scripts/oov.js`, which reruns the pipeline there. Its tables are generated
+from the Python modules by `scripts/build_tables.py`, so only the control flow
+exists twice, and `tests/test_js_conformance.py` runs both over 1,800 words and
+fails the build on any disagreement.
+
 Design follows the owner's UIUX spec, recorded with its resolved token values
 in `docs/DESIGN.md`.
 
@@ -91,7 +100,8 @@ in `docs/DESIGN.md`.
 
 ```
 src/boi/vi.py          quốc ngữ <-> syllable slots, and the rhyme inventory
-src/boi/g2p.py         word -> ARPAbet (CMUdict, g2p_en fallback)
+src/boi/g2p.py         word -> ARPAbet (CMUdict, then g2p_en, then spelling)
+src/boi/spell.py       spelling -> ARPAbet, for words CMUdict lacks
 src/boi/phonemap.py    ARPAbet -> Vietnamese slot options, each with a penalty
 src/boi/syllabify.py   phones -> syllable slots: cluster repair, gemination
 src/boi/tone.py        tone per syllable
@@ -100,7 +110,7 @@ src/boi/lexicon.py     the four words no rule predicts
 src/boi/align.py       gold alignment, used to check phonemap
 src/boi/generate.py    end to end, and the CLI
 
-app/                   the playground: markup, tokens, one stylesheet, one script
+app/                   the playground: markup, tokens, stylesheet, scripts
 docs/brief.md          the design brief
 docs/PRODUCT.md        what the product is and who it is for
 docs/DESIGN.md         resolved design tokens and the decisions behind them

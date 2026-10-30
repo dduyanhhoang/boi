@@ -25,6 +25,7 @@ const el = {
 };
 
 const shards = new Map();
+let oov = null;   // { readUnknown, tables }, loaded on the first unknown word
 let gold = {};
 let index = { examples: [], words: 0, gold: 0, agree: 0 };
 let active = -1;
@@ -37,6 +38,17 @@ function toneOf(syllable) {
   }
   return "ngang";
 }
+
+async function loadOov() {
+  if (!oov) {
+    oov = Promise.all([
+      import("./oov.js"),
+      fetch("./data/tables.json").then((r) => r.json()),
+    ]).then(([module, tables]) => ({ readUnknown: module.readUnknown, tables }));
+  }
+  return oov;
+}
+
 
 async function shardFor(letter) {
   if (!shards.has(letter)) {
@@ -71,10 +83,9 @@ function renderMissing(word) {
   el.examples.hidden = true;
   el.result.hidden = false;
   el.result.removeAttribute("data-fresh");
-  el.result.innerHTML = `<p class="state">No pronunciation for <b>${escapeHtml(word)}</b>.
-    The generator reads phones from CMUdict, which does not list it. Try another
-    spelling, or a word that is not a name.</p>`;
-  el.status.textContent = `${word}: no pronunciation available`;
+  el.result.innerHTML = `<p class="state">Nothing to read in <b>${escapeHtml(word)}</b>.
+    Letters are what the generator works from, so try a word with some.</p>`;
+  el.status.textContent = `${word}: nothing to read`;
 }
 
 function renderLoading() {
@@ -84,13 +95,16 @@ function renderLoading() {
   el.result.innerHTML = '<div class="skeleton"></div>';
 }
 
-function renderResult(word, phones, readings) {
+function renderResult(word, phones, readings, spelled = false) {
   const [best, ...alts] = readings;
   const syllables = best.split(" ");
   const g = gold[word];
 
   let note = "";
-  if (g) {
+  if (spelled) {
+    note = `<p class="note note--spelled"><span class="note-label">Read off the
+      spelling</span> CMUdict does not list this word</p>`;
+  } else if (g) {
     const matches = [g.vi, ...g.alt].includes(best);
     note = matches
       ? `<p class="note note--agree"><span class="note-label">Matches the reviewed reading</span></p>`
@@ -100,6 +114,7 @@ function renderResult(word, phones, readings) {
 
   const rows = [
     ["Phones", `<span class="phones">${escapeHtml(phones)}</span>`],
+    ["From", spelled ? "the spelling, letter by letter" : "CMUdict"],
     alts.length
       ? ["Also", `<span class="alts">${alts
           .map((a) => `<button type="button" data-swap="${escapeHtml(a)}">${escapeHtml(a)}</button>`)
@@ -153,10 +168,16 @@ async function show(word, { push = true } = {}) {
   clearTimeout(timer);
 
   const entry = shard[w];
-  if (!entry) renderMissing(w);
-  else {
+  if (entry) {
     const [phones, readings] = entry.split("|");
     renderResult(w, phones, readings.split(";"));
+  } else {
+    // Not one of the precomputed words, so run the pipeline here instead.
+    renderLoading();
+    const { readUnknown, tables } = await loadOov();
+    const { phones, readings } = readUnknown(w, tables, 5);
+    if (!readings.length) renderMissing(w);
+    else renderResult(w, (phones || []).join(" "), readings, true);
   }
   if (push) setUrl(w);
 }

@@ -3,7 +3,7 @@ name: Pages
 on:
   push:
     branches: [main]
-    paths: ["app/**", "src/**", "data/**", "scripts/build_web_data.py", ".github/workflows/pages.yml"]
+    paths: ["app/**", "src/**", "data/**", "scripts/**", "tests/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # app/scripts/oov.js reruns the pipeline in the browser for words the shards
+  # do not have. This job runs it against the Python over a few thousand words
+  # and blocks the deploy if they disagree.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv run scripts/build_tables.py
+      - run: uv run pytest -q
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -29,6 +43,7 @@ jobs:
       # app/data is generated, never committed, so the published readings
       # always match the rules in src/boi at this commit.
       - run: uv run scripts/build_web_data.py
+      - run: uv run scripts/build_tables.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

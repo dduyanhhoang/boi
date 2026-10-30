@@ -274,6 +274,7 @@ main {
 }
 .note--agree { background: var(--accent-wash); color: var(--accent-text); }
 .note--differ { background: var(--warning-wash); color: var(--warning-label); }
+.note--spelled { background: var(--bg-sunken); color: var(--label-secondary); }
 .note b { font-weight: 600; }
 .note .note-label { font-weight: 500; }
 
