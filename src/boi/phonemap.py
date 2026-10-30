@@ -1,7 +1,7 @@
 """ARPAbet -> Vietnamese slot options, with a penalty on each option.
 
 Penalty 0 is the preferred reading; higher means less likely. Every entry is
-traceable to the native-speaker corrections in boi.md or to a row of the eval
+traceable to the native-speaker corrections in docs/brief.md or to a row of the eval
 set, named in the comment. scripts/report_coverage.py checks the table against
 the gold alignment and prints what it misses.
 """
@@ -17,8 +17,8 @@ ONSET = {
     "F": [("ph", 0)],
     "V": [("v", 0)],
     "TH": [("th", 0)],
-    "DH": [("d", 0)],            # ð -> d, boi.md
-    "S": [("s", 0), ("x", 1)],   # xóp/xót are lexical, boi.md
+    "DH": [("d", 0)],            # ð -> d, docs/brief.md
+    "S": [("s", 0), ("x", 1)],   # xóp/xót are lexical, docs/brief.md
     "Z": [("d", 0)],             # z -> d: đì dai, vơ dừn
     "SH": [("s", 0), ("x", 1)],
     "ZH": [("d", 0)],            # ʒ -> d: vơ dừn
@@ -53,8 +53,8 @@ NUCLEUS_OPEN = {
     "ER": [("ơ", "", 0)],
     "UW": [("u", "", 0)],
     "UH": [("u", "", 0)],
-    "EY": [("â", "y", 0), ("ê", "", 1)],   # /eɪ/ -> ây, boi.md
-    "OW": [("â", "u", 0), ("ô", "", 1)],   # /oʊ/ -> âu, boi.md
+    "EY": [("â", "y", 0), ("ê", "", 1)],   # /eɪ/ -> ây, docs/brief.md
+    "OW": [("â", "u", 0), ("ô", "", 1)],   # /oʊ/ -> âu, docs/brief.md
     "AY": [("a", "i", 0)],
     "AW": [("a", "o", 0)],
     "OY": [("o", "i", 0)],
@@ -73,7 +73,7 @@ OW_FINAL = [("â", "u", 0), ("ô", "", 1)]
 OW_MID = [("ô", "", 0), ("â", "u", 1)]
 # /wɜr/ lands on uô: pát guốt, nét guốc.
 ER_AFTER_GLIDE = [("ô", "", 0), ("ơ", "", 1)]
-# Unstressed schwa, which boi.md puts at ơ or ư. The dev rows show it is the
+# Unstressed schwa, which docs/brief.md puts at ơ or ư. The dev rows show it is the
 # coda that decides, not the stress: -ment -> com, -le -> gồ, -et -> két.
 SCHWA_OPEN = [("a", "", 0), ("ơ", "", 1), ("ô", "", 1)]   # đa ta, ba na na / sô lu
 # A schwa before a final n is ư after a fricative (the -tion and -thon words)
@@ -98,7 +98,7 @@ SCHWA_CLOSED = [("ơ", "", 0), ("e", "", 1), ("i", "", 1)]
 CODA = {
     "P": [("p", 0)],
     "B": [("p", 0)],             # youtube -> diu túp
-    "F": [("p", 0)],             # v/f -> p, boi.md
+    "F": [("p", 0)],             # v/f -> p, docs/brief.md
     "V": [("p", 0)],             # love -> lớp
     "T": [("t", 0)],
     "D": [("t", 0)],             # code -> cốt
@@ -137,7 +137,7 @@ CODA_RUNS = {
     ("L", "D"): [("t", 0)],
     ("M", "P"): [("m", 0)],
 }
-# Final l after a vowel becomes a glide, boi.md. Keyed by the nucleus it follows.
+# Final l after a vowel becomes a glide, docs/brief.md. Keyed by the nucleus it follows.
 CODA_L = {
     "i": [("u", 0)],             # skill -> sờ kiu
     "ê": [("u", 0)],             # sale -> sêu

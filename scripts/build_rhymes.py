@@ -1,7 +1,7 @@
 """Count the Vietnamese rhymes the dev split uses and write them as a table.
 
 Dev only, never test. rank.py penalises a candidate whose rhyme never appears
-here, which is the "penalty for rare rhymes" of boi.md step 6 without pulling
+here, which is the "penalty for rare rhymes" of docs/brief.md step 6 without pulling
 in a Vietnamese corpus.
 
     uv run scripts/build_rhymes.py

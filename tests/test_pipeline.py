@@ -39,7 +39,7 @@ def test_known_reading(word, expected):
 
 # Known misses kept here so they are not mistaken for passing cases:
 #   taxi   -> tách si, gold tắc xi  (nucleus and coda both lexical)
-#   report -> ri pọt,  gold rì pọt  (boi.md's pre-stress huyền, which the dev
+#   report -> ri pọt,  gold rì pọt  (docs/brief.md's pre-stress huyền, which the dev
 #                                    rows contradict five times over)
 #   game   -> ghêm,    gold gêm     (the gold ignores the gh spelling rule)
 #   cool   -> cun,     gold cu      (school -> sờ cun has the same vowel and

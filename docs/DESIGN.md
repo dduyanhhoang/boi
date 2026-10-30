@@ -1,0 +1,73 @@
+# Design
+
+Visual authority is the owner's Notion spec, not this file. This file records
+the token values resolved from it, which that spec leaves as TBD, and the one
+place this project extends it.
+
+- SPEC-001 Core: Apple HIG, Liquid Glass, semantic tokens, concentric radii,
+  capsule controls, WCAG 2.2 AA floor.
+- SPEC-002 Web: archetype **web app**. Glass on the functional layer only
+  (toolbar and floating controls). Content is opaque. No glass on glass.
+
+Mode: Operate. The visitor types a word and reads an answer. Scanability and
+state handling outrank expression; the character lives in the detail.
+
+## Tokens
+
+Values are Apple's published system colours and iOS text styles, resolved by
+the owner on 2026-10-30. Implemented in `app/styles/tokens.css`.
+
+Colour, four variants per token (light, dark, light increased contrast, dark
+increased contrast): `bg`, `bg-grouped`, `bg-elevated`, `label`,
+`label-secondary`, `label-tertiary`, `separator`, `accent`, `accent-wash`,
+`destructive`, `success`, `warning`. Accent is systemBlue `#007AFF` / `#0A84FF`,
+and `#0040DD` / `#409CFF` at increased contrast.
+
+Type: Apple's iOS text styles by name, Large Title 34/41 down to Caption 2
+11/13, in rem against a 16px root. **One addition to the spec scale:** a
+`Display` step above Large Title, `clamp(2.5rem, 7.5vw, 4.25rem)` with -0.03em
+tracking, used only for the generated reading. The reading is the one thing on
+the page the visitor came for, and Large Title does not carry it.
+
+Spacing: base 4, rhythm 8, scale `4 8 12 16 24 32 48 64`.
+
+Radius: capsule for controls, 12 cards, 20 containers, 28 the input. Children
+are concentric: child radius = parent radius − the padding between them.
+
+Motion: 180ms state, 280ms enter and exit, 420ms the one authored moment;
+`cubic-bezier(.32,.72,0,1)`. Under `prefers-reduced-motion` everything becomes
+a 120ms opacity fade.
+
+## Type stack
+
+`-apple-system, BlinkMacSystemFont` first, so Apple devices render in the real
+system font with nothing downloaded, then self-hosted Inter Variable subset to
+latin plus Vietnamese (`app/fonts/inter-vi.woff2`, 118KB, weights 100 to 900),
+then `system-ui, sans-serif`. Monospace is `ui-monospace, SFMono-Regular,
+Menlo, monospace` with `tabular-nums`, used for ARPAbet only, which is data.
+
+SF Pro is deliberately not self-hosted. The owner's spec allows Apple fonts in
+personal projects, but this ships to public GitHub Pages, and serving Apple
+font binaries publicly is the case their licence excludes. Decided with the
+owner on 2026-10-30.
+
+## The authored moment
+
+The result composes once per lookup: the reading rises 8px and fades in while
+the syllable chips stagger in from `blur(6px)`. Nothing else on the page
+animates beyond its own state change. Disabled under reduced motion.
+
+## Emphasis
+
+Per SPEC-001, emphasis is a wash background plus same-tone text, never an
+underline, a rule, or a symbol beside the word. Two kinds on this surface and
+no more: `accent-wash` for the syllable under the pointer or keyboard focus,
+and `warning` wash for a reviewed word whose gold reading differs from the
+generated one. Both carry their meaning as text in the pill, so colour is never
+the only channel.
+
+## Icons
+
+Authored inline SVG on Lucide's geometry: 24px box, 1.75px stroke, round caps
+and joins. Six of them (search, clear, submit, theme, source, external). No
+emoji, no glyph substitutes. Each has a label for assistive tech.

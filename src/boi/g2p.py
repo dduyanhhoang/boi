@@ -1,7 +1,7 @@
 """English word -> ARPAbet phones with stress digits.
 
 CMUdict first. For a word CMUdict does not have, g2p_en predicts the phones,
-which boi.md allows only as this fallback. g2p_en is an optional dependency
+which docs/brief.md allows only as this fallback. g2p_en is an optional dependency
 (`uv sync --extra oov`) because it pulls in numpy and nltk and downloads a
 tagger on first use; without it, an unknown word returns None.
 """

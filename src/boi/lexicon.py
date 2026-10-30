@@ -1,6 +1,6 @@
 """Words whose reading no rule predicts.
 
-boi.md calls these out: s/sh becomes x in some short words (xóp, xót) and not
+docs/brief.md calls these out: s/sh becomes x in some short words (xóp, xót) and not
 in others (sóp pinh, phát sừn), and mall is the one final l that drops instead
 of gliding. The generator produces the rule-based form for all of them; these
 entries override it and the rule-based form stays available as an alternative.

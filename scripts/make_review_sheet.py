@@ -1,6 +1,6 @@
 """Run the generator over a word list and emit a sheet for a native speaker.
 
-Step 9 of boi.md: the generator proposes, a speaker corrects, the corrected
+Step 9 of docs/brief.md: the generator proposes, a speaker corrects, the corrected
 rows join data/eval_v0.csv and the tables get refitted. Columns match the eval
 set so a reviewed sheet can be concatenated straight on.
 

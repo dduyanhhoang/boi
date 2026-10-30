@@ -1,0 +1,185 @@
+/* Design tokens, resolved from the owner's Notion UIUX spec (SPEC-001 Core).
+   Values are Apple's published system colours and iOS text styles. Four
+   colour variants: light, dark, and each at increased contrast. See
+   docs/DESIGN.md. Nothing below is used directly by components except through
+   a semantic name. */
+
+:root {
+  /* Type ------------------------------------------------------------ */
+  --font-ui: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Apple iOS text styles. size / line-height / weight / tracking */
+  --text-display: clamp(2.5rem, 7.5vw, 4.25rem);
+  --leading-display: 1.04;
+  --tracking-display: -0.03em;
+
+  --text-large-title: 2.125rem;  --leading-large-title: 1.206;
+  --text-title-1: 1.75rem;       --leading-title-1: 1.214;
+  --text-title-2: 1.375rem;      --leading-title-2: 1.273;
+  --text-title-3: 1.25rem;       --leading-title-3: 1.25;
+  --text-headline: 1.0625rem;    --leading-headline: 1.294;
+  --text-body: 1.0625rem;        --leading-body: 1.294;
+  --text-callout: 1rem;          --leading-callout: 1.3125;
+  --text-subheadline: 0.9375rem; --leading-subheadline: 1.333;
+  --text-footnote: 0.8125rem;    --leading-footnote: 1.385;
+  --text-caption-1: 0.75rem;     --leading-caption-1: 1.333;
+  --text-caption-2: 0.6875rem;   --leading-caption-2: 1.182;
+
+  /* Space: base 4, rhythm 8 ----------------------------------------- */
+  --space-1: 0.25rem;  --space-2: 0.5rem;  --space-3: 0.75rem;
+  --space-4: 1rem;     --space-6: 1.5rem;  --space-8: 2rem;
+  --space-12: 3rem;    --space-16: 4rem;
+
+  /* Radius. Children are concentric: parent radius minus padding ----- */
+  --radius-capsule: 999px;
+  --radius-card: 0.75rem;
+  --radius-container: 1.25rem;
+  --radius-input: 1.75rem;
+
+  /* Motion ----------------------------------------------------------- */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-state: 180ms;
+  --duration-enter: 280ms;
+  --duration-moment: 420ms;
+
+  --measure: 42rem;
+}
+
+/* Light ------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+  --bg: #f2f2f7;
+  --bg-elevated: #ffffff;
+  --bg-sunken: #e5e5ea;
+  --label: #000000;
+  /* Apple's secondaryLabel is 0.6, which measures 3.45:1 on white and fails
+     WCAG AA for body and placeholder text. SPEC-001 puts accessibility above
+     every other rule, so light mode uses 0.75 (5.2:1). Dark mode keeps
+     Apple's 0.6, which already measures 6.0:1 on #1C1C1E. */
+  --label-secondary: rgba(60, 60, 67, 0.75);
+  --label-tertiary: rgba(60, 60, 67, 0.42);
+  --separator: rgba(60, 60, 67, 0.29);
+  /* Three accent roles, split by what WCAG asks of each. --accent is
+     Apple's systemBlue and is used only for non-text UI (rings, borders),
+     where 3:1 is the bar. White text on that blue measures 4.02:1, and blue
+     text on white 4.02:1, so both fall to darker measured values. */
+  --accent: #007aff;
+  --accent-text: #0040dd;   /* 7.56:1 on white */
+  --accent-fill: #0062cc;   /* white on it, 5.80:1 */
+  --accent-wash: rgba(0, 122, 255, 0.1);
+  --destructive: #ff3b30;
+  --destructive-wash: rgba(255, 59, 48, 0.1);
+  --success: #34c759;
+  --warning: #ff9500;
+  --warning-wash: rgba(255, 149, 0, 0.14);
+  --warning-label: #8a4b00;
+
+  --material: rgba(255, 255, 255, 0.72);
+  --material-opaque: #f7f7fa;
+  --material-border: rgba(60, 60, 67, 0.12);
+  --popover-border: transparent;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.03);
+  --shadow-2: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px -8px rgba(0, 0, 0, 0.1);
+  --shadow-3: 0 2px 6px rgba(0, 0, 0, 0.08), 0 16px 48px -12px rgba(0, 0, 0, 0.18);
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --label-secondary: rgba(60, 60, 67, 0.88);
+    --label-tertiary: rgba(60, 60, 67, 0.56);
+    --separator: rgba(60, 60, 67, 0.42);
+    --accent: #0040dd;
+    --accent-text: #00309f;
+    --accent-fill: #00309f;
+    --accent-wash: rgba(0, 64, 221, 0.12);
+    --destructive: #d70015;
+    --success: #248a3d;
+    --warning: #c93400;
+    --warning-label: #7a2000;
+    --material-border: rgba(60, 60, 67, 0.3);
+    --popover-border: rgba(60, 60, 67, 0.3);
+  }
+}
+
+/* Dark -------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #000000;
+    --bg-elevated: #1c1c1e;
+    --bg-sunken: #2c2c2e;
+    --label: #ffffff;
+    --label-secondary: rgba(235, 235, 245, 0.6);
+    --label-tertiary: rgba(235, 235, 245, 0.3);
+    --separator: rgba(84, 84, 88, 0.65);
+    --accent: #0a84ff;
+    --accent-text: #0a84ff;   /* 4.66:1 on #1c1c1e */
+    --accent-fill: #0062cc;   /* white on it, 5.80:1 */
+    --accent-wash: rgba(10, 132, 255, 0.18);
+    --destructive: #ff453a;
+    --destructive-wash: rgba(255, 69, 58, 0.18);
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --warning-wash: rgba(255, 159, 10, 0.18);
+    --warning-label: #ffc46b;
+
+    --material: rgba(28, 28, 30, 0.72);
+    --material-opaque: #161618;
+    --material-border: rgba(235, 235, 245, 0.12);
+    --popover-border: rgba(235, 235, 245, 0.14);
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-2: 0 1px 3px rgba(0, 0, 0, 0.6), 0 8px 24px -8px rgba(0, 0, 0, 0.7);
+    --shadow-3: 0 2px 6px rgba(0, 0, 0, 0.7), 0 16px 48px -12px rgba(0, 0, 0, 0.8);
+  }
+
+  @media (prefers-contrast: more) {
+    :root {
+      --label-secondary: rgba(235, 235, 245, 0.74);
+      --label-tertiary: rgba(235, 235, 245, 0.48);
+      --separator: rgba(235, 235, 245, 0.78);
+      --accent: #409cff;
+      --accent-text: #409cff;
+      --accent-fill: #0052ab;
+      --accent-wash: rgba(64, 156, 255, 0.22);
+      --destructive: #ff6961;
+      --success: #30db5b;
+      --warning: #ffb340;
+      --warning-label: #ffd79a;
+      --material-border: rgba(235, 235, 245, 0.3);
+      --popover-border: rgba(235, 235, 245, 0.3);
+    }
+  }
+}
+
+/* Manual override from the toolbar, same values as the queries above. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --bg-elevated: #1c1c1e;
+  --bg-sunken: #2c2c2e;
+  --label: #ffffff;
+  --label-secondary: rgba(235, 235, 245, 0.6);
+  --label-tertiary: rgba(235, 235, 245, 0.3);
+  --separator: rgba(84, 84, 88, 0.65);
+  --accent: #0a84ff;
+  --accent-text: #0a84ff;
+  --accent-fill: #0062cc;
+  --accent-wash: rgba(10, 132, 255, 0.18);
+  --destructive: #ff453a;
+  --destructive-wash: rgba(255, 69, 58, 0.18);
+  --success: #30d158;
+  --warning: #ff9f0a;
+  --warning-wash: rgba(255, 159, 10, 0.18);
+  --warning-label: #ffc46b;
+  --material: rgba(28, 28, 30, 0.72);
+  --material-opaque: #161618;
+  --material-border: rgba(235, 235, 245, 0.12);
+  --popover-border: rgba(235, 235, 245, 0.14);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 1px 3px rgba(0, 0, 0, 0.6), 0 8px 24px -8px rgba(0, 0, 0, 0.7);
+  --shadow-3: 0 2px 6px rgba(0, 0, 0, 0.7), 0 16px 48px -12px rgba(0, 0, 0, 0.8);
+}

@@ -69,6 +69,24 @@ uv run eval/run_eval.py dev --errors --tags
 uv run eval/run_eval.py test
 ```
 
+## Playground
+
+`app/` is a static page that looks up precomputed readings: type a word, see the
+reading, the syllables with their tones, the phones it started from, and, for
+the 181 reviewed words, what the native speaker wrote.
+
+```sh
+uv run scripts/build_web_data.py          # writes app/data, not committed
+python3 -m http.server --directory app    # then open localhost:8000
+```
+
+GitHub Actions rebuilds `app/data` and deploys `app/` to Pages on every push
+that touches the rules or the page, so the published readings always match the
+rules in `src/boi` at that commit.
+
+Design follows the owner's UIUX spec, recorded with its resolved token values
+in `docs/DESIGN.md`.
+
 ## How it works
 
 ```
@@ -81,6 +99,11 @@ src/boi/rank.py        candidate scoring
 src/boi/lexicon.py     the four words no rule predicts
 src/boi/align.py       gold alignment, used to check phonemap
 src/boi/generate.py    end to end, and the CLI
+
+app/                   the playground: markup, tokens, one stylesheet, one script
+docs/brief.md          the design brief
+docs/PRODUCT.md        what the product is and who it is for
+docs/DESIGN.md         resolved design tokens and the decisions behind them
 ```
 
 A word becomes phones, the phones become one or more syllable layouts, each
@@ -89,18 +112,18 @@ ranked by the penalties that produced them. Illegal rhymes are dropped before
 ranking. Nothing is learned end to end, so every output traces back to a named
 rule or a table row.
 
-Two parts of `boi.md` are deliberately absent, with reasons in `rank.py`: the
+Two parts of `docs/brief.md` are deliberately absent, with reasons in `rank.py`: the
 panphon feature-distance filter and a corpus-counted syllable-frequency prior.
 `src/boi/rhymes.py`, counted from dev by `scripts/build_rhymes.py`, stands in
 for the second one.
 
 `lexicon.py` holds four words: `shop` and `sauce` take x where `sóp pinh` and
 `sót` take s, `mall` is the one final l that drops rather than glides, and
-`bus` is `bớt` where the same vowel gives `bắc` and `ắp`. `boi.md` predicts
+`bus` is `bớt` where the same vowel gives `bắc` and `ắp`. `docs/brief.md` predicts
 each of them as lexical. The rule-based form is still generated and still
 shows up under `--all`.
 
-One rule from `boi.md` is contradicted by the data and left out. An unstressed
+One rule from `docs/brief.md` is contradicted by the data and left out. An unstressed
 syllable before the stressed one is supposed to take huyền; that fits `rì pọt`
 and `đì dai` and breaks `sô lu sừn`, `hê lô`, `ba na na`, `con tờ rôn` and
 `i ven`. The note stays in `tone.py` next to the disabled rule.
@@ -132,5 +155,5 @@ printf 'router\nbrunch\n' | uv run scripts/make_review_sheet.py -
 
 The sheet's columns match the eval set, so corrected rows concatenate onto it.
 
-`boi.md` is the design brief: prior work, the linguistic findings behind the
+`docs/brief.md` is the design brief: prior work, the linguistic findings behind the
 tables, and the open questions.
