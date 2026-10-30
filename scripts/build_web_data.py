@@ -15,7 +15,7 @@ import cmudict
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from boi import generate  # noqa: E402
+from boi import g2p, generate  # noqa: E402
 
 OUT = ROOT / "app" / "data"
 GOLD = ROOT / "data" / "eval_v0.csv"
@@ -36,12 +36,17 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     pronunciations = cmudict.dict()
 
+    # COMPOUNDS holds the words CMUdict lacks, icecream among them, and it is
+    # on the example chips. Iterating cmudict alone used to drop all three.
+    vocabulary = sorted(
+        {w for w in pronunciations if w.isalpha()} | set(g2p.COMPOUNDS))
+
     shards, total = {}, 0
-    for word in sorted(w for w in pronunciations if w.isalpha()):
+    for word in vocabulary:
         readings = generate.candidates(word, limit=TOP_N)
         if not readings:
             continue
-        phones = " ".join(pronunciations[word][0])
+        phones = " ".join(g2p.phones(word, predict=False))
         shards.setdefault(word[0], {})[word] = f"{phones}|{';'.join(readings)}"
         total += 1
 

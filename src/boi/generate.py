@@ -47,6 +47,10 @@ def _slot_options(slot):
                 # puts an o or u in between, so g stays g (sóp goe).
                 spelled = ("gh" if onset == "g" and not slot.glide
                            and nucleus[0] in "ieê" else onset)
+                # gi before an i nucleus would spell gii, giin, giíp. Northern
+                # d, gi and r are all /z/, so the i-nucleus forms take d.
+                if spelled == "gi" and nucleus[0] == "i":
+                    spelled = "d"
                 syl = vi.Syl(spelled, "w" if slot.glide else "", nucleus, coda, "ngang")
                 penalty = p_on + p_nu + p_co
                 # Vietnamese cannot say an illegal rhyme, so it is filtered.

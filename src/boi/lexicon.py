@@ -15,4 +15,5 @@ LEXICON = {
     "sauce": "xót",     # s -> x, against sót
     "mall": "mô",       # final l drops; sale glides to sêu, school takes n
     "bus": "bớt",       # /ʌ/ -> ơ, against bắc and ắp
+    "schedule": "sờ ke đùa",  # JH -> đ and UH0 + L -> ua, neither seen elsewhere
 }

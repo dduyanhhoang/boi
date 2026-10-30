@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from boi import generate, vi  # noqa: E402
+from boi import generate, lexicon, vi  # noqa: E402
 
 SPLITS = Path(__file__).resolve().parents[1] / "data" / "splits"
 TOP_K = 5
@@ -93,6 +93,22 @@ def evaluate(rows):
     }, by_tag, misses
 
 
+def without_lexicon():
+    """Context manager that empties the lexicon for the duration."""
+    import contextlib
+
+    @contextlib.contextmanager
+    def swap():
+        saved = dict(lexicon.LEXICON)
+        lexicon.LEXICON.clear()
+        try:
+            yield
+        finally:
+            lexicon.LEXICON.update(saved)
+
+    return swap()
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("split", nargs="?", default="dev", choices=["dev", "test"])
@@ -104,10 +120,20 @@ def main():
         rows = list(csv.DictReader(f))
 
     summary, by_tag, misses = evaluate(rows)
+    with without_lexicon():
+        rules_only, _, _ = evaluate(rows)
+
+    memorised = sorted(w for w in lexicon.LEXICON
+                       if w in {r["word"] for r in rows})
     print(f"{args.split}: {summary['n']} words")
     for key, value in summary.items():
-        if key != "n":
-            print(f"  {key:16} {value:.3f}")
+        if key == "n":
+            continue
+        bare = rules_only[key]
+        suffix = f"   (rules only {bare:.3f})" if abs(bare - value) > 1e-9 else ""
+        print(f"  {key:16} {value:.3f}{suffix}")
+    if memorised:
+        print(f"  {len(memorised)} of these are lexicon entries: {', '.join(memorised)}")
 
     if args.tags:
         print("\nexact match by tag (worst first)")

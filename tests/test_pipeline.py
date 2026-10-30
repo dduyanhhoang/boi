@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from boi import generate, g2p, lexicon, syllabify, tone, vi
+from boi import generate, g2p, lexicon, spell, syllabify, tone, vi
 
 DEV = Path(__file__).resolve().parents[1] / "data" / "splits" / "dev.csv"
 DEV_EXACT_FLOOR = 0.70
@@ -68,6 +68,30 @@ def test_inserted_syllable_takes_huyen():
 
 def test_unknown_word_without_g2p_en_is_none():
     assert g2p.phones("zzzqqq", predict=False) is None
+
+
+@pytest.mark.parametrize("word,expected", [
+    ("logitech", "lô di tếch"),     # read off the spelling: lo-gi-tech
+    ("lazada", "la da đa"),         # open a takes its continental value
+    ("zalopay", "da lô pây"),
+    ("vinfast", "vin phát"),
+    ("canva", "can va"),
+    ("figma", "phíc ma"),
+])
+def test_word_outside_cmudict(word, expected):
+    assert g2p.source(word) == "spelling"
+    assert expected in generate.candidates(word, limit=3)
+
+
+def test_every_word_gets_a_reading():
+    """The point of the spelling path: nothing comes back empty."""
+    for word in ("qwertyuiop", "xyzzy", "brunchify", "ngocanh", "zzz"):
+        assert generate.read(word), word
+
+
+def test_spelling_syllables_do_not_duplicate_consonants():
+    assert spell.phones("tiktok") == ["T", "IH1", "K", "T", "AA2", "K"]
+    assert spell.phones("momo") == ["M", "OW1", "M", "OW2"]
 
 
 def test_dev_exact_match_floor():

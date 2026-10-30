@@ -96,7 +96,14 @@ def _slots(phones):
     bare = [p for p, _ in pairs]
     vowels = [i for i, p in enumerate(bare) if p in VOWELS]
     if not vowels:
-        return []
+        # CMUdict carries a few vowelless entries (hmm, shh) and the spelling
+        # path can produce one too. Vietnamese has no vowelless syllable, so a
+        # schwa carries them: the last consonant closes it, the rest open it.
+        if not bare:
+            return []
+        onset, coda = (tuple(bare[:-1]), tuple(bare[-1:])) if len(bare) > 1 \
+            else (tuple(bare), ())
+        return [Slot(onset, "AH", coda, "1", final=True)]
 
     onsets = [tuple(bare[: vowels[0]])]
     codas = []
