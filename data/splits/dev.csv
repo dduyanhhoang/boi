@@ -1,0 +1,132 @@
+id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
+004,computer,K AH0 M P Y UW1 T ER0,com piu tơ,com pu tơ,,stress2,h,approved
+005,email,IY0 M EY1 L,i meo,,,coda_l,h,approved
+006,internet,IH1 N T ER0 N EH2 T,in tơ nét,,,coda_stop,h,approved
+007,online,AO1 N L AY2 N,on lai,,,diphthong,h,approved
+009,laptop,L AE1 P T AA2 P,láp tốp,,,coda_stop,h,approved
+010,server,S ER1 V ER0,sơ vơ,,,coda_r,h,approved
+012,software,S AO1 F T W EH2 R,sóp goe,,,coda_stop,h,corrected
+013,hardware,HH AA1 R D W EH2 R,hát goe,,,coda_stop,m,corrected
+014,website,W EH1 B S AY2 T,goép sai,,,coda_stop,h,corrected
+015,meeting,M IY1 T IH0 NG,mít tinh,,,ing,h,approved
+017,project,P R AA1 JH EH0 K T,pờ rô dếch,prô dếch,,cluster;coda_kt;stress1,m,approved
+018,report,R IY0 P AO1 R T,rì pọt,,,stress2;coda_stop,h,corrected
+019,file,F AY1 L,phai,,,coda_l,h,approved
+020,folder,F OW1 L D ER0,phâu đờ,,,coda_l,m,corrected
+021,download,D AW1 N L OW2 D,đao lốt,,,coda_d,h,approved
+022,upload,AH1 P L OW2 D,ắp lốt,,,coda_d,h,approved
+023,update,AH0 P D EY1 T,ắp đết,,,coda_stop,h,approved
+024,password,P AE1 S W ER2 D,pát guốt,,,coda_d,h,approved
+025,account,AH0 K AW1 N T,ắc cao,,,coda_nt;stress2,h,approved
+026,login,L AO1 G IH2 N,lóoc in,,,coda_stop,h,corrected
+027,app,AE1 P,áp,,,coda_stop,h,approved
+028,code,K OW1 D,cốt,,,coda_d,h,approved
+029,bug,B AH1 G,bắc,,,coda_g,h,approved
+031,data,D EY1 T AH0,đa ta,đây ta,,open,h,approved
+032,model,M AA1 D AH0 L,mo đồ,mô đen,,coda_l,h,approved
+034,feedback,F IY1 D B AE2 K,phít bách,phít bắc,,coda_stop,h,approved
+035,team,T IY1 M,tim,,,coda_m,h,approved
+037,boss,B AA1 S,bốt,,,coda_s,h,approved
+039,office,AO1 F IH0 S,óp phít,,,coda_s,h,corrected
+040,marketing,M AA1 R K AH0 T IH0 NG,ma két tinh,,,ing,h,approved
+041,sale,S EY1 L,sêu,,,coda_l,h,corrected
+042,budget,B AH1 JH IH0 T,bắt giét,,,coda_t,m,corrected
+043,plan,P L AE1 N,pờ lan,plan,,cluster,h,approved
+044,target,T AA1 R G AH0 T,ta ghét,,,coda_t,m,approved
+045,slide,S L AY1 D,sờ lai,,,cluster;coda_d,h,approved
+046,template,T EH1 M P L AH0 T,tem pơ lết,tem lết,,cluster;coda_t,m,approved
+048,layout,L EY1 AW2 T,lây ao,,,coda_t,h,approved
+053,keyboard,K IY1 B AO2 R D,ki bót,,,coda_d,h,corrected
+054,mouse,M AW1 S,mao,,chuột,coda_s,m,approved
+056,phone,F OW1 N,phôn,,,open,h,approved
+057,smartphone,S M AA1 R T F OW2 N,sờ mát phôn,,,cluster;coda_t,h,approved
+059,bluetooth,B L UW1 T UW2 TH,bờ lu tút,,,cluster;coda_th,h,approved
+060,chat,CH AE1 T,chát,,,coda_t,h,approved
+062,post,P OW1 S T,pốt,,,coda_st,h,approved
+063,like,L AY1 K,lai,,,coda_k_drop,h,approved
+065,comment,K AA1 M EH0 N T,com men,,,coda_nt,h,approved
+066,follow,F AA1 L OW0,pho lâu,,,open,h,corrected
+068,game,G EY1 M,gêm,,,coda_m,h,approved
+070,player,P L EY1 ER0,pờ lây ờ,,,cluster,m,corrected
+071,click,K L IH1 K,cờ líc,cờ lích,,cluster;coda_k,h,approved
+072,link,L IH1 NG K,linh,,,coda_nk,h,approved
+073,version,V ER1 ZH AH0 N,vơ dừn,,,tion,h,corrected
+075,network,N EH1 T W ER2 K,nét guốc,,,coda_k,h,approved
+076,cloud,K L AW1 D,cờ lao,,,cluster;coda_d,h,approved
+078,learning,L ER1 N IH0 NG,lơn ninh,,,ing,m,corrected
+079,algorithm,AE1 L G ER0 IH2 DH AH0 M,ao go ri dừm,an gô rít,,coda_m;stress1,m,corrected
+081,java,JH AA1 V AH0,gia va,,,open,h,approved
+082,function,F AH1 NG K SH AH0 N,phăng sừn,,,tion,h,approved
+083,option,AA1 P SH AH0 N,óp sừn,,,tion,h,approved
+084,action,AE1 K SH AH0 N,ách sừn,,,tion,h,corrected
+085,station,S T EY1 SH AH0 N,sờ tây sừn,,,cluster;tion,m,approved
+086,education,EH2 JH AH0 K EY1 SH AH0 N,e đu cây sừn,,,tion;stress3,m,corrected
+089,solution,S AH0 L UW1 SH AH0 N,sô lu sừn,,,tion,h,approved
+090,position,P AH0 Z IH1 SH AH0 N,pô di sừn,,,tion,h,corrected
+091,fashion,F AE1 SH AH0 N,phát sừn,,,tion,h,corrected
+093,parking,P AA1 R K IH0 NG,pác kinh,,,ing,h,approved
+096,idol,AY1 D AH0 L,ai đồ,ai đôn,,coda_l,h,approved
+097,show,SH OW1,sâu,,,open,h,corrected
+099,ticket,T IH1 K AH0 T,tích két,tích kết,,coda_t,m,corrected
+100,party,P AA1 R T IY0,pát ti,pác ti,,open,h,corrected
+103,shop,SH AA1 P,xóp,,,coda_p,h,corrected
+104,mall,M AO1 L,mô,,,coda_l,h,corrected
+105,hotel,HH OW0 T EH1 L,hô theo,,,stress2;coda_l,h,corrected
+106,taxi,T AE1 K S IY0,tắc xi,,,coda_ks,h,approved
+107,bus,B AH1 S,bớt,,xe buýt,coda_s,m,approved
+108,pizza,P IY1 T S AH0,pi da,,,open,h,approved
+109,cake,K EY1 K,kếch,,kêu,coda_k,m,approved
+111,sandwich,S AE1 N D W IH0 CH,sen guých,xăng uých,,coda_ch,m,approved
+113,salad,S AE1 L AH0 D,sa lát,,,coda_d,h,approved
+114,steak,S T EY1 K,sờ tếch,,bít tết,cluster;coda_k,m,approved
+115,menu,M EH1 N Y UW0,me nu,,,open,h,approved
+116,juice,JH UW1 S,giút,,,coda_s,m,approved
+117,icecream,AY1 S K R IY1 M,ai sờ cờ rim,,kem,cluster,m,corrected
+118,snack,S N AE1 K,sờ nách,,,cluster;coda_k,h,approved
+119,sauce,S AO1 S,xót,,,coda_s,h,corrected
+120,donut,D OW1 N AH2 T,đô nất,,,coda_t,h,corrected
+122,okay,OW2 K EY1,ô cây,,,open,h,corrected
+123,sorry,S AA1 R IY0,so ri,,,open,h,approved
+124,bye,B AY1,bai,,,open,h,approved
+127,family,F AE1 M AH0 L IY0,pham mơ li,,,stress1,m,corrected
+129,love,L AH1 V,lớp,lốp,,coda_v,h,approved
+130,crush,K R AH1 SH,cờ rắt,cờ rát,,cluster;coda_sh,h,corrected
+131,date,D EY1 T,đết,,,coda_t,h,approved
+132,cool,K UW1 L,cu,,,coda_l,h,approved
+133,nice,N AY1 S,nai,,,coda_s,h,approved
+135,bad,B AE1 D,bét,,,coda_d,h,approved
+136,very,V EH1 R IY0,ve ri,,,open,h,approved
+137,super,S UW1 P ER0,súp pơ,,,coda_r,h,corrected
+138,free,F R IY1,phờ ri,phri,,cluster,h,approved
+139,street,S T R IY1 T,sờ trít,,,cluster3;coda_t,h,approved
+140,spring,S P R IH1 NG,sờ pờ rinh,sờ prinh,,cluster3;ing,l,approved
+141,strong,S T R AO1 NG,sờ trong,,,cluster3;coda_ng,h,approved
+142,script,S K R IH1 P T,sờ críp,sờ cờ ríp,,cluster3;coda_pt,m,approved
+144,school,S K UW1 L,sờ cun,sờ cu,,cluster;coda_l,m,approved
+145,sport,S P AO1 R T,sờ pọt,,,cluster;coda_rt,h,approved
+146,star,S T AA1 R,sờ ta,,,cluster;coda_r,h,approved
+147,stress,S T R EH1 S,sờ trét,xì trét,,cluster3;coda_s,h,approved
+148,skill,S K IH1 L,sờ kiu,sờ kin,,cluster;coda_l,h,approved
+151,please,P L IY1 Z,pờ li,,,cluster;coda_z,h,approved
+152,play,P L EY1,pờ lây,,,cluster,h,approved
+153,black,B L AE1 K,bờ lách,,,cluster;coda_k,h,approved
+155,green,G R IY1 N,gờ rin,,,cluster;coda_n,h,approved
+156,blue,B L UW1,bờ lu,,,cluster,h,approved
+157,gray,G R EY1,gờ rây,,,cluster,h,approved
+158,white,W AY1 T,goai,oai,,coda_t,m,corrected
+160,red,R EH1 D,rét,rẹt,,coda_d,m,approved
+161,glass,G L AE1 S,gờ lát,,,cluster;coda_s,h,approved
+163,class,K L AE1 S,cờ lát,,lớp,cluster;coda_s,h,approved
+164,group,G R UW1 P,gờ rúp,,,cluster;coda_p,h,approved
+165,drama,D R AA1 M AH0,đờ ra ma,,,cluster,h,approved
+166,trend,T R EH1 N D,tren,tờ ren,,cluster;coda_nd,m,corrected
+169,control,K AH0 N T R OW1 L,con tờ rôn,con trôn,,cluster3;stress2;coda_l,m,approved
+171,image,IH1 M AH0 JH,i mịt,im mịt,,coda_dj,m,approved
+172,think,TH IH1 NG K,thinh,,,coda_nk,h,approved
+173,box,B AA1 K S,bóc,,,coda_ks,h,approved
+174,banana,B AH0 N AE1 N AH0,ba na na,,,stress2,h,approved
+175,google,G UW1 G AH0 L,gu gồ,,,coda_l,h,approved
+176,facebook,F EY1 S B UH2 K,phây búc,,,coda_k,h,approved
+177,youtube,Y UW1 T Y UW2 B,diu túp,,,coda_b,h,approved
+178,iphone,AY1 F OW2 N,ai phôn,,,open,h,approved
+180,microsoft,M AY1 K R OW2 S AO1 F T,mai cờ rô sóp,,,cluster;coda_ft,m,approved

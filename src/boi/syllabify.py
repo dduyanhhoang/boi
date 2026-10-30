@@ -1,0 +1,188 @@
+"""English phones -> Vietnamese syllable slots, as a few structural variants.
+
+Each slot keeps ARPAbet phones, not Vietnamese pieces; phonemap turns them
+into letters later. A word yields more than one variant where Vietnamese has
+more than one repair available: a cluster can take an inserted vowel or stay
+as it is, and a consonant before a final -ing or -y may geminate.
+"""
+
+from typing import NamedTuple
+
+VOWELS = {
+    "AA", "AE", "AH", "AO", "AW", "AY", "EH", "ER", "EY",
+    "IH", "IY", "OW", "OY", "UH", "UW",
+}
+# English allows these before l/r, so the pair can share one Vietnamese onset
+# or split into an inserted syllable. A nasal cannot: online is "on lai".
+_CLUSTER_HEADS = {"P", "B", "T", "D", "K", "G", "F", "TH", "S"}
+_INSERTED_NUCLEUS = "ơ"
+# Before a final -ing or -y the gold geminates any of these, even voiced N
+# (trên ninh), and it overwrites an r that was going to drop (pác kinh, pát ti).
+_GEMINATES = {"P", "T", "K", "N"}
+# Elsewhere it geminates only a voiceless consonant, between a stressed
+# syllable and an unstressed one: óp phít, súp pơ, phát sừn, tích két. Not ca
+# mê ra (voiced), not bờ lu tút (the next vowel is stressed), and not after
+# /eɪ/ or /oʊ/, which would rather keep their offglide: sờ tây sừn, mai cờ rô.
+_VOICELESS = {"P", "T", "K", "F", "S", "SH", "CH", "TH"}
+_KEEPS_OFFGLIDE = {"EY", "OW"}
+
+
+class Slot(NamedTuple):
+    onset: tuple = ()        # ARPAbet phones
+    nucleus: str = ""        # ARPAbet vowel, or "" for an inserted syllable
+    coda: tuple = ()
+    stress: str = ""
+    glide: bool = False      # w-glide, from W
+    yod: bool = False        # i-onglide, from Y
+    inserted: bool = False
+    final: bool = False
+
+
+def _strip_stress(phones):
+    out = []
+    for p in phones:
+        if p[-1].isdigit():
+            out.append((p[:-1], p[-1]))
+        else:
+            out.append((p, ""))
+    return out
+
+
+# Runs that are a legal Vietnamese onset on their own, so they need no repair.
+_VI_ONSETS = {("T", "R"), ("T", "S")}
+ONSET_RUNS_KEEP = {("T", "S")}   # pizza -> pi da, never pít sa
+
+
+def _is_onset_run(run):
+    if len(run) == 2 and run[1] in ("L", "R") and run[0] in _CLUSTER_HEADS:
+        return True
+    return run in (("T", "R"), ("T", "S"))
+
+
+# These nuclei always end in an offglide (lai, đao), which fills the coda slot,
+# so a following consonant run has to go to the next onset: ai sờ cờ rim.
+_OFFGLIDE_NUCLEI = {"AY", "AW", "OY"}
+
+
+def _split_run(run, left=None):
+    """Consonants between two vowels -> (coda of the left, onset of the right)."""
+    if run and run[-1] == "W":
+        return run[:-1], run[-1:]
+    if run and run[-1] == "Y":
+        coda, onset = _split_run(run[:-1], left)
+        return coda, onset + ("Y",)
+    if left and left[0] in _OFFGLIDE_NUCLEI:
+        # The offglide fills the coda, so a consonant that was going to be the
+        # coda either becomes its own syllable (ai sờ cờ rim) or drops
+        # altogether (đao lốt). Only a voiceless obstruent survives.
+        coda, onset = _split_run(run)
+        return (), (coda if coda and coda[-1] in _VOICELESS else ()) + onset
+    if run in ONSET_RUNS_KEEP:
+        return (), run
+    for n in range(min(2, len(run)), 0, -1):
+        if n == 1 or _is_onset_run(run[-n:]):
+            coda, onset = run[:-n], run[-n:]
+            # A stressed syllable with an empty coda takes the first consonant
+            # rather than leaving a cluster to repair: ắp lốt, not ă pờ lốt.
+            if not coda and len(onset) > 1 and left and left[1] in ("1", "2"):
+                coda, onset = onset[:1], onset[1:]
+            return coda, onset
+    return run, ()
+
+
+def _slots(phones):
+    """One flat pass: every English vowel becomes one Vietnamese syllable."""
+    pairs = _strip_stress(phones)
+    bare = [p for p, _ in pairs]
+    vowels = [i for i, p in enumerate(bare) if p in VOWELS]
+    if not vowels:
+        return []
+
+    onsets = [tuple(bare[: vowels[0]])]
+    codas = []
+    for left, right in zip(vowels, vowels[1:]):
+        coda, onset = _split_run(tuple(bare[left + 1 : right]),
+                                 (bare[left], pairs[left][1]))
+        codas.append(coda)
+        onsets.append(onset)
+    codas.append(tuple(bare[vowels[-1] + 1 :]))
+
+    out = []
+    for n, (i, onset, coda) in enumerate(zip(vowels, onsets, codas)):
+        glide = bool(onset) and onset[-1] == "W"
+        yod = bool(onset) and onset[-1] == "Y"
+        if glide and len(onset) > 1:
+            onset = onset[:-1]
+        if yod:
+            onset = onset[:-1] or ("Y",)
+        out.append(Slot(onset, bare[i], coda, pairs[i][1], glide, yod,
+                        final=n == len(vowels) - 1))
+    return out
+
+
+def _geminate(slots):
+    """Copy a syllable's onset back as the previous syllable's coda."""
+    out = list(slots)
+    changed = False
+    for i, (left, right) in enumerate(zip(slots, slots[1:])):
+        if len(right.onset) != 1 or left.nucleus in _OFFGLIDE_NUCLEI:
+            continue
+        phone = right.onset[0]
+        suffix = (right.final and right.stress in ("", "0", "2")
+                  and ((right.nucleus == "IH" and right.coda == ("NG",))
+                       or (right.nucleus == "IY" and not right.coda)))
+        if suffix and phone in _GEMINATES and left.coda in ((), ("R",)):
+            pass
+        elif (not left.coda and phone in _VOICELESS
+              and left.stress in ("1", "2") and right.stress in ("", "0")
+              and left.nucleus not in _KEEPS_OFFGLIDE):
+            pass
+        else:
+            continue
+        # Keep a replaced r in the run: ("R", "K") still maps to c and still
+        # leaves the nucleus open, which is what pác kinh and pát ti need.
+        out[i] = out[i]._replace(coda=left.coda + (phone,))
+        changed = True
+    return out if changed else None
+
+
+def _repair(slots, keep_clusters):
+    """Break onset clusters, by inserted vowel or by keeping them as written."""
+    out = []
+    for slot in slots:
+        if len(slot.onset) > 1 and slot.onset not in _VI_ONSETS:
+            if keep_clusters:
+                out.append(slot)
+                continue
+            # Peel every consonant but the last (or the last legal run) off as
+            # its own syllable: sờ cờ rin, pờ rô, bờ lu.
+            tail = slot.onset[-2:] if slot.onset[-2:] in _VI_ONSETS else slot.onset[-1:]
+            for phone in slot.onset[: len(slot.onset) - len(tail)]:
+                out.append(Slot(onset=(phone,), nucleus="", inserted=True))
+            out.append(slot._replace(onset=tail))
+            continue
+        out.append(slot)
+    return out
+
+
+def variants(phones):
+    """Structural variants for one word, preferred first, with a penalty each."""
+    base = _slots(phones)
+    if not base:
+        return []
+    out = []
+    for gem, penalty in ((True, 0), (False, 1)):
+        shapes = [base]
+        if gem:
+            geminated = _geminate(base)
+            if geminated is None:
+                continue
+            shapes = [geminated]
+        elif _geminate(base) is None:
+            penalty = 0
+        for keep, extra in ((False, 0), (True, 2)):
+            repaired = _repair(shapes[0], keep)
+            if keep and repaired == _repair(shapes[0], False):
+                continue
+            out.append((repaired, penalty + extra))
+    return out

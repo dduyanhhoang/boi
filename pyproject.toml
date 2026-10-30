@@ -1,6 +1,6 @@
 [project]
 name = "boi"
-version = "0.1.0"
+version = "0.0.1"
 description = "English words as Vietnamese speakers read them (tieng Anh boi)"
 readme = "README.md"
 authors = [
@@ -10,6 +10,12 @@ requires-python = ">=3.12"
 dependencies = [
     "cmudict>=1.1.3",
 ]
+
+[project.scripts]
+boi = "boi.generate:main"
+
+[project.optional-dependencies]
+oov = ["g2p-en>=2.1.0"]
 
 [build-system]
 requires = ["uv_build>=0.12.10,<0.13.0"]

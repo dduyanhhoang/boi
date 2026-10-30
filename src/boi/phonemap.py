@@ -1,0 +1,209 @@
+"""ARPAbet -> Vietnamese slot options, with a penalty on each option.
+
+Penalty 0 is the preferred reading; higher means less likely. Every entry is
+traceable to the native-speaker corrections in boi.md or to a row of the eval
+set, named in the comment. scripts/report_coverage.py checks the table against
+the gold alignment and prints what it misses.
+"""
+
+# --- onsets ---------------------------------------------------------------
+ONSET = {
+    "P": [("p", 0)],
+    "B": [("b", 0)],
+    "T": [("t", 0)],
+    "D": [("đ", 0)],
+    "K": [("k", 0)],
+    "G": [("g", 0)],
+    "F": [("ph", 0)],
+    "V": [("v", 0)],
+    "TH": [("th", 0)],
+    "DH": [("d", 0)],            # ð -> d, boi.md
+    "S": [("s", 0), ("x", 1)],   # xóp/xót are lexical, boi.md
+    "Z": [("d", 0)],             # z -> d: đì dai, vơ dừn
+    "SH": [("s", 0), ("x", 1)],
+    "ZH": [("d", 0)],            # ʒ -> d: vơ dừn
+    "CH": [("ch", 0)],
+    "JH": [("gi", 0), ("d", 1)], # gia va, giút / pờ rô dếch
+    "M": [("m", 0)],
+    "N": [("n", 0)],
+    "NG": [("ng", 0)],
+    "L": [("l", 0)],
+    "R": [("r", 0)],
+    "W": [("g", 0)],             # w -> g: sóp goe, goai, guốc
+    "Y": [("d", 0)],             # youtube -> diu túp
+    "HH": [("h", 0)],
+}
+
+# Consonant runs that become one onset instead of an inserted syllable.
+ONSET_RUNS = {
+    ("T", "R"): [("tr", 0)],     # tren, tra vồ, sờ trít
+    ("T", "S"): [("d", 0)],      # pizza -> pi da
+}
+
+# --- nuclei ---------------------------------------------------------------
+# value: (nucleus, offglide coda, penalty)
+NUCLEUS_OPEN = {
+    "IY": [("i", "", 0)],
+    "IH": [("i", "", 0)],
+    "EH": [("e", "", 0), ("ê", "", 1)],   # tét, mét / con tếch (ec is illegal)
+    "AE": [("a", "", 0), ("e", "", 1)],
+    "AA": [("a", "", 0), ("o", "", 1)],
+    "AH": [("ơ", "", 0), ("a", "", 1)],     # ă never stands alone in a rhyme
+    "AO": [("o", "", 0)],
+    "ER": [("ơ", "", 0)],
+    "UW": [("u", "", 0)],
+    "UH": [("u", "", 0)],
+    "EY": [("â", "y", 0), ("ê", "", 1)],   # /eɪ/ -> ây, boi.md
+    "OW": [("â", "u", 0), ("ô", "", 1)],   # /oʊ/ -> âu, boi.md
+    "AY": [("a", "i", 0)],
+    "AW": [("a", "o", 0)],
+    "OY": [("o", "i", 0)],
+}
+# A consonant coda follows, so the offglide slot is taken.
+NUCLEUS_CLOSED = dict(
+    NUCLEUS_OPEN,
+    AA=[("o", "", 0), ("a", "", 1)],       # con tếch, bóc / láp tốp
+    AH=[("ă", "", 0), ("ơ", "", 1)],       # ắp, bắc / lớp, bớt
+    EY=[("ê", "", 0), ("â", "y", 1)],      # đết, kếch, sờ tếch
+    OW=[("ô", "", 0), ("â", "u", 1)],      # phôn, cốt, lốt
+)
+# /oʊ/ is âu at the end of a word (sâu, pho lâu, sờ nâu) and before an l that
+# turns into the u glide (phâu đờ), but ô anywhere else (ô cây, hô theo, đô).
+OW_FINAL = [("â", "u", 0), ("ô", "", 1)]
+OW_MID = [("ô", "", 0), ("â", "u", 1)]
+# /wɜr/ lands on uô: pát guốt, nét guốc.
+ER_AFTER_GLIDE = [("ô", "", 0), ("ơ", "", 1)]
+# Unstressed schwa, which boi.md puts at ơ or ư. The dev rows show it is the
+# coda that decides, not the stress: -ment -> com, -le -> gồ, -et -> két.
+SCHWA_OPEN = [("a", "", 0), ("ơ", "", 1), ("ô", "", 1)]   # đa ta, ba na na / sô lu
+# A schwa before a final n is ư after a fricative (the -tion and -thon words)
+# and o after a stop: con tờ rôn, not cưn.
+SCHWA_BEFORE_N = [("ư", "", 0), ("ơ", "", 1)]
+SCHWA_BEFORE_N_STOP = [("o", "", 0), ("ơ", "", 1)]
+_FRICATIVES = {"S", "Z", "SH", "ZH", "CH", "TH", "DH", "F", "V"}
+
+SCHWA_BY_CODA = {
+    "N": SCHWA_BEFORE_N,                 # pai thừn, in phô mây sừn
+    "M": [("o", "", 0), ("ơ", "", 1)],   # com piu tơ, ao go ri dừm
+    "L": [("ô", "", 0), ("ơ", "", 1)],   # gu gồ, mo đồ, le vồ, ai đồ
+    "T": [("e", "", 0), ("i", "", 1)],   # ma két tinh, ta ghét / cờ re đít
+    "D": [("a", "", 0), ("ơ", "", 1)],   # sa lát
+    "JH": [("i", "", 0)],                # i mịt, mét sịt
+    "S": [("i", "", 0), ("ơ", "", 1)],   # óp phít
+    "P": [("ă", "", 0), ("ơ", "", 1)],   # ắp đết
+}
+SCHWA_CLOSED = [("ơ", "", 0), ("e", "", 1), ("i", "", 1)]
+
+# --- codas ---------------------------------------------------------------
+CODA = {
+    "P": [("p", 0)],
+    "B": [("p", 0)],             # youtube -> diu túp
+    "F": [("p", 0)],             # v/f -> p, boi.md
+    "V": [("p", 0)],             # love -> lớp
+    "T": [("t", 0)],
+    "D": [("t", 0)],             # code -> cốt
+    "TH": [("t", 0)],            # bluetooth -> tút
+    "DH": [("t", 0)],
+    "S": [("t", 0), ("", 1)],    # boss -> bốt / mouse -> mao
+    "Z": [("", 0), ("t", 1)],    # size -> sai, cheese -> chi
+    "SH": [("t", 0)],
+    "ZH": [("t", 0)],
+    "CH": [("ch", 0)],
+    "JH": [("t", 0)],            # image -> i mịt
+    "K": [("c", 0)],
+    "G": [("c", 0)],             # bug -> bắc
+    "M": [("m", 0)],
+    "N": [("n", 0)],
+    "NG": [("ng", 0)],
+    "L": [("", 0)],              # overridden by CODA_L below
+    "R": [("", 0)],              # server -> sơ vơ, star -> sờ ta
+}
+CODA_RUNS = {
+    ("K", "S"): [("c", 0)],              # con tếch, bóc
+    ("K", "T"): [("c", 0)],              # pờ rô dếch
+    ("K", "S", "T"): [("c", 0)],         # context
+    ("N", "T"): [("n", 0)],              # i ven, com men
+    ("N", "D"): [("n", 0)],              # tren, phren
+    ("N", "S"): [("n", 0)],
+    ("N", "TH"): [("n", 0)],
+    ("NG", "K"): [("ng", 0)],            # pinh, linh / phăng sừn
+    ("S", "T"): [("t", 0)],              # pốt, tét
+    ("F", "T"): [("p", 0)],              # mai cờ rô sóp
+    ("P", "T"): [("p", 0)],              # sờ críp
+    ("R", "T"): [("t", 0)],              # sờ pọt, sờ mát
+    ("R", "D"): [("t", 0)],              # pát guốt
+    ("R", "K"): [("c", 0)],              # nét guốc
+    ("R", "S"): [("t", 0)],
+    ("L", "D"): [("t", 0)],
+    ("M", "P"): [("m", 0)],
+}
+# Final l after a vowel becomes a glide, boi.md. Keyed by the nucleus it follows.
+CODA_L = {
+    "i": [("u", 0)],             # skill -> sờ kiu
+    "ê": [("u", 0)],             # sale -> sêu
+    "â": [("u", 0)],
+    "e": [("o", 0)],             # email -> i meo, hotel -> hô theo
+    "o": [("", 0), ("n", 1)],    # mall -> mô
+    "ô": [("", 0), ("n", 1)],    # control -> con tờ rôn
+    "ơ": [("", 0), ("n", 1)],
+    "u": [("", 0), ("n", 1)],    # cool -> cu / school -> sờ cun
+    "ư": [("", 0)],
+    "a": [("", 0), ("u", 1)],
+    "ă": [("", 0)],
+}
+# c vs ch and ng vs nh are not predictable from the nucleus (bác and bách both
+# exist), so the gold decides the default: ch after a and ê (sờ nách, bờ lách,
+# con tếch), c after i (cờ líc), nh after i and ê (pinh, linh).
+_CH_AFTER = "aê"
+_NH_AFTER = "iê"
+
+
+def onset_options(phones):
+    if not phones:
+        return [("", 0)]
+    if tuple(phones) in ONSET_RUNS:
+        return ONSET_RUNS[tuple(phones)]
+    return ONSET.get(phones[-1], [("", 3)])
+
+
+def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
+                    onset=()):
+    if phone == "ER" and glide:
+        return ER_AFTER_GLIDE
+    if phone == "OW":
+        if next_coda == ("L",) and not final:
+            return OW_FINAL          # phâu đờ
+        if not closed:
+            return OW_FINAL if final else OW_MID
+    if phone == "AH" and stress == "0":
+        if not closed:
+            return SCHWA_OPEN
+        if next_coda[0] == "N" and onset and onset[-1] not in _FRICATIVES:
+            return SCHWA_BEFORE_N_STOP
+        return SCHWA_BY_CODA.get(next_coda[0], SCHWA_CLOSED)
+    table = NUCLEUS_CLOSED if closed else NUCLEUS_OPEN
+    return table.get(phone, [("ơ", 3)])
+
+
+def coda_options(phones, nucleus):
+    if not phones:
+        return [("", 0)]
+    key = tuple(phones)
+    if key == ("L",):
+        return CODA_L.get(nucleus, [("", 0)])
+    options = CODA_RUNS.get(key)
+    if options is None:
+        options = CODA.get(phones[0]) or CODA.get(phones[-1], [("", 2)])
+    out = []
+    for coda, penalty in options:
+        # ch after a only for a plain k (sờ nách, bờ lách); a cluster coda keeps
+        # c (pác kinh, tắc xi).
+        if coda == "c" and nucleus in _CH_AFTER and (nucleus != "a" or len(key) == 1):
+            out.append(("ch", penalty))
+        elif coda == "ng" and nucleus in _NH_AFTER:
+            out.append(("nh", penalty))
+        else:
+            out.append((coda, penalty))
+        if coda == "c" and nucleus == "i":
+            out.append(("ch", penalty + 1))   # cờ líc / nét phờ lích
+    return out
