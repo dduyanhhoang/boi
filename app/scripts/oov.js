@@ -291,8 +291,11 @@ function geminate(slots, T) {
           && !T.syllabify.keepsOffglide.includes(left.nucleus))
       // A doubled velar nasal stays the coda; phonemap reads the onset copy
       // as g, so singer is sinh gờ.
-      || (phone === "NG" && !left.coda.length
-          && left.stress === "1" && ["", "0"].includes(right.stress));
+      // A nasal doubles when the reduced vowel after it is written with a
+      // front letter: com men, lơn ninh, pham mi li, sinh gờ.
+      || (T.syllabify.nasalCodas.includes(phone) && !left.coda.length
+          && left.stress === "1" && ["", "0"].includes(right.stress)
+          && nasalDoublesBefore(right));
     if (!ok) continue;
     // A doubled /tʃ/ is only the stop closure, so it returns as t.
     out[i] = { ...left, coda: [...left.coda, phone === "CH" ? "T" : phone] };
@@ -327,6 +330,12 @@ function repair(slots, keepClusters, T) {
     out.push(s);
   }
   return out;
+}
+
+/** An i or y always takes the doubled nasal, an e only when closed or final. */
+function nasalDoublesBefore(right) {
+  if (right.letter === "i" || right.letter === "y") return true;
+  return right.letter === "e" && (right.coda.length > 0 || right.final);
 }
 
 function variants(phones, letters, T) {

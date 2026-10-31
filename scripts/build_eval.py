@@ -155,7 +155,7 @@ sorry|so ri||open|h
 bye|bai||open|h
 baby|bây bi||open|h
 happy|háp pi||coda_p|h
-family|pham mơ li||stress1|m
+family|pham mi li|pham mơ li|stress1|m
 friend|phren|phờ ren|cluster;coda_nd|m
 love|lớp|lốp|coda_v|h
 crush|cờ rắt|cờ rát|cluster;coda_sh|h

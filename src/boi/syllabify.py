@@ -38,6 +38,7 @@ _VOICELESS = {"P", "T", "K", "F", "S", "SH", "CH", "TH"}
 # rather than becoming a syllable of its own: phờ ren ly, like sen guých.
 _SWALLOWED_AFTER_NASAL = {"P", "B", "T", "D", "K", "G"}
 _NASAL_CODAS = {"M", "N", "NG"}
+_FRONT_LETTERS = {"e", "i", "y"}
 _KEEPS_OFFGLIDE = {"EY", "OW"}
 # A Vietnamese reader sees -tion as one piece and says sừn wherever it sits.
 # CMUdict gives it away: the vowel letters are io and the onset is a sibilant.
@@ -178,6 +179,19 @@ def _slots(phones, letters=None):
     return out
 
 
+def _nasal_doubles_before(right):
+    """Whether a nasal doubles into this reduced syllable.
+
+    Fitted to the nine dev rows that have a nasal between a primary-stressed
+    vowel and a reduced one. An i or y always takes it; an e takes it only
+    where the syllable is closed or ends the word, since an open mid-word e
+    is the reduced vowel that keeps camera at ca mê ra; an a or u never does.
+    """
+    if right.letter in ("i", "y"):
+        return True
+    return right.letter == "e" and bool(right.coda or right.final)
+
+
 def _geminate(slots):
     """Copy a syllable's onset back as the previous syllable's coda."""
     out = list(slots)
@@ -205,10 +219,15 @@ def _geminate(slots):
               and left.stress == "1" and right.stress in ("", "0")
               and left.nucleus not in _KEEPS_OFFGLIDE):
             pass
-        elif (phone == "NG" and not left.coda
-              and left.stress == "1" and right.stress in ("", "0")):
-            # The nasal stays as the coda; phonemap reads the onset copy
-            # as g, so singer is sinh gờ and not si ngờ.
+        elif (phone in _NASAL_CODAS and not left.coda
+              and left.stress == "1" and right.stress in ("", "0")
+              and _nasal_doubles_before(right)):
+            # A nasal doubles when the reduced vowel after it is written
+            # with a front letter: com men, lơn ninh, pham mi li, sinh gờ.
+            # Not with a or u: đờ ra ma, i mịt, ba na na, đô nất. Not into a
+            # mid-word ER either, whose own r is already freed as the next
+            # onset, which is what keeps camera at ca mê ra. For ng the nasal
+            # stays as the coda and phonemap reads the onset copy as g.
             pass
         else:
             continue

@@ -125,7 +125,7 @@ id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
 124,bye,B AY1,bai,,,open,h,approved
 125,baby,B EY1 B IY0,bây bi,,,open,h,corrected
 126,happy,HH AE1 P IY0,háp pi,,,coda_p,h,approved
-127,family,F AE1 M AH0 L IY0,pham mơ li,,,stress1,m,corrected
+127,family,F AE1 M AH0 L IY0,pham mi li,pham mơ li,,stress1,m,corrected
 128,friend,F R EH1 N D,phren,phờ ren,,cluster;coda_nd,m,approved
 129,love,L AH1 V,lớp,lốp,,coda_v,h,approved
 130,crush,K R AH1 SH,cờ rắt,cờ rát,,cluster;coda_sh,h,corrected

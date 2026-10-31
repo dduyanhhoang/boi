@@ -88,7 +88,7 @@ id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
 122,okay,OW2 K EY1,ô cây,,,open,h,corrected
 123,sorry,S AA1 R IY0,so ri,,,open,h,approved
 124,bye,B AY1,bai,,,open,h,approved
-127,family,F AE1 M AH0 L IY0,pham mơ li,,,stress1,m,corrected
+127,family,F AE1 M AH0 L IY0,pham mi li,pham mơ li,,stress1,m,corrected
 129,love,L AH1 V,lớp,lốp,,coda_v,h,approved
 130,crush,K R AH1 SH,cờ rắt,cờ rát,,cluster;coda_sh,h,corrected
 131,date,D EY1 T,đết,,,coda_t,h,approved

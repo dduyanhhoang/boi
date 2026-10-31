@@ -252,6 +252,12 @@ def test_dev_exact_match_floor():
     ("headphone", "hết phôn"),      # ea closed by a d is ê
     ("red", "rét"),                 # a plain e is not
     ("sweat", "sờ goét"),           # nor is ea closed by a t
+    ("family", "pham mi li"),       # a nasal doubles before a front letter
+    ("comment", "com men"),
+    ("learning", "lơn ninh"),
+    ("camera", "ca mê ra"),         # but not before an open mid-word e
+    ("drama", "đờ ra ma"),          # nor before an a
+    ("banana", "ba na na"),
     ("friendly", "phờ ren li"),     # a stop after a nasal coda is unheard
     ("handle", "han đồ"),           # unless a vowel follows, making it an onset
 ])

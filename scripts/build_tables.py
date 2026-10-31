@@ -55,6 +55,7 @@ def main():
             "voiceless": sorted(syllabify._VOICELESS),
             "swallowedAfterNasal": sorted(syllabify._SWALLOWED_AFTER_NASAL),
             "nasalCodas": sorted(syllabify._NASAL_CODAS),
+            "frontLetters": sorted(syllabify._FRONT_LETTERS),
             "keepsOffglide": sorted(syllabify._KEEPS_OFFGLIDE),
             "offglideNuclei": sorted(syllabify._OFFGLIDE_NUCLEI),
             "insertedNucleus": syllabify._INSERTED_NUCLEUS,
