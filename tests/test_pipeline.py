@@ -281,6 +281,9 @@ def test_dev_exact_match_floor():
     ("improvement", "im pờ rúp mừn"),   # -ment is ừn after a stressed syllable
     ("movement", "múp mừn"),
     ("development", "đi ve lắp men"),   # and men after a reduced one
+    ("english", "inh lích"),        # /ɪ/ before a velar nasal is always i
+    ("link", "linh"),
+    ("encyclopedia", "en sai cờ lô pê đi a"),   # elsewhere the letter decides
     ("conscious", "con sợt"),       # -ious is ợt
     ("delicious", "đi lít sợt"),
     ("friendly", "phờ ren li"),     # a voiced stop after a nasal still goes

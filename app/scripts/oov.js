@@ -441,7 +441,10 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
   // A single plain vowel letter takes its Vietnamese value when the syllable
   // is stressed or closed: en and pê in encyclopedia, but i ven in event.
   // A word-initial open one is a prefix read as the English letter name.
+  // Not before a velar nasal: eleven gold rows read i there whatever letter
+  // is written, so english is inh lích.
   if (["IH", "IY"].includes(phone) && P.singleLetters.includes(letter)
+      && nextCoda[0] !== "NG"
       && (["1", "2"].includes(stress) || closed) && !(first && !closed)) {
     const byLetter = P.schwaByLetter[letter];
     if (byLetter) return closed ? byLetter[1] : byLetter[0];
@@ -506,6 +509,8 @@ function codaOptions(phones, nucleus, schwa, vowel, T, doubled, reduced) {
       && (doubled || reduced || phones.length > 1)) {
     return [["ch", 0], ["c", 1]];
   }
+  // A /ʃ/ closing an i is ch, like a k there: english is lích.
+  if (key === "SH" && nucleus === "i") return [["ch", 0], ["t", 1]];
   if (key === "L") {
     if (P.back.includes(nucleus)) return schwa ? P.codaLBackSchwa : P.codaLBackStressed;
     return P.codaL[nucleus] ?? [["", 0]];

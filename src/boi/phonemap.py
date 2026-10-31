@@ -246,7 +246,11 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # one keeps CMUdict's vowel: event is i ven, not ê ven.
     # A word-initial open one is a prefix read as the English letter name,
     # which is where email gets i meo and esport i sờ pọt.
+    # Not before a velar nasal: every one of the eleven gold rows with an /ɪ/
+    # there reads i, linh, pinh, thinh, sinh gờ and the -ing words, whatever
+    # letter is written, so english is inh lích and not ênh.
     if phone in ("IH", "IY") and letter in SINGLE_LETTERS \
+            and next_coda[:1] != ("NG",) \
             and (stress in ("1", "2") or closed) and not (first and not closed):
         by_letter = SCHWA_BY_LETTER.get(letter)
         if by_letter:
@@ -320,6 +324,9 @@ def coda_options(phones, nucleus, schwa=False, vowel="", doubled=False,
     if (nucleus == "i" and key[0] == "K"
             and (doubled or reduced or len(key) > 1)):
         return [("ch", 0), ("c", 1)]
+    # A /ʃ/ closing an i is ch, like a k there: english is lích.
+    if key == ("SH",) and nucleus == "i":
+        return [("ch", 0), ("t", 1)]
     # A final z goes unheard after a tense vowel, which is every gold case
     # (sai, chi, pờ li), but closes a checked one: disneyland is đít ni.
     if key == ("Z",) and vowel and vowel not in TENSE:
