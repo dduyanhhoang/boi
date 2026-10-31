@@ -205,7 +205,9 @@ def _geminate(slots):
             continue
         # Keep a replaced r in the run: ("R", "K") still maps to c and still
         # leaves the nucleus open, which is what pác kinh and pát ti need.
-        out[i] = out[i]._replace(coda=left.coda + (phone,))
+        # A doubled /tʃ/ is only the stop closure, so it comes back as t:
+        # teacher is tít chờ. A real final one keeps ch, as in sen guých.
+        out[i] = out[i]._replace(coda=left.coda + ("T" if phone == "CH" else phone,))
         changed = True
     return out if changed else None
 

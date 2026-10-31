@@ -283,7 +283,8 @@ function geminate(slots, T) {
           && left.stress === "1" && ["", "0"].includes(right.stress)
           && !T.syllabify.keepsOffglide.includes(left.nucleus));
     if (!ok) continue;
-    out[i] = { ...left, coda: [...left.coda, phone] };
+    // A doubled /tʃ/ is only the stop closure, so it returns as t.
+    out[i] = { ...left, coda: [...left.coda, phone === "CH" ? "T" : phone] };
     changed = true;
   }
   return changed ? out : null;
@@ -422,8 +423,10 @@ function toneOf(s, syl, T) {
       return "huyen";
     }
     // A final -er is ngang by default, but huyền after a d: phâu đờ, o đờ.
-    if (s.nucleus === "ER" && s.stress === "0"
-        && s.onset.length && s.onset[s.onset.length - 1] === "D") return "huyen";
+    if (s.nucleus === "ER" && s.stress === "0" && s.onset.length
+        && T.tone.huyenBeforeEr.includes(s.onset[s.onset.length - 1])) {
+      return "huyen";
+    }
   }
   if (T.tone.stopCodas.includes(syl.coda)) {
     if (s.final && T.tone.nangCodas.includes(joinKey(s.coda))) return "nang";
