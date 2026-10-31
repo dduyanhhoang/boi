@@ -3,7 +3,10 @@ name: Pages
 on:
   push:
     branches: [main]
-    paths: ["app/**", "src/**", "data/**", "scripts/**", "tests/**", ".github/workflows/pages.yml"]
+    # eval/** matters too: run_ngo.py is imported by tests, so a change there
+    # can break the build without touching anything else listed here.
+    paths: ["app/**", "src/**", "data/**", "scripts/**", "tests/**", "eval/**",
+            ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
