@@ -376,10 +376,13 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   return table[phone] ?? [["ơ", "", 3]];
 }
 
-function codaOptions(phones, nucleus, schwa, T) {
+function codaOptions(phones, nucleus, schwa, vowel, T) {
   const P = T.phonemap;
   if (!phones.length) return [["", 0]];
   const key = joinKey(phones);
+  // A final z goes unheard after a tense vowel (sai, chi, pờ li) but closes a
+  // checked one: disneyland is đít ni.
+  if (key === "Z" && vowel && !P.tense.includes(vowel)) return [["t", 0], ["", 1]];
   if (key === "L") {
     if (P.back.includes(nucleus)) return schwa ? P.codaLBackSchwa : P.codaLBackStressed;
     return P.codaL[nucleus] ?? [["", 0]];
@@ -478,7 +481,7 @@ function slotOptions(s, T) {
     for (const [nucleus, offglide, pNu] of slotNucleusOptions(s, T)) {
       const codas = offglide
         ? [[offglide, s.coda.length ? 1 : 0]]
-        : codaOptions(s.coda, nucleus, schwa, T);
+        : codaOptions(s.coda, nucleus, schwa, s.nucleus, T);
       for (const [coda, pCo] of codas) {
         let spelled = (onset === "g" && !s.glide && "ieê".includes(nucleus[0]))
           ? "gh" : onset;

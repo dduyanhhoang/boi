@@ -109,6 +109,10 @@ SCHWA_BY_LETTER = {
     "y": ([("i", "", 0)], [("i", "", 0)]),
 }
 
+# A tense vowel or diphthong can end a syllable; a checked one cannot. Used
+# for where a cluster breaks, and for whether a final z is heard at all.
+TENSE = {"IY", "EY", "AY", "OW", "OY", "AW", "UW", "ER"}
+
 # --- codas ---------------------------------------------------------------
 CODA = {
     "P": [("p", 0)],
@@ -120,7 +124,7 @@ CODA = {
     "TH": [("t", 0)],            # bluetooth -> tút
     "DH": [("t", 0)],
     "S": [("t", 0), ("", 1)],    # boss -> bốt / mouse -> mao
-    "Z": [("", 0), ("t", 1)],    # size -> sai, cheese -> chi
+    "Z": [("", 0), ("t", 1)],    # size -> sai, cheese -> chi; see below
     "SH": [("t", 0)],
     "ZH": [("t", 0)],
     "CH": [("ch", 0)],       # sen guých; after a it is t, see _CH_CODA_AFTER_A
@@ -235,10 +239,14 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     return table.get(phone, [("ơ", 3)])
 
 
-def coda_options(phones, nucleus, schwa=False):
+def coda_options(phones, nucleus, schwa=False, vowel=""):
     if not phones:
         return [("", 0)]
     key = tuple(phones)
+    # A final z goes unheard after a tense vowel, which is every gold case
+    # (sai, chi, pờ li), but closes a checked one: disneyland is đít ni.
+    if key == ("Z",) and vowel and vowel not in TENSE:
+        return [("t", 0), ("", 1)]
     if key == ("L",):
         if nucleus in _BACK:
             return CODA_L_BACK_SCHWA if schwa else CODA_L_BACK_STRESSED

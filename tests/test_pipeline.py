@@ -80,6 +80,10 @@ def test_known_reading(word, expected):
     ("match", "mát"),
     ("watch", "goát"),
     ("sandwich", "san guých"),
+    # a final z closes a checked vowel and goes unheard after a tense one
+    ("disney", "đít ni"),
+    ("size", "sai"),
+    ("cheese", "chi"),
 ])
 def test_reduced_vowel_follows_the_spelling(word, expected):
     assert generate.read(word) == expected

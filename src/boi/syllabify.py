@@ -8,6 +8,8 @@ as it is, and a consonant before a final -ing or -y may geminate.
 
 from typing import NamedTuple
 
+from .phonemap import TENSE as _TENSE
+
 VOWELS = {
     "AA", "AE", "AH", "AO", "AW", "AY", "EH", "ER", "EY",
     "IH", "IY", "OW", "OY", "UH", "UW",
@@ -20,10 +22,9 @@ _INSERTED_NUCLEUS = "ơ"
 # than a C+l or C+r pair does: e-sport, not es-port.
 _S_CLUSTERS = {("S", "P"), ("S", "T"), ("S", "K"), ("S", "M"), ("S", "N"),
                ("S", "L"), ("S", "W")}
-# A tense vowel or a diphthong can end a syllable in English, so a cluster
-# after it stays whole: e-sport, mi-stake, mai cờ rô. Everything else is
-# checked and has to take a consonant from the run: sys-tem, up-load, óp lai.
-_TENSE = {"IY", "EY", "AY", "OW", "OY", "AW", "UW", "ER"}
+# _TENSE comes from phonemap: a tense vowel or diphthong can end a syllable,
+# so a cluster after it stays whole (e-sport, mi-stake, mai cờ rô), while a
+# checked one takes a consonant from the run (sys-tem, up-load, óp lai).
 # Before a final -ing or -y the gold geminates any of these, even voiced N
 # (trên ninh), and it overwrites an r that was going to drop (pác kinh, pát ti).
 _GEMINATES = {"P", "T", "K", "N"}
