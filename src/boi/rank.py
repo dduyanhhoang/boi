@@ -11,6 +11,11 @@ from . import vi
 from .rhymes import RHYMES
 
 _ILLEGAL_ONSET = 2.0
+# Looks inert and is not. 0, 0.25 and 0.5 give the same dev and test, but
+# across the vocabulary this is what lets the -ese rule's ít beat an open ê
+# (sudanese, timorese): no -ese word is in the eval, so the eval cannot see
+# it. Raised to 1.0 it costs six points on test. test_owner_corrections pins
+# chinese and japanese, which fail if it is taken out.
 _UNSEEN_RHYME = 0.5
 
 
