@@ -27,6 +27,11 @@ COMPOUNDS = {
     "livestream": "L AY1 V S T R IY1 M",  # "live" as in /laɪv/, not /lɪv/
     "icecream": "AY1 S K R IY1 M",
     "tiktok": "T IH1 K T AA2 K",
+    # The splitter cuts this as trans + lite + ration, three real words
+    # across the wrong seams. trans plus the -literation of alliteration,
+    # which CMUdict has right, so the rules read it from sound phones.
+    "transliteration": "T R AE2 N Z L IH1 T ER0 EY2 SH AH0 N",
+    "transliterated": "T R AE2 N Z L IH1 T ER0 EY2 T IH0 D",
 }
 
 

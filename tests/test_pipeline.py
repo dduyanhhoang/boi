@@ -54,7 +54,7 @@ def test_known_reading(word, expected):
 @pytest.mark.parametrize("word,expected", [
     # A single plain vowel letter is read as that letter.
     ("encyclopedia", "en sai cờ lô pê đi a"),
-    ("refrigerator", "rê phờ ri giơ ây tơ"),   # not ra: the letter is an e
+    ("refrigerator", "rê phờ ri giơ rây tơ"),  # not ra: the letter is an e
     ("camera", "ca mê ra"),                    # the r in ER0 opens the last one
     ("solution", "sô lu sừn"),   # the gold; it used to read sô lút sừn
     # A digraph keeps CMUdict's vowel, and an unstressed open one does too.
@@ -286,6 +286,11 @@ def test_dev_exact_match_floor():
     ("time", "tham"),               # lexicon, for the th alone
     ("lifetime", "lai phờ tam"),    # the /aɪ/ before an m is the rule
     ("style", "sờ tai"),            # before every other coda it keeps it
+    ("transliteration", "tran lít tơ rây sừn"),  # phones composed, reading derived
+    ("generation", "gie nơ rây sừn"),  # an r before a stressed front vowel opens it
+    ("operation", "o pơ rây sừn"),
+    ("poweroff", "pao ơ óp"),       # but not before a back one: a compound
+    ("overall", "ô vơ on"),
     ("schedule", "sờ ke đùa"),      # by rule now, not memorised
     ("module", "mo đùa"),
     ("education", "e đu cây sừn"),  # the same đ, from the gold

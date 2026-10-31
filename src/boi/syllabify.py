@@ -40,6 +40,7 @@ _VOICELESS = {"P", "T", "K", "F", "S", "SH", "CH", "TH"}
 # nasal; the p of improvement does not, and is its own syllable: im pờ rúp.
 _SWALLOWED_AFTER_NASAL = {"B", "D", "G"}
 _NASAL_CODAS = {"M", "N", "NG"}
+_FRONT_VOWELS = {"IY", "IH", "EY", "EH", "AE"}
 _KEEPS_OFFGLIDE = {"EY", "OW"}
 # A Vietnamese reader sees -tion as one piece and says sừn wherever it sits.
 # CMUdict gives it away: the vowel letters are io and the onset is a sibilant.
@@ -133,11 +134,16 @@ def _free_the_r(phones):
     out = []
     for i, phone in enumerate(phones):
         nxt = phones[i + 1] if i + 1 < len(phones) else ""
-        # Only before a reduced vowel. A stressed one after an ER0 means a
-        # compound boundary, where the r belongs to the piece before it:
-        # poweroff is power plus off, not powe plus roff.
+        # Before a reduced vowel, and before a stressed front one: ao go ri
+        # dừm, and every -eration word, giê nơ rây sừn. Not before a stressed
+        # back vowel, which is where a compound boundary falls, the second
+        # word starting off or all: pao ơ óp, ô vơ ôn, not pao ơ róp.
         if phone == "ER0" and nxt[:-1] in VOWELS and nxt[-1:] == "0":
+            # The vowel left behind takes its letter: ca mê ra.
             out += ["AH0", "R"]
+        elif phone == "ER0" and nxt[:-1] in _FRONT_VOWELS:
+            # It stays ơ, the r only opening the next syllable: nơ rây.
+            out += ["ER0", "R"]
         else:
             out.append(phone)
     return out

@@ -235,10 +235,15 @@ function freeTheR(phones, T) {
   const out = [];
   phones.forEach((phone, i) => {
     const next = phones[i + 1] ?? "";
-    // Only before a reduced vowel: a stressed one means a compound boundary.
+    // Before a reduced vowel the vowel left behind takes its letter: ca mê ra.
+    // Before a stressed front vowel it stays ơ and the r opens the next
+    // syllable: nơ rây. Not before a stressed back vowel, where a compound
+    // boundary falls: pao ơ óp.
     if (phone === "ER0" && T.syllabify.phoneVowels.includes(next.slice(0, -1))
         && next.endsWith("0")) out.push("AH0", "R");
-    else out.push(phone);
+    else if (phone === "ER0" && T.syllabify.frontVowels.includes(next.slice(0, -1))) {
+      out.push("ER0", "R");
+    } else out.push(phone);
   });
   return out;
 }
