@@ -264,6 +264,12 @@ def test_dev_exact_match_floor():
     ("java", "gia va"),             # an a stays a
     ("marketing", "ma két tinh"),
     ("vietnamese", "việt nam mít"),  # lexicon: read as Vietnamese
+    ("chinese", "chai nít"),        # but -ese is a rule, not a lexicon entry
+    ("japanese", "gia pa nít"),
+    ("cheese", "chi"),              # ee keeps its z silent
+    ("please", "pờ li"),            # and so does ea
+    ("finance", "phai nan"),        # the variant that agrees with the letter
+    ("image", "i mịt"),             # whose first vowel is not reduced
     ("livestream", "lai sờ trim"),  # a v after a tense vowel is unheard
     ("live", "lai"),
     ("icecream", "ai sờ cờ rim"),   # only a v, an s still gives sờ

@@ -129,11 +129,42 @@ def undoubled(word):
     return collapsed if collapsed != word and collapsed in _DICT else None
 
 
+# The vowel each letter has when the letter is named: a is EY, i is AY. A
+# reader who does not know the word says the letters, which is how finance
+# becomes phai nan rather than phi nan.
+_LETTER_NAME_VOWEL = {"a": "EY", "e": "IY", "i": "AY", "o": "OW", "u": "UW"}
+_REDUCED = {"AH0", "IH0"}
+
+
+def _spelled_out(word, entries):
+    """A variant whose first vowel is the one its letter is named with.
+
+    CMUdict lists finance reduced-first, as F AH0 N AE1 N S, because that is
+    how it is said in running speech. The first vowel of the first syllable
+    is the one a Vietnamese reader takes from the spelling, so where CMUdict
+    offers a reading that agrees with the letter, that is the one to use.
+    """
+    first = next((p for p in entries[0] if p[-1].isdigit()), None)
+    if first not in _REDUCED:
+        return None
+    groups = spell.align_vowels(word, entries[0])
+    if not groups:
+        return None
+    wanted = _LETTER_NAME_VOWEL.get(groups[0])
+    if not wanted:
+        return None
+    for entry in entries[1:]:
+        vowel = next((p for p in entry if p[-1].isdigit()), None)
+        if vowel and vowel[:-1] == wanted:
+            return entry
+    return None
+
+
 def phones(word, predict=True):
     """Phones for any word. None only when there are no letters to read."""
     w = word.lower()
     if w in _DICT:
-        return _DICT[w][0]
+        return _spelled_out(w, _DICT[w]) or _DICT[w][0]
     if w in COMPOUNDS:
         return COMPOUNDS[w].split()
     if not predict:

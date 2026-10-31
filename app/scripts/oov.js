@@ -389,6 +389,10 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   // A single plain vowel letter takes its Vietnamese value when the syllable
   // is stressed or closed: en and pê in encyclopedia, but i ven in event.
   // A word-initial open one is a prefix read as the English letter name.
+  // -ese is ít: chai nít, việt nam mít. The plain e separates it from chi
+  // and pờ li, whose ee and ea keep their z silent.
+  if (phone === "IY" && letter === "e" && final
+      && ["Z", "S"].includes(joinKey(nextCoda))) return P.eseEnding;
   if (["IH", "IY"].includes(phone) && P.singleLetters.includes(letter)
       && (["1", "2"].includes(stress) || closed) && !(first && !closed)) {
     const byLetter = P.schwaByLetter[letter];

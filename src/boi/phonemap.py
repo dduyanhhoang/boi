@@ -67,6 +67,7 @@ NUCLEUS_OPEN = {
 AE_BEFORE_D = [("e", "", 0), ("a", "", 1)]
 EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
 AA_SPELLED_O = [("o", "", 0), ("ô", "", 1), ("a", "", 2)]
+ESE_ENDING = [("i", "t", 0), ("ê", "", 1)]
 OW_BEFORE_FINAL_SIBILANT = [("â", "u", 0), ("ô", "", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
@@ -221,6 +222,11 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # one keeps CMUdict's vowel: event is i ven, not ê ven.
     # A word-initial open one is a prefix read as the English letter name,
     # which is where email gets i meo and esport i sờ pọt.
+    # -ese is ít: chai nít, việt nam mít. The z is heard, where a final z
+    # after a tense vowel is usually not, and the plain e is what separates
+    # this from chi and pờ li, whose ee and ea keep theirs silent.
+    if phone == "IY" and letter == "e" and final and next_coda in (("Z",), ("S",)):
+        return ESE_ENDING
     if phone in ("IH", "IY") and letter in SINGLE_LETTERS \
             and (stress in ("1", "2") or closed) and not (first and not closed):
         by_letter = SCHWA_BY_LETTER.get(letter)

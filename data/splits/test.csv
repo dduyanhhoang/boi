@@ -46,6 +46,6 @@ id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
 162,clean,K L IY1 N,cờ lin,,,cluster;coda_n,h,approved
 167,travel,T R AE1 V AH0 L,tra vồ,tờ ra ven,,cluster;coda_l,l,approved
 168,credit,K R EH1 D AH0 T,cờ re đít,,,cluster;coda_t,m,approved
-170,event,IH0 V EH1 N T,i ven,,,stress2;coda_nt,h,approved
+170,event,IY0 V EH1 N T,i ven,,,stress2;coda_nt,h,approved
 179,netflix,N EH1 T F L IH0 K S,nét phờ lích,,,cluster;coda_ks,h,approved
 181,tiktok,T IH1 K T AA2 K,tíc tóc,,,coda_k,h,approved
