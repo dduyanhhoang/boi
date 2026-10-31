@@ -46,7 +46,7 @@ NUCLEUS_OPEN = {
     "IY": [("i", "", 0)],
     "IH": [("i", "", 0)],
     "EH": [("e", "", 0), ("ê", "", 1)],   # tét, mét / con tếch (ec is illegal)
-    "AE": [("a", "", 0), ("e", "", 1)],
+    "AE": [("a", "", 0), ("e", "", 1)],   # áp, chát, lách; see AE_BEFORE_D
     "AA": [("a", "", 0), ("o", "", 1)],
     "AH": [("ơ", "", 0), ("a", "", 1)],     # ă never stands alone in a rhyme
     "AO": [("o", "", 0)],
@@ -60,6 +60,10 @@ NUCLEUS_OPEN = {
     "OY": [("o", "i", 0)],
 }
 # A consonant coda follows, so the offglide slot is taken.
+# /æ/ is a, but e when a d closes the syllable: bad is bét and sandwich sen,
+# against plan and fan, whose coda is a bare n. So disneyland is đít ni len.
+AE_BEFORE_D = [("e", "", 0), ("a", "", 1)]
+
 NUCLEUS_CLOSED = dict(
     NUCLEUS_OPEN,
     AA=[("o", "", 0), ("a", "", 1)],       # con tếch, bóc / láp tốp
@@ -214,6 +218,8 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         by_letter = SCHWA_BY_LETTER.get(letter)
         if by_letter:
             return by_letter[1] if closed else by_letter[0]
+    if phone == "AE" and closed and next_coda and next_coda[-1] == "D":
+        return AE_BEFORE_D
     if phone == "AH" and stress == "0":
         if not closed:
             if letter and letter[0] in SCHWA_BY_LETTER:

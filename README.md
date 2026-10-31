@@ -44,11 +44,11 @@ rules and is tried first when it is installed.
 
 | | dev, rules only | dev, with lexicon | test |
 |---|---|---|---|
-| exact match on `vi_form` | 0.725 | 0.756 | 0.540 |
-| match on `vi_form` or an `alt_form` | 0.740 | 0.771 | 0.620 |
-| gold form in the top 5 | 0.832 | 0.840 | 0.760 |
-| syllable error rate | 0.174 | 0.158 | 0.273 |
-| tone accuracy | 0.956 | 0.956 | 0.933 |
+| exact match on `vi_form` | 0.740 | 0.771 | 0.600 |
+| match on `vi_form` or an `alt_form` | 0.756 | 0.786 | 0.700 |
+| gold form in the top 5 | 0.847 | 0.855 | 0.820 |
+| syllable error rate | 0.154 | 0.138 | 0.200 |
+| tone accuracy | 0.956 | 0.956 | 0.942 |
 
 All four lexicon words are dev rows, so the lexicon column is partly
 memorisation and the rules-only column is the one to compare against test.

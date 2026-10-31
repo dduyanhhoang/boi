@@ -356,6 +356,9 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
     const byLetter = P.schwaByLetter[letter];
     if (byLetter) return closed ? byLetter[1] : byLetter[0];
   }
+  // /æ/ is a, but e when a d closes the syllable: bét, sen, đít ni len.
+  if (phone === "AE" && closed && nextCoda.length
+      && nextCoda[nextCoda.length - 1] === "D") return P.aeBeforeD;
   if (phone === "AH" && stress === "0") {
     const byLetter = letter && P.schwaByLetter[letter[0]];
     if (!closed) return byLetter ? byLetter[0] : P.schwaOpen;

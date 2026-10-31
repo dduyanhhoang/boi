@@ -79,11 +79,16 @@ def test_known_reading(word, expected):
     # a /tʃ/ coda is t after a, ch after i
     ("match", "mát"),
     ("watch", "goát"),
-    ("sandwich", "san guých"),
     # a final z closes a checked vowel and goes unheard after a tense one
     ("disney", "đít ni"),
     ("size", "sai"),
     ("cheese", "chi"),
+    # /æ/ is e when a d closes the syllable, a otherwise
+    ("disneyland", "đít ni len"),
+    ("bad", "bét"),
+    ("sandwich", "sen guých"),
+    ("plan", "pờ lan"),
+    ("fan", "phan"),
 ])
 def test_reduced_vowel_follows_the_spelling(word, expected):
     assert generate.read(word) == expected
