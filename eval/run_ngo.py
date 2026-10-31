@@ -26,7 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from boi import generate, g2p, letters  # noqa: E402
+from boi import generate, g2p, letters, vi  # noqa: E402
 
 DATA = ROOT / "data" / "ngo"
 
@@ -84,9 +84,24 @@ def decode(syllable):
     if "?" in coda:
         return []
 
+    # iê, uô and ươ are spelled ia, ua and ưa when nothing closes them.
+    if not coda:
+        nucleus = {"iê": "ia", "uô": "ua", "ươ": "ưa"}.get(nucleus, nucleus)
     i = 1 if nucleus in _TWO_PART else 0
     marked = unicodedata.normalize("NFC", nucleus[: i + 1] + tone + nucleus[i + 1:])
-    return [spell_onset(o, nucleus) + marked + coda for o in onsets]
+
+    out = []
+    for onset in onsets:
+        text = spell_onset(onset, nucleus) + marked + coda
+        # Anything that will not round trip is notation this decoder does not
+        # understand, so drop it rather than score against a string that is
+        # not Vietnamese.
+        try:
+            if vi.render_word(vi.parse_word(text)) == text:
+                out.append(text)
+        except ValueError:
+            pass
+    return out
 
 
 def readings(line):
