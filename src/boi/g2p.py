@@ -57,6 +57,16 @@ def _split(word, _cache={}):
     return _cache[word]
 
 
+def citation_table():
+    """The nine CMUdict words whose citation form is not the one it lists first.
+
+    Small enough to ship to the browser whole, which is why the shards carry
+    one pronunciation per word and this sits beside them.
+    """
+    return {word: _citation(word) for word in _DICT
+            if _citation(word) != _DICT[word][0]}
+
+
 def _citation(piece):
     """The pronunciation a piece has when said alone.
 

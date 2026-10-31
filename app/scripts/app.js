@@ -271,7 +271,7 @@ async function show(word, { push = true } = {}) {
         const found = shardsFor[pieces.indexOf(piece)][piece];
         return found ? found.split("|")[0].split(" ") : null;
       };
-      const phones = module.compoundPhones(pieces, phonesOf);
+      const phones = module.compoundPhones(pieces, phonesOf, tables);
       const readings = module.candidatesFromPhones(phones, tables, 5);
       if (readings.length) {
         renderResult(w, phones.join(" "), readings, false, pieces);

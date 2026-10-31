@@ -631,10 +631,13 @@ export function splitInto(word, known) {
 }
 
 /** Phones for a split; only the first piece keeps primary stress. */
-export function compoundPhones(pieces, phonesOf) {
+export function compoundPhones(pieces, phonesOf, T) {
   const out = [];
   pieces.forEach((piece, n) => {
-    const phones = phonesOf(piece);
+    // A compound is words said one after another, so each piece takes the
+    // form it has alone. CMUdict lists and reduced first, as AH0 N D.
+    const cited = T?.g2p?.citation?.[piece];
+    const phones = cited ? cited.split(" ") : phonesOf(piece);
     if (!phones) return;
     for (const phone of phones) {
       out.push(n && phone.endsWith("1") ? phone.replace("1", "2") : phone);

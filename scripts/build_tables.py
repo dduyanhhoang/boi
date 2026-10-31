@@ -15,7 +15,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from boi import letters, lexicon, phonemap, rank, spell, syllabify, tone, vi  # noqa: E402
+from boi import (g2p, letters, lexicon, phonemap, rank, spell,  # noqa: E402
+                 syllabify, tone, vi)
 from boi.rhymes import RHYMES  # noqa: E402
 
 OUT = ROOT / "app" / "data" / "tables.json"
@@ -32,6 +33,12 @@ def dict_keys(d):
 
 def main():
     tables = {
+        "g2p": {
+            # The nine words CMUdict lists reduced-first; a compound piece
+            # takes the form it has when said alone.
+            "citation": {w: " ".join(ph)
+                         for w, ph in g2p.citation_table().items()},
+        },
         "spell": {
             "vowels": spell.VOWELS,
             "consonants": {k: list(v) if isinstance(v, tuple) else [v]
