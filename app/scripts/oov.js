@@ -509,8 +509,9 @@ function codaOptions(phones, nucleus, schwa, vowel, T, doubled, reduced) {
       && (doubled || reduced || phones.length > 1)) {
     return [["ch", 0], ["c", 1]];
   }
-  // A /ʃ/ closing an i is ch, like a k there: english is lích.
-  if (key === "SH" && nucleus === "i") return [["ch", 0], ["t", 1]];
+  // A real /ʃ/ closing an i is ch: english is lích. A doubled one is only
+  // the closure, so delicious keeps đi lít sợt.
+  if (key === "SH" && nucleus === "i" && !doubled) return [["ch", 0], ["t", 1]];
   if (key === "L") {
     if (P.back.includes(nucleus)) return schwa ? P.codaLBackSchwa : P.codaLBackStressed;
     return P.codaL[nucleus] ?? [["", 0]];
