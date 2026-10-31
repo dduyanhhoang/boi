@@ -67,6 +67,7 @@ def main():
             "owFinal": phonemap.OW_FINAL,
             "owMid": phonemap.OW_MID,
             "erAfterGlide": phonemap.ER_AFTER_GLIDE,
+            "erSpelledOr": phonemap.ER_SPELLED_OR,
             "schwaOpen": phonemap.SCHWA_OPEN,
             "schwaByCoda": phonemap.SCHWA_BY_CODA,
             "schwaClosed": phonemap.SCHWA_CLOSED,

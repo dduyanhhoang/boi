@@ -61,6 +61,14 @@ def test_known_reading(word, expected):
     ("meeting", "mít tinh"),
     ("event", "i ven"),
     ("email", "i mêu"),
+    # ơ is what an er is read as, not an or.
+    ("information", "in phô mây sừn"),
+    ("server", "sơ vơ"),
+    ("burger", "bơ gơ"),
+    # -y doubles only after a stressed syllable.
+    ("responsibility", "ri sờ pon si bi li ti"),
+    ("happy", "háp pi"),
+    ("marketing", "ma két tinh"),
 ])
 def test_reduced_vowel_follows_the_spelling(word, expected):
     assert generate.read(word) == expected

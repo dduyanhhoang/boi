@@ -259,9 +259,11 @@ function geminate(slots, T) {
     if (right.onset.length !== 1
         || T.syllabify.offglideNuclei.includes(left.nucleus)) continue;
     const phone = right.onset[0];
+    // -ing doubles whatever is before it, -y only after a stressed syllable.
+    const isIng = right.nucleus === "IH" && joinKey(right.coda) === "NG";
+    const isY = right.nucleus === "IY" && !right.coda.length;
     const suffix = right.final && ["", "0", "2"].includes(right.stress)
-      && ((right.nucleus === "IH" && joinKey(right.coda) === "NG")
-          || (right.nucleus === "IY" && !right.coda.length));
+      && (isIng || (isY && ["1", "2"].includes(left.stress)));
     const codaKey = joinKey(left.coda);
     const ok = (suffix && T.syllabify.geminates.includes(phone)
                 && (codaKey === "" || codaKey === "R"))
@@ -329,6 +331,9 @@ function onsetOptions(phones, T) {
 function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, letter, first, T) {
   const P = T.phonemap;
   if (phone === "ER" && glide) return P.erAfterGlide;
+  // ơ is what an er is read as; an or inside a word is not (information is
+  // phô). A word-final -or is ơ again: đốc tơ, not đốc tô.
+  if (phone === "ER" && letter === "o" && !final) return P.erSpelledOr;
   if (phone === "OW") {
     if (joinKey(nextCoda) === "L" && !final) return P.owFinal;
     if (!closed) return final ? P.owFinal : P.owMid;

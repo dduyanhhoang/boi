@@ -169,9 +169,12 @@ def _geminate(slots):
         if len(right.onset) != 1 or left.nucleus in _OFFGLIDE_NUCLEI:
             continue
         phone = right.onset[0]
+        # -ing doubles whatever is before it (ma két tinh), but -y only after
+        # a stressed syllable: happy is háp pi, responsibility is bi li ti.
+        is_ing = right.nucleus == "IH" and right.coda == ("NG",)
+        is_y = right.nucleus == "IY" and not right.coda
         suffix = (right.final and right.stress in ("", "0", "2")
-                  and ((right.nucleus == "IH" and right.coda == ("NG",))
-                       or (right.nucleus == "IY" and not right.coda)))
+                  and (is_ing or (is_y and left.stress in ("1", "2"))))
         if suffix and phone in _GEMINATES and left.coda in ((), ("R",)):
             pass
         elif (not left.coda and phone in _VOICELESS

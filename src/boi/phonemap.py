@@ -73,6 +73,7 @@ OW_FINAL = [("â", "u", 0), ("ô", "", 1)]
 OW_MID = [("ô", "", 0), ("â", "u", 1)]
 # /wɜr/ lands on uô: pát guốt, nét guốc.
 ER_AFTER_GLIDE = [("ô", "", 0), ("ơ", "", 1)]
+ER_SPELLED_OR = [("ô", "", 0), ("o", "", 1)]
 # Unstressed schwa, which docs/brief.md puts at ơ or ư. The dev rows show it is the
 # coda that decides, not the stress: -ment -> com, -le -> gồ, -et -> két.
 SCHWA_OPEN = [("a", "", 0), ("ơ", "", 1), ("ô", "", 1)]   # đa ta, ba na na / sô lu
@@ -186,6 +187,11 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
                     onset=(), letter="", first=False):
     if phone == "ER" and glide:
         return ER_AFTER_GLIDE
+    # ơ is what an er is read as. An or inside a word is not: the o of
+    # information is phô, not phơ. A word-final -or is ơ again, like every
+    # other final r-vowel: đốc tơ, ắc tơ, not đốc tô.
+    if phone == "ER" and letter == "o" and not final:
+        return ER_SPELLED_OR
     if phone == "OW":
         if next_coda == ("L",) and not final:
             return OW_FINAL          # phâu đờ
