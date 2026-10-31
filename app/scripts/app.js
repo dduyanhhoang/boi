@@ -156,9 +156,8 @@ function fillGrouping(word, phones, best, module, tables) {
     </div>`).join("");
 }
 
-function renderResult(word, phones, readings, spelled = false, pieces = null,
-                      theirs = "", method = "") {
-  current = { word, phones, readings, spelled, pieces, theirs, method };
+function renderResult(word, phones, readings, spelled = false, pieces = null) {
+  current = { word, phones, readings, spelled, pieces };
   const [best, ...alts] = readings;
   const syllables = best.split(" ");
   const g = gold[word];
@@ -243,8 +242,8 @@ async function show(word, { push = true } = {}) {
 
   const entry = shard[w];
   if (entry) {
-    const [phones, readings, theirs, method] = entry.split("|");
-    renderResult(w, phones, readings.split(";"), false, null, theirs, method);
+    const [phones, readings] = entry.split("|");
+    renderResult(w, phones, readings.split(";"));
   } else {
     // Not one of the precomputed words, so run the pipeline here instead.
     renderLoading();
@@ -254,8 +253,8 @@ async function show(word, { push = true } = {}) {
     // lands on a word we already have: dissneeland reads as disneyland does.
     const plain = module.undoubled(w, (c) => c in shard);
     if (plain) {
-      const [phones, readings, theirs, method] = shard[plain].split("|");
-      renderResult(w, phones, readings.split(";"), false, null, theirs, method);
+      const [phones, readings] = shard[plain].split("|");
+      renderResult(w, phones, readings.split(";"));
       return;
     }
 
@@ -407,7 +406,7 @@ document.addEventListener("click", (e) => {
     if (reading === current.readings[0]) return;
     const reordered = [reading, ...current.readings.filter((r) => r !== reading)];
     renderResult(current.word, current.phones, reordered,
-                 current.spelled, current.pieces, current.theirs, current.method);
+                 current.spelled, current.pieces);
   }
 });
 

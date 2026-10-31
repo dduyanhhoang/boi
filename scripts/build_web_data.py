@@ -15,7 +15,7 @@ import cmudict
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from boi import g2p, generate, ngo, ngo_model  # noqa: E402
+from boi import g2p, generate  # noqa: E402
 
 OUT = ROOT / "app" / "data"
 GOLD = ROOT / "data" / "eval_v0.csv"
@@ -41,37 +41,17 @@ def main():
     vocabulary = sorted(
         {w for w in pronunciations if w.isalpha()} | set(g2p.COMPOUNDS))
 
-    # Ngo et al.'s published readings only. Their code is vendored in
-    # third_party/ngo, but this project's Python 3 port of it reproduces their
-    # own shipped output for only 28% of their own inputs, and on the example
-    # in their paper (disneyland, đi sờ ni len) it gives đi ni lan. Until that
-    # is understood, running it would put readings on screen under their name
-    # that are not theirs.
-    theirs = {w: sorted(f) for w, f in ngo.pairs().items()}
-    print(f"  {len(theirs)} readings from Ngo et al.'s published output")
-
-    # Their method, reimplemented from the paper in ngo_model.py, for every
-    # word. Kept apart from their published readings: this is their algorithm
-    # as read off arXiv:1810.03184, not their system's output.
-    print("  reading every word by their method ...", flush=True)
-    method = {}
-    for word in vocabulary:
-        phones = g2p.phones(word, predict=False)
-        if phones:
-            got = ngo_model.read(word, phones)
-            if got:
-                method[word] = got
-    print(f"  {len(method)} readings by the reimplemented method")
-
     shards, total = {}, 0
     for word in vocabulary:
         readings = generate.candidates(word, limit=TOP_N)
         if not readings:
             continue
         phones = " ".join(g2p.phones(word, predict=False))
-        shards.setdefault(word[0], {})[word] = (
-            f"{phones}|{';'.join(readings)}|{';'.join(theirs.get(word, []))}"
-            f"|{';'.join(method.get(word, []))}")
+        # The page shows the reading and derives the rest in the browser, so
+        # a shard carries the phones and the readings and nothing it never
+        # displays. The Ngo readings used to ride along as two more fields,
+        # a third of every shard, after the page stopped showing them.
+        shards.setdefault(word[0], {})[word] = f"{phones}|{';'.join(readings)}"
         total += 1
 
     size = 0
