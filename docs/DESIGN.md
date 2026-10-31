@@ -108,6 +108,26 @@ first sat inside "How it got there", where nobody found it. It is not a third
 emphasis style: it carries no wash, only a secondary label and a bordered
 capsule, so the two-emphasis rule still holds.
 
+## The wide layout
+
+Below 70rem the result is one column, which is the phone composition and the
+one most visits use. At 70rem and above the derivation moves beside the
+answer and `main` widens to 54rem, so the screen is read as answer-then-
+working across rather than down, and the page stops being a narrow column
+with the right half of the screen empty.
+
+The second column hugs the derivation rather than stretching to the grid, so
+the width that is left is the page's margin and not an empty cell. `footer`
+takes the same width as `main` at that breakpoint; its own rule sits later in
+the file than the layout block, so the override has to sit later still.
+
+Everything on the page shares one left edge, with the derivation as the only
+second. The derivation's phone column is `max-content`, which lets the rows
+start at their own heading's edge while the arrows stay aligned to each other.
+
+Running text in the footer is Subheadline, not Footnote. Footnote is 13px and
+these are paragraphs; the scale was right and the role was not.
+
 ## Getting back
 
 The wordmark is a real link to `./`, so it reads as a link, opens in a new

@@ -127,7 +127,7 @@ main {
   width: 100%;
   max-width: var(--measure);
   margin-inline: auto;
-  padding: var(--space-8) var(--space-4) var(--space-12);
+  padding: var(--space-8) var(--space-4) var(--space-8);
 }
 
 /* Search ------------------------------------------------------------- */
@@ -236,6 +236,23 @@ main {
 
 /* Result ------------------------------------------------------------- */
 .result { margin-top: var(--space-8); }
+
+@media (min-width: 70rem) {
+  main { max-width: 54rem; }
+  .result {
+    display: grid;
+    /* The second column hugs the derivation rather than stretching, so the
+       page keeps its margins instead of growing an empty cell. */
+    grid-template-columns: minmax(0, 1fr) max-content;
+    column-gap: var(--space-12);
+    align-items: start;
+  }
+  .reading, .syllables, .note { grid-column: 1; }
+  .trace { grid-column: 2; grid-row: 1 / span 4; margin-top: 0; }
+  .source { grid-column: 1 / -1; }
+  /* The search field keeps the reading column's measure, not the grid's. */
+  .search { max-width: 42rem; }
+}
 
 .reading {
   margin: 0;
@@ -367,7 +384,9 @@ main {
 .stage-groups { display: grid; gap: var(--space-2); }
 .group {
   display: grid;
-  grid-template-columns: minmax(0, 7rem) auto 1fr;
+  /* max-content, so the column hugs the widest group and the rows start at
+     the stage label's left edge instead of floating in from it. */
+  grid-template-columns: max-content auto 1fr;
   align-items: baseline;
   gap: var(--space-3);
 }
@@ -464,6 +483,7 @@ main {
 footer {
   flex: none;
   width: 100%;
+  /* Matches main at every width, so the page keeps one pair of margins. */
   max-width: var(--measure);
   margin: var(--space-12) auto 0;
   padding: var(--space-6) var(--space-4) var(--space-8);
@@ -472,7 +492,16 @@ footer {
   font-size: var(--text-footnote);
   line-height: 1.5;
 }
-footer p { margin: 0 0 var(--space-2); max-width: 60ch; }
+@media (min-width: 70rem) {
+  footer { max-width: 54rem; }   /* matches main, so the margins stay equal */
+}
+
+footer p {
+  margin: 0 0 var(--space-3);
+  max-width: 60ch;
+  font-size: var(--text-subheadline);
+  line-height: var(--leading-subheadline);
+}
 footer #count { font-variant-numeric: tabular-nums; }
 footer a {
   display: inline-block;
