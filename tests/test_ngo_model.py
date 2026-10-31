@@ -35,6 +35,29 @@ def test_figure_4_pseudo_syllables():
     assert units[1]["epenthetic"]
 
 
+def test_figure_4_tones():
+    """The tones of the figure's reading, which target_slots drops."""
+    assert ngo_model.target_tones(FIGURE_4_READING) == ["_1", "_3", "_1", "_1"]
+    syllables = ngo_model.slots_to_syllables(
+        ngo_model.target_slots(FIGURE_4_READING),
+        ngo_model.target_tones(FIGURE_4_READING))
+    assert [s["tone"] for s in syllables] == ["_1", "_3", "_1", "_1"]
+
+
+def test_tone_model_sees_every_tone():
+    """Eq. 9 trained on a constant can only ever answer ngang.
+
+    target_slots drops the _-prefixed tokens, tones among them, and for a
+    while slots_to_syllables filled in _1 for all of them; the model counted
+    15,945 ngang and nothing else, so disneyland came out đi sơ nây lan where
+    the paper's own figure has sờ.
+    """
+    model = ngo_model.trained()
+    counted = {tone for counter in model.tones.values() for tone in counter}
+    assert len(counted) > 1, "the tone model is trained on a constant"
+    assert "_3" in counted
+
+
 def test_it_reads_real_words():
     import cmudict
 

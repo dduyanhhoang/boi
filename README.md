@@ -116,10 +116,27 @@ example, Figure 4, which formulates DISNEYLAND as D-I / S-@: / N-EY / L-A-N;
 exactly.
 
 Trained on the 2,273 of their 2,400 pairs that yield ground-truth labels, it
-reaches 0.916 label accuracy and 0.295 whole-word accuracy on a held-out
-fifth, against 0.354 for their own system on the same reference. It needs no
-GPU and no training run: all three models are counts, fitted in about a
-second.
+reaches 0.924 label accuracy, 0.927 tone accuracy and 0.288 whole-word
+accuracy on a held-out fifth, against 0.354 for their own system on the same
+reference. It needs no GPU and no training run: all three models are counts,
+fitted in about a second.
+
+The whole-word figure was 0.295 until the tone model was fixed, and the drop
+is the measurement becoming real rather than the model getting worse.
+`target_slots` drops every `_`-prefixed token, tones among them, and
+`slots_to_syllables` was filling in `_1` for all of them, so Eq. 9 was
+trained on a constant: 15,945 ngang and nothing else. Both the prediction and
+the gold it was scored against were ngang throughout, which made tone free.
+With the tones read back, `disneyland` gives `đi sờ nây lan`, matching the
+paper's own `sờ`.
+
+What still differs from Figure 4 is the training corpus, not the method. They
+published `large_test.lex`, their *test* set: 2,400 foreign proper names. The
+lexicon they trained on is not in the repo, so every mapping is counted from
+names. The key `(N, ey, IY)` never occurs there, and `(N, a, AE)` reads `a:`
+378 times against `E` 5. Their own reference even gives `ney` as `n @I` and
+`bailey` as `b_< a:I . l @I`, so Figure 4's `n i` disagrees with the data
+they shipped alongside it.
 
 The playground shows it as "their method, reimplemented", kept distinct from
 the 2,391 readings they published, which stay labelled as theirs.

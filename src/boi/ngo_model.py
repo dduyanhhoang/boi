@@ -55,6 +55,19 @@ def target_slots(line):
     return out
 
 
+def target_tones(line):
+    """Their reading -> the tone marker of each syllable, in order.
+
+    target_slots drops these with the rest of the _-prefixed tokens, because
+    the slot sequence is about structure. Eq. 9 needs them back.
+    """
+    out = []
+    for syllable in line.strip().split(" . "):
+        marks = [p for p in syllable.split() if p.startswith("_")]
+        out.append(marks[-1] if marks else "_1")
+    return out
+
+
 def derive_labels(word, slots):
     """The label per letter whose pseudo-syllables match those slots, or None.
 
@@ -133,7 +146,7 @@ def training_pairs():
             continue
         labels = derive_labels(word, slots)
         if labels:
-            out.append((word, aligned, slots, labels))
+            out.append((word, aligned, slots, labels, target_tones(line)))
     return out
 
 
@@ -218,7 +231,7 @@ class Model:
         self.tones = collections.defaultdict(collections.Counter)
 
     def train(self, examples):
-        for word, aligned, slots, labels in examples:
+        for word, aligned, slots, labels, tones in examples:
             for i, label in enumerate(labels):
                 window = _window(word, i)
                 for form, _ in _backoffs(window, len(window) // 2):
@@ -227,10 +240,9 @@ class Model:
             # Eq. 8: target phoneme given the graphemes and source phones of
             # that sub-syllabic unit.
             units = units_from_labels(word, aligned, labels)
-            target = slots_to_syllables(slots)
-            if len(units) != len(target):
-                continue
-            for unit, syllable in zip(units, target):
+            target = slots_to_syllables(slots, tones)
+            for unit, syllable in (zip(units, target)
+                                   if len(units) == len(target) else ()):
                 for role, graphemes, phones, token in (
                         ("O", unit["og"], unit["op"], syllable["onset"]),
                         ("N", unit["ng"], unit["np"], syllable["nucleus"]),
@@ -274,8 +286,12 @@ class Model:
         return "_1"
 
 
-def slots_to_syllables(slots):
-    """Group a slot sequence back into syllables, with their tone slot."""
+def slots_to_syllables(slots, tones=None):
+    """Group a slot sequence back into syllables, with their tone slot.
+
+    tones, when given, are the markers target_tones read off the same line;
+    without them every syllable is ngang, which is only right for generating.
+    """
     out, current = [], None
     for role, token in slots:
         if role == "O":
@@ -289,6 +305,8 @@ def slots_to_syllables(slots):
             current["nucleus"] = token
         elif role == "Cd" and current is not None:
             current["coda"] = token
+    for syllable, tone in zip(out, tones or ()):
+        syllable["tone"] = tone
     return out
 
 
