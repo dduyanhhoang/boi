@@ -91,6 +91,7 @@ def main():
             "longABeforeT": phonemap.LONG_A_BEFORE_T,
             "uBeforeL": phonemap.U_BEFORE_L,
             "ahBeforeSV": phonemap.AH_BEFORE_S_V,
+            "ayBeforeM": phonemap.AY_BEFORE_M,
             "jhBeforeBack": phonemap.JH_BEFORE_BACK,
             "jhTakesD": sorted(phonemap._JH_TAKES_D),
             "ehEaBeforeD": phonemap.EH_EA_BEFORE_D,

@@ -427,6 +427,9 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
   // ơ is what an er is read as; an or inside a word is not (information is
   // phô). A word-final -or is ơ again: đốc tơ, not đốc tô.
   if (phone === "ER" && letter === "o" && !final) return P.erSpelledOr;
+  // /aɪ/ keeps its glide before every coda the gold has, but none is an m.
+  // Before one it is a: tham.
+  if (phone === "AY" && nextCoda[0] === "M") return P.ayBeforeM;
   // A stressed /ʌ/ is ă, but ơ before an s or a v: bớt, lớp. Not every
   // fricative: crush has one and takes ă.
   if (phone === "AH" && stress === "1" && ["S", "V"].includes(nextCoda[0])) {

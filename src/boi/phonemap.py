@@ -75,6 +75,7 @@ IOUS_ENDING = [("ơ", "", 0), ("i", "", 1)]
 A_BEFORE_TURE = [("â", "y", 0), ("a", "", 1)]
 U_BEFORE_L = [("uô", "", 0), ("u", "", 1)]
 AH_BEFORE_S_V = [("ơ", "", 0), ("ă", "", 1)]
+AY_BEFORE_M = [("a", "", 0), ("a", "i", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
 NUCLEUS_CLOSED = dict(
@@ -235,6 +236,10 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         return ER_SPELLED_OR
     # An unstressed u closed by an l takes the l as an a: sờ ke đùa. Stressed
     # it does not, which is cu and sờ cun.
+    # /aɪ/ keeps its glide before every coda the gold has, on lai, sai, phai
+    # and eighteen more, but none of them is an m. Before one it is a: tham.
+    if phone == "AY" and next_coda[:1] == ("M",):
+        return AY_BEFORE_M
     # A stressed /ʌ/ is ă, but ơ before an s or a v: bớt and lớp against
     # ắp, bắc, bắt giét, phăng sừn and cờ rắt. Not "before a fricative":
     # crush has one and takes ă. These are the two that were observed.
