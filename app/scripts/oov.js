@@ -143,6 +143,7 @@ const slot = (o = {}) => ({
 function isOnsetRun(run, T) {
   if (run.length === 2 && ["L", "R"].includes(run[1])
       && T.syllabify.clusterHeads.includes(run[0])) return true;
+  if (T.syllabify.sClusters.includes(joinKey(run))) return true;
   return T.syllabify.viOnsets.includes(joinKey(run))
     || joinKey(run) === "T+R" || joinKey(run) === "T+S";
 }
@@ -163,7 +164,8 @@ function splitRun(run, left, T) {
     if (n === 1 || isOnsetRun(run.slice(-n), T)) {
       let coda = run.slice(0, run.length - n);
       let onset = run.slice(run.length - n);
-      if (!coda.length && onset.length > 1 && left && ["1", "2"].includes(left[1])) {
+      if (!coda.length && onset.length > 1 && left && ["1", "2"].includes(left[1])
+          && !T.syllabify.tense.includes(left[0])) {
         coda = onset.slice(0, 1);
         onset = onset.slice(1);
       }

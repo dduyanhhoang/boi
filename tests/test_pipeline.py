@@ -31,6 +31,9 @@ DEV_EXACT_FLOOR = 0.70
     ("control", "con trôn"),        # final l after a stressed vowel -> n
     ("sport", "sờ pọt"),            # nặng on a final -rt
     ("snack", "sờ nách"),           # k after a is spelled ch
+    ("esport", "i sờ pọt"),         # tense vowel stays open, s+p holds together
+    ("offline", "óp lai"),          # checked vowel takes the f
+    ("escape", "i sờ kếp"),
 ])
 def test_known_reading(word, expected):
     got = generate.candidates(word, limit=5)

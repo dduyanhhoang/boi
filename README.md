@@ -108,8 +108,8 @@ uv run boi --read ecology     # ê cô lô gi      the letters, read as Vietname
 uv run boi --all ecology      # both, with alternatives
 ```
 
-The page shows the second one under "How it got there", and clicking it makes
-it the main reading.
+The page shows both: the heard reading large, the letter reading on a line
+under it, and clicking the second one makes it the main reading.
 
 The default is the heard reading because the data says so: over the 181
 reviewed rows it matches 0.707 against 0.420 for the letters, winning 54 words

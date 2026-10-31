@@ -69,10 +69,11 @@ the only channel.
 ## The second reading
 
 A word carries two readings: the heard one, from CMUdict, and the letter one.
-The page leads with the heard reading and puts the letter reading inside "How
-it got there" as a chip that swaps in when clicked. It is not a third emphasis
-style: it is a row in the panel, so the two-emphasis rule still holds, and the
-panel is where the rest of the provenance already lives.
+The page leads with the heard reading and puts the letter reading on a quiet
+line directly under the syllables, as a capsule that swaps in when clicked. It
+first sat inside "How it got there", where nobody found it. It is not a third
+emphasis style: it carries no wash, only a secondary label and a bordered
+capsule, so the two-emphasis rule still holds.
 
 ## Icons
 

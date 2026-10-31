@@ -16,6 +16,14 @@ VOWELS = {
 # or split into an inserted syllable. A nasal cannot: online is "on lai".
 _CLUSTER_HEADS = {"P", "B", "T", "D", "K", "G", "F", "TH", "S"}
 _INSERTED_NUCLEUS = "ơ"
+# English allows these to open a syllable too, and they resist splitting more
+# than a C+l or C+r pair does: e-sport, not es-port.
+_S_CLUSTERS = {("S", "P"), ("S", "T"), ("S", "K"), ("S", "M"), ("S", "N"),
+               ("S", "L"), ("S", "W")}
+# A tense vowel or a diphthong can end a syllable in English, so a cluster
+# after it stays whole: e-sport, mi-stake, mai cờ rô. Everything else is
+# checked and has to take a consonant from the run: sys-tem, up-load, óp lai.
+_TENSE = {"IY", "EY", "AY", "OW", "OY", "AW", "UW", "ER"}
 # Before a final -ing or -y the gold geminates any of these, even voiced N
 # (trên ninh), and it overwrites an r that was going to drop (pác kinh, pát ti).
 _GEMINATES = {"P", "T", "K", "N"}
@@ -56,6 +64,8 @@ ONSET_RUNS_KEEP = {("T", "S")}   # pizza -> pi da, never pít sa
 def _is_onset_run(run):
     if len(run) == 2 and run[1] in ("L", "R") and run[0] in _CLUSTER_HEADS:
         return True
+    if run in _S_CLUSTERS:
+        return True
     return run in (("T", "R"), ("T", "S"))
 
 
@@ -82,9 +92,10 @@ def _split_run(run, left=None):
     for n in range(min(2, len(run)), 0, -1):
         if n == 1 or _is_onset_run(run[-n:]):
             coda, onset = run[:-n], run[-n:]
-            # A stressed syllable with an empty coda takes the first consonant
+            # A checked vowel has to close, so it takes the first consonant
             # rather than leaving a cluster to repair: ắp lốt, not ă pờ lốt.
-            if not coda and len(onset) > 1 and left and left[1] in ("1", "2"):
+            if (not coda and len(onset) > 1 and left
+                    and left[1] in ("1", "2") and left[0] not in _TENSE):
                 coda, onset = onset[:1], onset[1:]
             return coda, onset
     return run, ()

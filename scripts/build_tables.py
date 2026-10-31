@@ -55,6 +55,8 @@ def main():
             "keepsOffglide": sorted(syllabify._KEEPS_OFFGLIDE),
             "offglideNuclei": sorted(syllabify._OFFGLIDE_NUCLEI),
             "insertedNucleus": syllabify._INSERTED_NUCLEUS,
+            "sClusters": sorted(key(t) for t in syllabify._S_CLUSTERS),
+            "tense": sorted(syllabify._TENSE),
         },
         "phonemap": {
             "onset": phonemap.ONSET,

@@ -261,6 +261,31 @@ main {
   font-size: var(--text-caption-1);
 }
 
+/* The other reading, quiet but in the open. */
+.second {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  color: var(--label-secondary);
+  font-size: var(--text-subheadline);
+}
+.second button {
+  min-height: 36px;
+  padding: var(--space-1) var(--space-4);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-capsule);
+  background: var(--bg-elevated);
+  color: var(--label);
+  font: inherit;
+  font-size: var(--text-callout);
+  cursor: pointer;
+  transition: background var(--duration-state) var(--ease),
+              border-color var(--duration-state) var(--ease);
+}
+.second button:hover { background: var(--accent-wash); border-color: var(--accent); color: var(--accent-text); }
+
 /* Emphasis is a wash plus same-tone text, never a rule or a symbol. */
 .note {
   display: flex;
@@ -382,6 +407,7 @@ footer a {
   animation: sharpen var(--duration-moment) var(--ease) both;
   animation-delay: calc(var(--i) * 55ms + 90ms);
 }
+.result[data-fresh] .second,
 .result[data-fresh] .note,
 .result[data-fresh] .source { animation: rise var(--duration-enter) var(--ease) both; animation-delay: 240ms; }
 

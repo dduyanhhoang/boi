@@ -16,4 +16,5 @@ LEXICON = {
     "mall": "mô",       # final l drops; sale glides to sêu, school takes n
     "bus": "bớt",       # /ʌ/ -> ơ, against bắc and ắp
     "schedule": "sờ ke đùa",  # JH -> đ and UH0 + L -> ua, neither seen elsewhere
+    "handsome": "hen săm",    # AE + n is a elsewhere (phan, pờ lan), AH0 + m is o
 }

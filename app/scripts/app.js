@@ -102,6 +102,16 @@ function renderLoading() {
   el.result.innerHTML = '<div class="skeleton"></div>';
 }
 
+/** The other reading, offered next to the main one rather than buried. */
+function secondReading(reading, best) {
+  if (!reading || reading === best) return '<div class="second" hidden></div>';
+  return `<div class="second">
+    <span>as letters</span>
+    <button type="button" data-swap="${escapeHtml(reading)}" lang="vi">${
+      escapeHtml(reading)}</button></div>`;
+}
+
+
 function renderResult(word, phones, readings, spelled = false, pieces = null) {
   current = { word, phones, readings, spelled, pieces };
   const [best, ...alts] = readings;
@@ -133,10 +143,6 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
           .map((a) => `<button type="button" data-swap="${escapeHtml(a)}">${escapeHtml(a)}</button>`)
           .join("")}</span>`]
       : null,
-    asLetters && asLetters !== best
-      ? ["As letters", `<span class="alts"><button type="button" data-swap="${
-          escapeHtml(asLetters)}">${escapeHtml(asLetters)}</button></span>`]
-      : null,
     g && g.native ? ["Vietnamese word", escapeHtml(g.native)] : null,
     g && g.tags.length ? ["Tags", `<span class="tags">${escapeHtml(g.tags.join(" "))}</span>`] : null,
     g ? ["Reviewed in", `${escapeHtml(g.split)} split, ${escapeHtml(g.status)}`] : null,
@@ -150,6 +156,7 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
       ${syllables.map((s, i) => `<li class="syllable" style="--i:${i}">
         <b lang="vi">${escapeHtml(s)}</b><span>${toneOf(s)}</span></li>`).join("")}
     </ul>
+    ${secondReading(asLetters, best)}
     ${note}
     <details class="source">
       <summary>${icon("chevron")}How it got there</summary>
@@ -169,12 +176,9 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
   if (!asLetters) {
     loadOov().then(({ module, tables }) => {
       if (!current || current.word !== word) return;
-      const reading = module.readLetters(word, tables);
-      const list = el.result.querySelector(".source dl");
-      if (!reading || reading === best || !list) return;
-      list.insertAdjacentHTML("beforeend",
-        `<dt>As letters</dt><dd><span class="alts"><button type="button"
-          data-swap="${escapeHtml(reading)}">${escapeHtml(reading)}</button></span></dd>`);
+      const slot = el.result.querySelector(".second");
+      if (!slot) return;
+      slot.outerHTML = secondReading(module.readLetters(word, tables), best);
     });
   }
 }
