@@ -266,11 +266,16 @@ main {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2) var(--space-6);
   margin-top: var(--space-4);
   color: var(--label-secondary);
   font-size: var(--text-subheadline);
 }
+.second .pair { display: flex; align-items: center; gap: var(--space-3); }
+.second .label { white-space: nowrap; }
+.second .label a { color: inherit; text-underline-offset: 0.2em; }
+.second .label a:hover { color: var(--accent-text); }
+.second .agrees { color: var(--accent-text); font-size: var(--text-footnote); }
 .second button {
   min-height: 36px;
   padding: var(--space-1) var(--space-4);

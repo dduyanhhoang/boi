@@ -15,7 +15,7 @@ import cmudict
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from boi import g2p, generate  # noqa: E402
+from boi import g2p, generate, ngo  # noqa: E402
 
 OUT = ROOT / "app" / "data"
 GOLD = ROOT / "data" / "eval_v0.csv"
@@ -62,6 +62,11 @@ def main():
     index = sorted(w for w in vocabulary if len(w) >= 3)
     (OUT / "words.txt").write_text("\n".join(index), encoding="utf-8")
     size += (OUT / "words.txt").stat().st_size
+
+    # Ngo et al.'s readings, for the words they cover, so the page can show a
+    # second opinion from outside this project.
+    size += write(OUT / "ngo.json",
+                  {word: ";".join(sorted(forms)) for word, forms in ngo.pairs().items()})
 
     # The review tool reads the open sheet from here.
     sheet = ROOT / "data" / "review" / "sheet_001.csv"

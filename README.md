@@ -139,7 +139,11 @@ uv run boi --all ecology      # both, with alternatives
 ```
 
 The page shows both: the heard reading large, the letter reading on a line
-under it, and clicking the second one makes it the main reading.
+under it, and clicking it makes it the main reading. For the 2,391 words Ngo
+et al. cover, their reading sits on that line too, so three systems can be
+compared at a glance. Where their notation cannot separate two spellings, a
+reading that differs only there counts as agreement and the line says so
+rather than repeating it.
 
 The default is the heard reading because the data says so: over the 181
 reviewed rows it matches 0.707 against 0.420 for the letters, winning 54 words

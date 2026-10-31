@@ -22,12 +22,15 @@ const el = {
   status: document.querySelector("#status"),
   theme: document.querySelector("#theme"),
   count: document.querySelector("#count"),
+  gold: document.querySelector("#gold"),
+  agree: document.querySelector("#agree"),
 };
 
 const shards = new Map();
 let oov = null;       // promise for the browser pipeline
 let oovReady = null;  // its resolved value, once it is in
 let gold = {};
+let ngo = {};
 let index = { examples: [], words: 0, gold: 0, agree: 0 };
 let active = -1;
 let suggestions = [];
@@ -102,13 +105,37 @@ function renderLoading() {
   el.result.innerHTML = '<div class="skeleton"></div>';
 }
 
-/** The other reading, offered next to the main one rather than buried. */
-function secondReading(reading, best) {
-  if (!reading || reading === best) return '<div class="second" hidden></div>';
-  return `<div class="second">
-    <span>as letters</span>
-    <button type="button" data-swap="${escapeHtml(reading)}" lang="vi">${
-      escapeHtml(reading)}</button></div>`;
+/** The other readings, offered next to the main one rather than buried. */
+function otherReadings(word, best, asLetters) {
+  const rows = [];
+  const theirsAll = (ngo[word] || "").split(";").filter(Boolean);
+  // Only merge the two when the letters row is actually being shown; if the
+  // letter reading is the main one, their row still has to say it agrees.
+  const lettersShown = Boolean(asLetters) && asLetters !== best;
+  const shared = lettersShown && theirsAll.includes(asLetters);
+  if (lettersShown) {
+    rows.push([shared
+      ? `as letters, and <a href="https://arxiv.org/abs/1810.03184"
+          rel="noopener">Ngo et al.</a>`
+      : "as letters", asLetters]);
+  }
+  // A second opinion from outside this project, for the words it covers.
+  // Their notation cannot separate s from x or d from gi, so a reading that
+  // differs only there is agreement, and repeating it would read as a
+  // disagreement that is not there.
+  const link = `<a href="https://arxiv.org/abs/1810.03184" rel="noopener"
+    >Ngo et al.</a>`;
+  if (theirsAll.length && !shared) {
+    rows.push([link, theirsAll.includes(best) ? null : theirsAll[0]]);
+  }
+
+  if (!rows.length) return '<div class="second" hidden></div>';
+  return `<div class="second">${rows.map(([label, reading]) => `
+    <span class="pair"><span class="label">${label}</span>
+      ${reading
+        ? `<button type="button" data-swap="${escapeHtml(reading)}" lang="vi">${
+            escapeHtml(reading)}</button>`
+        : '<span class="agrees">agrees</span>'}</span>`).join("")}</div>`;
 }
 
 
@@ -156,7 +183,7 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
       ${syllables.map((s, i) => `<li class="syllable" style="--i:${i}">
         <b lang="vi">${escapeHtml(s)}</b><span>${toneOf(s)}</span></li>`).join("")}
     </ul>
-    ${secondReading(asLetters, best)}
+    ${otherReadings(word, best, asLetters)}
     ${note}
     <details class="source">
       <summary>${icon("chevron")}How it got there</summary>
@@ -178,7 +205,7 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
       if (!current || current.word !== word) return;
       const slot = el.result.querySelector(".second");
       if (!slot) return;
-      slot.outerHTML = secondReading(module.readLetters(word, tables), best);
+      slot.outerHTML = otherReadings(word, best, module.readLetters(word, tables));
     });
   }
 }
@@ -382,16 +409,21 @@ async function boot() {
   try { applyTheme(localStorage.getItem("boi-theme") || "auto"); }
   catch { applyTheme("auto"); }
 
-  const [idx, g] = await Promise.all([
+  const [idx, g, n] = await Promise.all([
     fetch("./data/index.json").then((r) => r.json()).catch(() => index),
     fetch("./data/gold.json").then((r) => r.json()).catch(() => ({})),
+    fetch("./data/ngo.json").then((r) => r.json()).catch(() => ({})),
   ]);
   index = idx;
   gold = g;
+  ngo = n;
 
   el.examples.querySelector(".chips").innerHTML = index.examples
     .map((w) => `<button type="button" class="chip" data-word="${w}">${w}</button>`).join("");
+  // Read from the data rather than hard-coded, so the footer cannot go stale.
   el.count.textContent = index.words.toLocaleString("en-US");
+  if (el.gold) el.gold.textContent = index.gold;
+  if (el.agree) el.agree.textContent = index.agree;
 
   const word = new URLSearchParams(location.search).get("w");
   if (word) show(word, { push: false });
