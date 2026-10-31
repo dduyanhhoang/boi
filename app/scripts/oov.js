@@ -380,6 +380,8 @@ function codaOptions(phones, nucleus, schwa, T) {
     if (P.back.includes(nucleus)) return schwa ? P.codaLBackSchwa : P.codaLBackStressed;
     return P.codaL[nucleus] ?? [["", 0]];
   }
+  // A /tʃ/ coda is ch after i (sen guých) but t after a: match is mát.
+  if (key === "CH" && nucleus === "a") return [[P.chCodaAfterA, 0], ["ch", 1]];
   const options = P.codaRuns[key] ?? P.coda[phones[0]] ?? P.coda[phones[phones.length - 1]]
     ?? [["", 2]];
   const out = [];

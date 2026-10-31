@@ -76,6 +76,10 @@ def test_known_reading(word, expected):
     # and the letter decides before a coda n
     ("development", "đi ve lắp men"),
     ("government", "gơ vơ men"),
+    # a /tʃ/ coda is t after a, ch after i
+    ("match", "mát"),
+    ("watch", "goát"),
+    ("sandwich", "san guých"),
 ])
 def test_reduced_vowel_follows_the_spelling(word, expected):
     assert generate.read(word) == expected

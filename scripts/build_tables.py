@@ -85,6 +85,7 @@ def main():
             "codaLBackSchwa": phonemap.CODA_L_BACK_SCHWA,
             "back": phonemap._BACK,
             "chAfter": phonemap._CH_AFTER,
+            "chCodaAfterA": phonemap._CH_CODA_AFTER_A,
             "nhAfter": phonemap._NH_AFTER,
         },
         "vi": {

@@ -22,7 +22,7 @@ ONSET = {
     "Z": [("d", 0)],             # z -> d: đì dai, vơ dừn
     "SH": [("s", 0), ("x", 1)],
     "ZH": [("d", 0)],            # ʒ -> d: vơ dừn
-    "CH": [("ch", 0)],
+    "CH": [("ch", 0)],       # sen guých; after a it is t, see _CH_CODA_AFTER_A
     "JH": [("gi", 0), ("d", 1)], # gia va, giút / pờ rô dếch
     "M": [("m", 0)],
     "N": [("n", 0)],
@@ -123,7 +123,7 @@ CODA = {
     "Z": [("", 0), ("t", 1)],    # size -> sai, cheese -> chi
     "SH": [("t", 0)],
     "ZH": [("t", 0)],
-    "CH": [("ch", 0)],
+    "CH": [("ch", 0)],       # sen guých; after a it is t, see _CH_CODA_AFTER_A
     "JH": [("t", 0)],            # image -> i mịt
     "K": [("c", 0)],
     "G": [("c", 0)],             # bug -> bắc
@@ -172,6 +172,8 @@ _BACK = "oôơu"
 # exist), so the gold decides the default: ch after a and ê (sờ nách, bờ lách,
 # con tếch), c after i (cờ líc), nh after i and ê (pinh, linh).
 _CH_AFTER = "aê"
+# A /tʃ/ coda is ch after i (sen guých) but t after a: match is mát, not mách.
+_CH_CODA_AFTER_A = "t"
 _NH_AFTER = "iê"
 
 
@@ -244,6 +246,8 @@ def coda_options(phones, nucleus, schwa=False):
     options = CODA_RUNS.get(key)
     if options is None:
         options = CODA.get(phones[0]) or CODA.get(phones[-1], [("", 2)])
+    if key == ("CH",) and nucleus == "a":
+        return [(_CH_CODA_AFTER_A, 0), ("ch", 1)]
     out = []
     for coda, penalty in options:
         # ch after a only for a plain k (sờ nách, bờ lách); a cluster coda keeps
