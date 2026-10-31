@@ -96,10 +96,25 @@ expected shape rather than a verdict.
 Their code is vendored in `third_party/ngo/` and it runs, but **this project's
 Python 3 port of it does not reproduce their results**: on their own input it
 matches their own shipped output 28.4% of the time, and on the example in
-their paper, disneyland, the paper gives `đi sờ ni len` where this copy gives
-`đi ni lan`. So nothing in `app/` comes from running it, and there is no
-figure here for their system on the loanword set. Only their published
-readings are shown or scored.
+their paper, disneyland, the paper gives `đi sờ ni len` where that copy gives
+`đi ni lan`. Nothing is generated from it.
+
+`src/boi/ngo_model.py` is their method instead, written from
+[the 2018 paper](https://arxiv.org/abs/1810.03184) rather than ported: the
+pseudo-syllable formulation of Section III-A, the grapheme-to-phoneme mapping
+of Eq. 8, and the tone model of Eq. 9. It is pinned to the paper's own worked
+example, Figure 4, which formulates DISNEYLAND as D-I / S-@: / N-EY / L-A-N;
+`tests/test_ngo_model.py` checks the derived labels against that figure
+exactly.
+
+Trained on the 2,273 of their 2,400 pairs that yield ground-truth labels, it
+reaches 0.916 label accuracy and 0.295 whole-word accuracy on a held-out
+fifth, against 0.354 for their own system on the same reference. It needs no
+GPU and no training run: all three models are counts, fitted in about a
+second.
+
+The playground shows it as "their method, reimplemented", kept distinct from
+the 2,391 readings they published, which stay labelled as theirs.
 
 Reproduce:
 

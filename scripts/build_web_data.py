@@ -15,7 +15,7 @@ import cmudict
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from boi import g2p, generate, ngo  # noqa: E402
+from boi import g2p, generate, ngo, ngo_model  # noqa: E402
 
 OUT = ROOT / "app" / "data"
 GOLD = ROOT / "data" / "eval_v0.csv"
@@ -50,6 +50,19 @@ def main():
     theirs = {w: sorted(f) for w, f in ngo.pairs().items()}
     print(f"  {len(theirs)} readings from Ngo et al.'s published output")
 
+    # Their method, reimplemented from the paper in ngo_model.py, for every
+    # word. Kept apart from their published readings: this is their algorithm
+    # as read off arXiv:1810.03184, not their system's output.
+    print("  reading every word by their method ...", flush=True)
+    method = {}
+    for word in vocabulary:
+        phones = g2p.phones(word, predict=False)
+        if phones:
+            got = ngo_model.read(word, phones)
+            if got:
+                method[word] = got
+    print(f"  {len(method)} readings by the reimplemented method")
+
     shards, total = {}, 0
     for word in vocabulary:
         readings = generate.candidates(word, limit=TOP_N)
@@ -57,7 +70,8 @@ def main():
             continue
         phones = " ".join(g2p.phones(word, predict=False))
         shards.setdefault(word[0], {})[word] = (
-            f"{phones}|{';'.join(readings)}|{';'.join(theirs.get(word, []))}")
+            f"{phones}|{';'.join(readings)}|{';'.join(theirs.get(word, []))}"
+            f"|{';'.join(method.get(word, []))}")
         total += 1
 
     size = 0

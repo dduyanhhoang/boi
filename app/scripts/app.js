@@ -105,7 +105,7 @@ function renderLoading() {
 }
 
 /** The other readings, offered next to the main one rather than buried. */
-function otherReadings(word, best, asLetters, theirsRaw) {
+function otherReadings(word, best, asLetters, theirsRaw, methodRaw) {
   const rows = [];
   // Their reading rides along in the shard entry. A leading ~ means their
   // system run on input rebuilt from CMUdict rather than their own lexicon.
@@ -132,6 +132,15 @@ function otherReadings(word, best, asLetters, theirsRaw) {
     rows.push([link, theirsAll.includes(best) ? null : theirsAll[0]]);
   }
 
+  // Their method as reimplemented from the paper, which is not the same
+  // thing as their system's output and says so.
+  const method = (methodRaw || "").split(";").filter(Boolean);
+  if (method.length && !theirsAll.includes(method[0])) {
+    rows.push([`<a href="https://arxiv.org/abs/1810.03184" rel="noopener"
+      >their method</a>, reimplemented`,
+      method.includes(best) ? null : method[0]]);
+  }
+
   if (!rows.length) return '<div class="second" hidden></div>';
   return `<div class="second">${rows.map(([label, reading]) => `
     <span class="pair"><span class="label">${label}</span>
@@ -143,8 +152,8 @@ function otherReadings(word, best, asLetters, theirsRaw) {
 
 
 function renderResult(word, phones, readings, spelled = false, pieces = null,
-                      theirs = "") {
-  current = { word, phones, readings, spelled, pieces, theirs };
+                      theirs = "", method = "") {
+  current = { word, phones, readings, spelled, pieces, theirs, method };
   const [best, ...alts] = readings;
   const asLetters = oovReady ? oovReady.module.readLetters(word, oovReady.tables) : null;
   const syllables = best.split(" ");
@@ -187,7 +196,7 @@ function renderResult(word, phones, readings, spelled = false, pieces = null,
       ${syllables.map((s, i) => `<li class="syllable" style="--i:${i}">
         <b lang="vi">${escapeHtml(s)}</b><span>${toneOf(s)}</span></li>`).join("")}
     </ul>
-    ${otherReadings(word, best, asLetters, theirs)}
+    ${otherReadings(word, best, asLetters, theirs, method)}
     ${note}
     <details class="source">
       <summary>${icon("chevron")}How it got there</summary>
@@ -210,7 +219,8 @@ function renderResult(word, phones, readings, spelled = false, pieces = null,
       const slot = el.result.querySelector(".second");
       if (!slot) return;
       slot.outerHTML = otherReadings(word, best,
-                                     module.readLetters(word, tables), theirs);
+                                     module.readLetters(word, tables), theirs,
+                                     method);
     });
   }
 }
@@ -236,8 +246,8 @@ async function show(word, { push = true } = {}) {
 
   const entry = shard[w];
   if (entry) {
-    const [phones, readings, theirs] = entry.split("|");
-    renderResult(w, phones, readings.split(";"), false, null, theirs);
+    const [phones, readings, theirs, method] = entry.split("|");
+    renderResult(w, phones, readings.split(";"), false, null, theirs, method);
   } else {
     // Not one of the precomputed words, so run the pipeline here instead.
     renderLoading();
@@ -388,7 +398,7 @@ document.addEventListener("click", (e) => {
     if (reading === current.readings[0]) return;
     const reordered = [reading, ...current.readings.filter((r) => r !== reading)];
     renderResult(current.word, current.phones, reordered,
-                 current.spelled, current.pieces, current.theirs);
+                 current.spelled, current.pieces, current.theirs, current.method);
   }
 });
 
