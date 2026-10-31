@@ -12,5 +12,26 @@ the five words it shares with `data/eval_v0.csv` its readings match the gold
 four times out of five, so it is a useful second opinion from a source that
 never saw this project.
 
-`eval/run_ngo.py` decodes the X-SAMPA and scores against it. Nothing here is
-fitted on this data; it is held out entirely.
+Three files: `large_test.lex` is the input, English words with English
+phones; `large_test.vie` is the Vietnamese reference; `large_test.output` is
+their own system's prediction. The last two agree 35% of the time, which is
+how you can tell which is which.
+
+`eval/run_ngo.py` decodes the X-SAMPA and scores against the reference, and
+`--baseline` scores their system the same way, so the comparison is like for
+like. Nothing here is fitted on; `--split` holds half back.
+
+Their method and this one converge and diverge in a way worth knowing. Their
+first stage builds "pseudo-syllables", assigning source graphemes to
+onset/nucleus/coda slots under the target language's phonotactics, which is
+what `syllabify.py` and `vi.LEGAL_CODAS` do, arrived at separately. Their
+mapping is conditioned on which slot a grapheme landed in, their example
+being l to /n/ in a coda and /l/ in an onset, which is what the split between
+`phonemap.ONSET` and `phonemap.CODA` encodes.
+
+Where they differ is the axis this project keeps running into: they map
+source graphemes straight to target phonemes and deliberately skip the source
+pronunciation, to avoid importing source-language assumptions. This project
+reaches for CMUdict first and the letters second. `letters.py` is the closer
+match to their architecture, and it is the one that scores better on their
+data.

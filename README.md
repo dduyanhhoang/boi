@@ -80,6 +80,20 @@ Two independent sets, each preferring a different reading, which is the case
 for keeping both. It also gives `letters.py` a measurement it otherwise has
 none of. Nothing is fitted on the Ngo data; `--split dev` holds half back.
 
+Their repo also carries their own system's output, so the comparison can be
+like for like on the same 2,391 words:
+
+| | agreement with their reference |
+|---|---|
+| Ngo et al.'s own system | 0.354 |
+| this, letters | 0.213 |
+| this, either reading | 0.269 |
+| this, heard | 0.125 |
+
+Their system was built and trained for exactly that task. This one was built
+for a different one and has never seen a name, so the gap is the expected
+shape; what the number gives is a calibrated sense of how far off it is.
+
 Reproduce:
 
 ```sh

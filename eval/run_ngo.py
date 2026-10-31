@@ -119,6 +119,8 @@ def main():
     ap.add_argument("--errors", action="store_true")
     ap.add_argument("--reading", choices=["heard", "letters", "either"],
                     default="heard", help="which reading to score")
+    ap.add_argument("--baseline", action="store_true",
+                    help="score Ngo et al.'s own system output instead of ours")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--split", choices=["dev", "test", "all"], default="all",
                     help="every other word, so the letter reader can be fitted "
@@ -128,6 +130,9 @@ def main():
     words = [l.split("\t")[0].strip()
              for l in open(DATA / "large_test.lex", encoding="utf-8")]
     lines = open(DATA / "large_test.vie", encoding="utf-8").read().splitlines()
+    # Their system's own predictions, decoded the same way and scored the same
+    # way, so the comparison is like for like.
+    theirs = open(DATA / "large_test.output", encoding="utf-8").read().splitlines()
 
     total = exact = undecodable = 0
     misses = []
@@ -142,17 +147,23 @@ def main():
         if not allowed:
             undecodable += 1
             continue
-        heard = generate.read(word)
-        spelled = letters.read(word)
-        got = {"heard": heard, "letters": spelled,
-               "either": heard if heard in allowed else spelled}[args.reading]
+        if args.baseline:
+            predicted = readings(theirs[n]) or set()
+            got = next(iter(predicted & allowed), sorted(predicted)[0] if predicted
+                       else None)
+        else:
+            heard = generate.read(word)
+            spelled = letters.read(word)
+            got = {"heard": heard, "letters": spelled,
+                   "either": heard if heard in allowed else spelled}[args.reading]
         total += 1
         if got in allowed:
             exact += 1
         elif len(misses) < 400:
             misses.append((word, got, sorted(allowed)[0], g2p.source(word)))
 
-    print(f"Ngo et al. large_test [{args.split}] ({args.reading}): "
+    label = "Ngo et al.'s own system" if args.baseline else args.reading
+    print(f"Ngo et al. large_test [{args.split}] ({label}): "
           f"{total} words scored, "
           f"{undecodable} could not be decoded")
     print(f"  agreement  {exact / total:.3f}  ({exact}/{total})")
