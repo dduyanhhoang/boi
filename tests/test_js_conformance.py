@@ -25,15 +25,22 @@ from boi import rank as rank_mod  # noqa: E402
 TABLES = ROOT / "app" / "data" / "tables.json"
 RUNNER = ROOT / "tests" / "conformance.mjs"
 SAMPLE = 1500
+REAL_SAMPLE = 3000
 SEED = 7
 
 pytestmark = pytest.mark.skipif(shutil.which("node") is None,
                                 reason="node is needed to run the browser pipeline")
 
 
-def python_reading(word, limit=3):
-    """generate.candidates, but forced down the spelling path."""
-    phones = spell.phones(word)
+def python_reading(word, limit=3, phones=None):
+    """generate.candidates without the lexicon, on the phones given.
+
+    Without phones it takes the spelling path, which is what the browser does
+    for a word outside the shards. With them it takes whatever it is handed,
+    which is how the real CMUdict stress patterns get compared.
+    """
+    if phones is None:
+        phones = spell.phones(word)
     if phones is None:
         return None, []
     import itertools
@@ -78,22 +85,58 @@ def sample_words():
     return sorted(set(words))
 
 
+def real_pairs():
+    """CMUdict words with the phones the pipeline actually uses for them.
+
+    The eval and every word pinned in test_pipeline go in first, since those
+    are the ones whose rules were written against real phones; then a seeded
+    sample of the rest.
+    """
+    import csv
+    import cmudict
+
+    words = set()
+    for split in ("dev", "test"):
+        with open(ROOT / "data" / "splits" / f"{split}.csv", encoding="utf-8") as f:
+            words |= {r["word"] for r in csv.DictReader(f)}
+    words |= {"improvement", "development", "temperature", "template", "accurate",
+              "english", "schedule", "module", "education", "conscious",
+              "delicious", "enthusiasm", "algorithm", "album", "these",
+              "chinese", "family", "mechanical", "singing", "singer", "camera",
+              "teacher", "order", "lifetime", "bus", "love", "crush", "netflix"}
+    real = sorted(w for w in cmudict.dict() if w.isalpha() and 3 <= len(w) <= 14)
+    words |= set(random.Random(SEED + 1).sample(real, REAL_SAMPLE))
+    return [(w, g2p.phones(w)) for w in sorted(words) if g2p.phones(w)]
+
+
 def test_browser_pipeline_matches_python():
     assert TABLES.exists(), "run: uv run scripts/build_tables.py"
     words = sample_words()
+    pairs = real_pairs()
     import cmudict
 
     known = sorted(w for w in cmudict.dict() if w.isalpha() and len(w) >= 3)
     payload = {"tables": json.loads(TABLES.read_text(encoding="utf-8")),
-               "words": words, "known": known}
+               "words": words, "known": known, "pairs": pairs}
 
     done = subprocess.run(
         ["node", str(RUNNER)],
         input=json.dumps(payload), capture_output=True, text=True, check=False)
     assert done.returncode == 0, done.stderr[-2000:]
-    js = json.loads(done.stdout)
+    out = json.loads(done.stdout)
+    js, real = out["spelled"], out["real"]
 
     mismatches = []
+    for word, phones in pairs:
+        want = python_reading(word, phones=phones)[1]
+        got = real[word]["readings"]
+        if got != want:
+            mismatches.append(f"{word} {' '.join(phones)}\n  py {want}\n  js {got}")
+        if real[word]["letters"] != spell.align_vowels(word, phones):
+            mismatches.append(f"{word} letters\n  py {spell.align_vowels(word, phones)}"
+                              f"\n  js {real[word]['letters']}")
+        if len(mismatches) >= 8:
+            break
     for word in words:
         phones, readings = python_reading(word)
         got = js[word]
@@ -110,5 +153,6 @@ def test_browser_pipeline_matches_python():
             break
 
     assert not mismatches, (
-        f"{len(mismatches)}+ of {len(words)} words differ between the Python "
-        f"pipeline and app/scripts/oov.js:\n\n" + "\n\n".join(mismatches))
+        f"{len(mismatches)}+ disagreements between the Python pipeline and "
+        f"app/scripts/oov.js, over {len(pairs)} words on their real phones and "
+        f"{len(words)} on the spelling path:\n\n" + "\n\n".join(mismatches))
