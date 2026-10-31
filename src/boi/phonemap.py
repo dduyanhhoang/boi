@@ -69,8 +69,12 @@ EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
 AA_SPELLED_O = [("o", "", 0), ("ô", "", 1), ("a", "", 2)]
 ESE_ENDING = [("i", "t", 0), ("ê", "", 1)]
 AH_BEFORE_M = [("ư", "", 0), ("â", "", 1)]
+_JH_TAKES_D = {"UH", "UW", "AH"}
+JH_BEFORE_BACK = [("đ", 0), ("gi", 1), ("d", 2)]
 IOUS_ENDING = [("ơ", "", 0), ("i", "", 1)]
 A_BEFORE_TURE = [("â", "y", 0), ("a", "", 1)]
+U_BEFORE_L = [("uô", "", 0), ("u", "", 1)]
+AH_BEFORE_S_V = [("ơ", "", 0), ("ă", "", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
 NUCLEUS_CLOSED = dict(
@@ -202,7 +206,7 @@ _CH_CODA_AFTER_A = "t"
 _NH_AFTER = "iê"
 
 
-def onset_options(phones, doubled=False):
+def onset_options(phones, doubled=False, nucleus="", stress=""):
     if not phones:
         return [("", 0)]
     # A doubled ŋ has already left the nasal behind as the previous coda, so
@@ -210,6 +214,10 @@ def onset_options(phones, doubled=False):
     # which is what singing needs; reading that one as g loses the nasal.
     if doubled and tuple(phones) == ("NG",):
         return [("g", 0)]
+    # /dʒ/ is gi, but đ before an unstressed back vowel: e đu cây sừn and
+    # sờ ke đùa. Stressed it stays gi, which is what giút and gia va need.
+    if tuple(phones) == ("JH",) and stress == "0" and nucleus in _JH_TAKES_D:
+        return JH_BEFORE_BACK
     if tuple(phones) in ONSET_RUNS:
         return ONSET_RUNS[tuple(phones)]
     return ONSET.get(phones[-1], [("", 3)])
@@ -225,6 +233,15 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # other final r-vowel: đốc tơ, ắc tơ, not đốc tô.
     if phone == "ER" and letter == "o" and not final:
         return ER_SPELLED_OR
+    # An unstressed u closed by an l takes the l as an a: sờ ke đùa. Stressed
+    # it does not, which is cu and sờ cun.
+    # A stressed /ʌ/ is ă, but ơ before an s or a v: bớt and lớp against
+    # ắp, bắc, bắt giét, phăng sừn and cờ rắt. Not "before a fricative":
+    # crush has one and takes ă. These are the two that were observed.
+    if phone == "AH" and stress == "1" and next_coda[:1] in (("S",), ("V",)):
+        return AH_BEFORE_S_V
+    if phone in ("UH", "UW") and stress == "0" and next_coda == ("L",):
+        return U_BEFORE_L
     if phone == "OW":
         if next_coda == ("L",) and not final:
             return OW_FINAL          # phâu đờ

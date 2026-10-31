@@ -14,8 +14,6 @@ LEXICON = {
     "shop": "xóp",      # s -> x, against sóp pinh
     "sauce": "xót",     # s -> x, against sót
     "mall": "mô",       # final l drops; sale glides to sêu, school takes n
-    "bus": "bớt",       # /ʌ/ -> ơ, against bắc and ắp
-    "schedule": "sờ ke đùa",  # JH -> đ and UH0 + L -> ua, neither seen elsewhere
     "handsome": "hen săm",    # AE + n is a elsewhere (phan, pờ lan), AH0 + m is o
     # The country's own name, so it is read as Vietnamese rather than
     # transliterated: no rule gets iê out of IY0 EH2, or mít out of -mese.

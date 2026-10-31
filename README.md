@@ -44,7 +44,7 @@ rules and is tried first when it is installed.
 
 | | dev, rules only | dev, with lexicon | test |
 |---|---|---|---|
-| exact match on `vi_form` | 0.824 | 0.863 | 0.780 |
+| exact match on `vi_form` | 0.847 | 0.878 | 0.780 |
 | match on `vi_form` or an `alt_form` | 0.832 | 0.870 | 0.860 |
 | gold form in the top 5 | 0.893 | 0.908 | 0.880 |
 | syllable error rate | 0.119 | 0.095 | 0.100 |

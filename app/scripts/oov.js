@@ -407,10 +407,13 @@ function variants(phones, letters, T) {
 
 /* phonemap.py --------------------------------------------------------- */
 
-function onsetOptions(phones, T, doubled) {
+function onsetOptions(phones, T, doubled, nucleus, stress) {
   // A doubled ŋ left the nasal behind as the previous coda, so the copy is
   // just g: sinh gờ. An ordinary onset ŋ keeps it, which singing needs.
   if (doubled && joinKey(phones) === "NG") return [["g", 0]];
+  // /dʒ/ is gi, but đ before an unstressed back vowel: e đu cây sừn, sờ ke đùa.
+  if (joinKey(phones) === "JH" && stress === "0"
+      && T.phonemap.jhTakesD.includes(nucleus)) return T.phonemap.jhBeforeBack;
   if (!phones.length) return [["", 0]];
   const run = T.phonemap.onsetRuns[joinKey(phones)];
   if (run) return run;
@@ -424,6 +427,15 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
   // ơ is what an er is read as; an or inside a word is not (information is
   // phô). A word-final -or is ơ again: đốc tơ, not đốc tô.
   if (phone === "ER" && letter === "o" && !final) return P.erSpelledOr;
+  // A stressed /ʌ/ is ă, but ơ before an s or a v: bớt, lớp. Not every
+  // fricative: crush has one and takes ă.
+  if (phone === "AH" && stress === "1" && ["S", "V"].includes(nextCoda[0])) {
+    return P.ahBeforeSV;
+  }
+  // An unstressed u closed by an l takes the l as an a: sờ ke đùa. Stressed
+  // it does not, which is cu and sờ cun.
+  if (["UH", "UW"].includes(phone) && stress === "0"
+      && joinKey(nextCoda) === "L") return P.uBeforeL;
   if (phone === "OW") {
     if (joinKey(nextCoda) === "L" && !final) return P.owFinal;
     // A final s or z closes it on paper and goes unheard: close and clothes
@@ -557,8 +569,9 @@ function toneOf(s, syl, T) {
       && syl.nucleus === "ư"
       && (s.final || s.letter === T.syllabify.tionLetters)) return "huyen";
   if (s.final) {
-    if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "L") {
-      return "huyen";
+    if (s.stress === "0" && joinKey(s.coda) === "L"
+        && ["AH", "UH", "UW"].includes(s.nucleus)) {
+      return "huyen";          // -le/-al/-ule: gu gồ, mo đồ, đùa
     }
     // The huyền goes with the ư, not with the m: ao bum does not take it.
     if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "M"
@@ -627,7 +640,7 @@ function slotNucleusOptions(s, T) {
 
 function slotOptions(s, T) {
   if (s.inserted) {
-    return onsetOptions(s.onset, T)
+    return onsetOptions(s.onset, T, Boolean(s.onsetDoubled), s.nucleus, s.stress)
       .map(([o, p]) => [{ onset: o, glide: "", nucleus: T.syllabify.insertedNucleus,
                           coda: "", tone: "ngang" }, p])
       .slice(0, T.generate.perSlot);
@@ -636,7 +649,8 @@ function slotOptions(s, T) {
   const legal = new Map();
   const illegal = new Map();
   const schwa = s.nucleus === "AH" && s.stress === "0";
-  for (const [onset, pOn] of onsetOptions(s.onset, T, s.onsetDoubled)) {
+  for (const [onset, pOn] of onsetOptions(s.onset, T, s.onsetDoubled,
+                                          s.nucleus, s.stress)) {
     for (const [nucleus, offglide, pNu] of slotNucleusOptions(s, T)) {
       const codas = offglide
         ? [[offglide, s.coda.length ? 1 : 0]]

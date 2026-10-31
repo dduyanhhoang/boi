@@ -283,6 +283,13 @@ def test_dev_exact_match_floor():
     ("message", "mét sịt"),         # but -age is not: the coda decides
     ("movement", "múp mừn"),
     ("development", "đi ve lắp men"),   # and men after a reduced one
+    ("schedule", "sờ ke đùa"),      # by rule now, not memorised
+    ("module", "mo đùa"),
+    ("education", "e đu cây sừn"),  # the same đ, from the gold
+    ("juice", "giút"),              # stressed, so gi
+    ("bus", "bớt"),                 # /ʌ/ before s or v is ơ
+    ("love", "lớp"),
+    ("crush", "cờ rắt"),            # but not before every fricative
     ("temperature", "tem pơ rây chờ"),  # inserted ngang after a nasal; -ature
     ("template", "tem pờ lết"),     # -ate is ết, and the inserted ơ is huyền
     ("netflix", "nét phờ lích"),    # huyền after a stop coda

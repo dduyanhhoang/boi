@@ -25,9 +25,10 @@ def tone_of(slot, syl):
             and (slot.final or slot.letter == "io")):
         return "huyen"
     if slot.final:
+        if slot.stress == "0" and slot.coda == ("L",) \
+                and slot.nucleus in ("AH", "UH", "UW"):
+            return "huyen"                  # -le/-al/-ule: gu gồ, mo đồ, đùa
         if slot.nucleus == "AH" and slot.stress == "0":
-            if slot.coda == ("L",):
-                return "huyen"              # -le/-al: gu gồ, mo đồ, le vồ
             # The huyền goes with the ư, not with the m: dừm and từm take it,
             # ao bum does not.
             if slot.coda == ("M",) and syl.nucleus == "ư":
