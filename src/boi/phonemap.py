@@ -282,10 +282,17 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     return table.get(phone, [("ơ", 3)])
 
 
-def coda_options(phones, nucleus, schwa=False, vowel=""):
+def coda_options(phones, nucleus, schwa=False, vowel="", doubled=False,
+                 reduced=False):
     if not phones:
         return [("", 0)]
     key = tuple(phones)
+    # After i a k is ch, unless it is a plain one closing a stressed syllable:
+    # tích két, sờ pích cơ, nét phờ lích and mê ca ních against cờ líc and
+    # tíc tóc. A doubled k is a copy of the next onset, not a plain coda.
+    if (nucleus == "i" and key[0] == "K"
+            and (doubled or reduced or len(key) > 1)):
+        return [("ch", 0), ("c", 1)]
     # A final z goes unheard after a tense vowel, which is every gold case
     # (sai, chi, pờ li), but closes a checked one: disneyland is đít ni.
     if key == ("Z",) and vowel and vowel not in TENSE:

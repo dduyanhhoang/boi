@@ -60,6 +60,7 @@ class Slot(NamedTuple):
     final: bool = False
     first: bool = False
     letter: str = ""        # the vowel letters this phone was written with
+    doubled: bool = False   # the coda is a copy of the next syllable's onset
 
 
 def _strip_stress(phones):
@@ -182,11 +183,15 @@ def _slots(phones, letters=None):
 def _nasal_doubles_before(right):
     """Whether a nasal doubles into this reduced syllable.
 
-    Fitted to the nine dev rows that have a nasal between a primary-stressed
-    vowel and a reduced one. An i or y always takes it; an e takes it only
-    where the syllable is closed or ends the word, since an open mid-word e
-    is the reduced vowel that keeps camera at ca mê ra; an a or u never does.
+    Two conditions, fitted to the nine rows with a nasal between a
+    primary-stressed vowel and a reduced one. The syllable must not be closed
+    by a stop, which is what keeps mechanic at mê ca ních against com men;
+    and it must be written i or y, or else be closed or end the word, an open
+    mid-word e being what keeps camera at ca mê ra. An a or u never takes it:
+    đờ ra ma, i mịt, ba na na, đô nất.
     """
+    if right.coda and right.coda[0] not in _NASAL_CODAS:
+        return False
     if right.letter in ("i", "y"):
         return True
     return right.letter == "e" and bool(right.coda or right.final)
@@ -235,7 +240,8 @@ def _geminate(slots):
         # leaves the nucleus open, which is what pác kinh and pát ti need.
         # A doubled /tʃ/ is only the stop closure, so it comes back as t:
         # teacher is tít chờ. A real final one keeps ch, as in sen guých.
-        out[i] = out[i]._replace(coda=left.coda + ("T" if phone == "CH" else phone,))
+        out[i] = out[i]._replace(
+            coda=left.coda + ("T" if phone == "CH" else phone,), doubled=True)
         changed = True
     return out if changed else None
 

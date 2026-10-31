@@ -295,10 +295,11 @@ function geminate(slots, T) {
       // front letter: com men, lơn ninh, pham mi li, sinh gờ.
       || (T.syllabify.nasalCodas.includes(phone) && !left.coda.length
           && left.stress === "1" && ["", "0"].includes(right.stress)
-          && nasalDoublesBefore(right));
+          && nasalDoublesBefore(right, T));
     if (!ok) continue;
     // A doubled /tʃ/ is only the stop closure, so it returns as t.
-    out[i] = { ...left, coda: [...left.coda, phone === "CH" ? "T" : phone] };
+    out[i] = { ...left, coda: [...left.coda, phone === "CH" ? "T" : phone],
+               doubled: true };
     changed = true;
   }
   return changed ? out : null;
@@ -337,8 +338,12 @@ function repair(slots, keepClusters, T) {
   return out;
 }
 
-/** An i or y always takes the doubled nasal, an e only when closed or final. */
-function nasalDoublesBefore(right) {
+/** A nasal doubles unless a stop closes the syllable; an e also needs it
+ *  closed or final, an open mid-word one keeping camera at ca mê ra. */
+function nasalDoublesBefore(right, T) {
+  if (right.coda.length && !T.syllabify.nasalCodas.includes(right.coda[0])) {
+    return false;
+  }
   if (right.letter === "i" || right.letter === "y") return true;
   return right.letter === "e" && (right.coda.length > 0 || right.final);
 }
@@ -439,13 +444,19 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   return table[phone] ?? [["ơ", "", 3]];
 }
 
-function codaOptions(phones, nucleus, schwa, vowel, T) {
+function codaOptions(phones, nucleus, schwa, vowel, T, doubled, reduced) {
   const P = T.phonemap;
   if (!phones.length) return [["", 0]];
   const key = joinKey(phones);
   // A final z goes unheard after a tense vowel (sai, chi, pờ li) but closes a
   // checked one: disneyland is đít ni.
   if (key === "Z" && vowel && !P.tense.includes(vowel)) return [["t", 0], ["", 1]];
+  // After i a k is ch, unless it is a plain one closing a stressed syllable:
+  // tích két, sờ pích cơ, nét phờ lích, mê ca ních against cờ líc, tíc tóc.
+  if (nucleus === "i" && phones[0] === "K"
+      && (doubled || reduced || phones.length > 1)) {
+    return [["ch", 0], ["c", 1]];
+  }
   if (key === "L") {
     if (P.back.includes(nucleus)) return schwa ? P.codaLBackSchwa : P.codaLBackStressed;
     return P.codaL[nucleus] ?? [["", 0]];
@@ -554,7 +565,8 @@ function slotOptions(s, T) {
     for (const [nucleus, offglide, pNu] of slotNucleusOptions(s, T)) {
       const codas = offglide
         ? [[offglide, s.coda.length ? 1 : 0]]
-        : codaOptions(s.coda, nucleus, schwa, s.nucleus, T);
+        : codaOptions(s.coda, nucleus, schwa, s.nucleus, T,
+                      Boolean(s.doubled), s.stress === "0");
       for (const [coda, pCo] of codas) {
         let spelled = (onset === "g" && !s.glide && "ieê".includes(nucleus[0]))
           ? "gh" : onset;

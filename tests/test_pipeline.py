@@ -264,6 +264,12 @@ def test_dev_exact_match_floor():
     ("java", "gia va"),             # an a stays a
     ("marketing", "ma két tinh"),
     ("vietnamese", "việt nam mít"),  # lexicon: read as Vietnamese
+    ("mechanic", "mê ca ních"),     # no doubling into a stop-closed syllable
+    ("ticket", "tích két"),         # a doubled k after i is ch
+    ("speaker", "sờ pích cơ"),
+    ("netflix", "nét phờ lích"),    # and so is a cluster
+    ("click", "cờ líc"),            # a plain one after a stressed vowel is c
+    ("tiktok", "tíc tóc"),
     ("system", "xít từm"),          # lexicon for the x, rule for the ừm
     ("enthusiasm", "en thu di a dừm"),  # -sm is dừm, and the m is syllabic
     ("sarcasm", "sa ca dừm"),

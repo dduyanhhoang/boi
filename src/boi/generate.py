@@ -43,7 +43,8 @@ def _slot_options(slot):
                 codas = phonemap.coda_options(
                     slot.coda, nucleus,
                     schwa=slot.nucleus == "AH" and slot.stress == "0",
-                    vowel=slot.nucleus)
+                    vowel=slot.nucleus, doubled=slot.doubled,
+                    reduced=slot.stress == "0")
             for coda, p_co in codas:
                 # Standard quốc ngữ: gh before a front vowel, but a w-glide
                 # puts an o or u in between, so g stays g (sóp goe).
