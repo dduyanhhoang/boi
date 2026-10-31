@@ -138,9 +138,14 @@ function fillGrouping(word, phones, best, module, tables) {
                                 module.alignVowels(word, list, tables), collect);
   } catch { return; }
   const groups = collect.get(best);
-  if (!groups) {              // a lexicon reading has no slots behind it
-    host.innerHTML = `<p class="stage-text stage-text--quiet">memorised, so
-      there is no derivation to show</p>`;
+  if (!groups) {
+    // A memorised reading has no slots behind it. Anything else means this
+    // pipeline did not reproduce the shard's reading, which is a bug, so say
+    // which of the two it is rather than claiming the flattering one.
+    const memorised = Boolean(tables.lexicon[word.toLowerCase()]);
+    host.innerHTML = `<p class="stage-text stage-text--quiet">${memorised
+      ? "memorised, so there is no derivation to show"
+      : "the derivation did not come back for this one"}</p>`;
     return;
   }
   host.innerHTML = groups.map((g, i) => `<div class="group" style="--j:${i}">

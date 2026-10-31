@@ -165,6 +165,11 @@ export function alignVowels(word, phones, T) {
     if (index < 0) return null;
     groups.splice(index, 1, ...groups[index].split(""));
   }
+  // More vowel letters than phones means a silent one inside the word: the e
+  // of improve before -ment. Only a lone e, never the first group.
+  while (groups.length > vowels.length && groups.indexOf("e", 1) > 0) {
+    groups.splice(groups.indexOf("e", 1), 1);
+  }
   if (groups.length !== vowels.length) return null;
   if (syllabic) groups.push("");
   // A silent e lengthens the vowel before it: these is di, not dê.
