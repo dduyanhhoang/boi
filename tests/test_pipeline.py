@@ -41,7 +41,9 @@ def test_known_reading(word, expected):
 
 
 # Known misses kept here so they are not mistaken for passing cases:
-#   taxi   -> tách si, gold tắc xi  (nucleus and coda both lexical)
+#   fashion -> pha sừn, gold phát sừn  (position and solution want no doubling
+#                                     before a final -tion and outvote it)
+#   speaker -> sờ píc cơ, gold sờ pích cơ
 #   report -> ri pọt,  gold rì pọt  (docs/brief.md's pre-stress huyền, which the dev
 #                                    rows contradict five times over)
 #   game   -> ghêm,    gold gêm     (the gold ignores the gh spelling rule)
@@ -215,3 +217,44 @@ def test_dev_exact_match_floor():
     hits = sum(generate.read(r["word"]) == r["vi_form"] for r in rows)
     rate = hits / len(rows)
     assert rate >= DEV_EXACT_FLOOR, f"dev exact match fell to {rate:.3f}"
+
+
+@pytest.mark.parametrize("word,expected", [
+    # Each of these is a correction the owner made by ear, pinned to the exact
+    # first candidate rather than to the top five, because a rule that ranks
+    # the right reading second is the bug they reported.
+    ("facebook", "phây búc"),       # /eɪ/ before an s is ây, the s unheard
+    ("date", "đết"),                # a d coda still closes it
+    ("position", "pô di sừn"),      # nothing doubles before a final -tion
+    ("solution", "sô lu sừn"),
+    ("international", "in tơ nát sừn nồ"),   # but -tional keeps its doubling
+    ("order", "o đờ"),              # a final -er, and the consonant before it
+    ("folder", "phâu đờ"),
+    ("teacher", "tít chờ"),         # plus a doubled /tʃ/ closing as t
+    ("singer", "sinh gờ"),          # plus a doubled velar nasal
+    ("computer", "com piu tơ"),
+    ("server", "sơ vơ"),
+    ("burger", "bơ gơ"),
+    ("super", "súp pơ"),
+    ("accurate", "a cu rét"),       # nothing doubles into a yod
+    ("taxi", "tắc xi"),             # lexicon: no rule predicts ă or x here
+    ("bag", "bác"),                 # ch after a is for a plain k, not a g
+    ("bug", "bắc"),
+    ("match", "mát"),               # a real final /tʃ/ after a
+    ("sandwich", "sen guých"),      # after i it keeps ch
+    ("close", "cờ lâu"),            # /oʊ/ before an unheard final sibilant
+    ("clothes", "cờ lâu"),
+    ("post", "pốt"),                # a stop coda keeps ô
+    ("phone", "phôn"),
+    ("show", "sâu"),                # a written w decides âu against ô
+    ("hello", "hê lô"),
+    ("video", "vi đi ô"),
+    ("headphone", "hết phôn"),      # ea closed by a d is ê
+    ("red", "rét"),                 # a plain e is not
+    ("sweat", "sờ goét"),           # nor is ea closed by a t
+    ("friendly", "phờ ren li"),     # a stop after a nasal coda is unheard
+    ("handle", "han đồ"),           # unless a vowel follows, making it an onset
+])
+def test_owner_corrections(word, expected):
+    got = generate.candidates(word, limit=5)
+    assert got and got[0] == expected, f"{word}: got {got}"
