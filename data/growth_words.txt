@@ -1,0 +1,78 @@
+# Words for the next round of review, chosen to cover what the first 181 do
+# not: long Latinate words, agent nouns, compounds, brands, and the vowel and
+# cluster patterns that keep producing wrong readings.
+# One word per line. Lines starting with # are ignored.
+
+# -tion, -sion, -tional
+national international additional operational education presentation
+decision occasion division permission discussion condition position
+attention situation application information organization explanation
+
+# -ment, -ance, -ence
+development government management agreement equipment moment
+experience difference conference reference performance insurance
+
+# -ity, -ility
+responsibility quality security community activity university
+ability possibility facility capacity majority priority
+
+# -able, -ible, -al, -ual
+available comfortable reasonable possible terrible visible
+manual annual digital personal normal central actual casual
+
+# -ic, -ical, -ology, -ography
+basic classic public traffic plastic electric economic
+medical physical practical technical biology psychology photography
+
+# agent nouns in -or, -er, -ar
+doctor actor editor monitor sensor projector calculator
+teacher writer printer scanner cleaner container
+
+# compounds
+password keyboard notebook software network homework weekend
+birthday bedroom bathroom football basketball airport supermarket
+smartphone headphone laptop desktop screenshot username
+
+# brands and tech
+google facebook youtube netflix spotify android windows
+samsung huawei xiaomi vinfast shopee lazada tiktok zalo
+grab gojek canva figma notion discord telegram
+
+# everyday short words
+match social hospital doctor music movie hotel market
+coffee water bread cheese butter sugar
+window table chair garden street market
+happy angry hungry lucky early ready
+
+# more Latinate, where the letters and CMUdict disagree most
+encyclopedia refrigerator medicine ecology biology energy history
+category memory factory battery delivery recovery machinery
+operator generator calculator elevator escalator radiator
+condition tradition addition ambition nutrition
+natural cultural structural agricultural
+celebrate separate operate generate educate communicate
+original official initial essential financial commercial
+necessary temporary ordinary secondary library
+
+# clusters and digraphs
+school scholar scheme stomach character technology
+bridge badge fridge village message package language
+beach teach reach speech peach each
+house mouse round sound found mountain
+flower power tower shower
+train brain chain plain explain complain
+cloud proud about around
+field shield yield piece field
+
+# ch, sh, th, j, z
+change church challenge chocolate machine
+shadow shampoo shuttle shoulder
+theatre thousand throat through
+jacket journey junior major project
+zero zone zoom size prize
+
+# everyday, short
+apple orange banana lemon mango grape
+tiger rabbit monkey elephant
+summer winter autumn spring season
+morning evening tonight today tomorrow

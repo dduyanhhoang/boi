@@ -274,7 +274,7 @@ function geminate(slots, T) {
       || (suffix && T.syllabify.geminates.includes(phone)
                 && (codaKey === "" || codaKey === "R"))
       || (!left.coda.length && T.syllabify.voiceless.includes(phone)
-          && ["1", "2"].includes(left.stress) && ["", "0"].includes(right.stress)
+          && left.stress === "1" && ["", "0"].includes(right.stress)
           && !T.syllabify.keepsOffglide.includes(left.nucleus));
     if (!ok) continue;
     out[i] = { ...left, coda: [...left.coda, phone] };

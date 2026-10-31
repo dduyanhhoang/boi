@@ -198,14 +198,36 @@ corrected by the reviewer.
 The splits are stratified so every tag appears in both halves. Thirteen tags
 occur once in the whole set and cannot be split; those rows are in dev.
 
-To grow the set, run the generator over a word list and give the sheet to a
-speaker to correct:
+## Growing the eval
+
+181 words is not enough. They are all short spoken loanwords, so a rule that
+is wrong for long Latinate words, brands or compounds can pass every check
+here, which is how wrong readings keep surfacing one at a time.
+
+`data/review/sheet_001.csv` is the next round: 251 words covering the classes
+the first set misses, grouped by tag so similar words sit together.
+
+To review it, edit `vi_form` where the reading is wrong and leave it where it
+is right, then set `status` to `approved` or `corrected`. `alt_forms` already
+holds the generator's other candidates and its letter reading, so the right
+answer is often a copy rather than a retype. Rows left as `generated` are
+treated as unreviewed, so the sheet can come back in batches.
 
 ```sh
-printf 'router\nbrunch\n' | uv run scripts/make_review_sheet.py -
+uv run scripts/merge_review.py data/review/sheet_001.csv --dry-run
+uv run scripts/merge_review.py data/review/sheet_001.csv
+uv run scripts/build_eval.py && uv run scripts/make_splits.py \
+  && uv run scripts/build_rhymes.py
 ```
 
-The sheet's columns match the eval set, so corrected rows concatenate onto it.
+Every reading is parsed before it is accepted, so a typo is caught at merge
+time rather than breaking the orthography round trip later.
+
+To build a different sheet:
+
+```sh
+uv run scripts/make_review_sheet.py data/growth_words.txt > sheet.csv
+```
 
 `docs/brief.md` is the design brief: prior work, the linguistic findings behind the
 tables, and the open questions.

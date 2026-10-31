@@ -27,8 +27,9 @@ _TENSE = {"IY", "EY", "AY", "OW", "OY", "AW", "UW", "ER"}
 # Before a final -ing or -y the gold geminates any of these, even voiced N
 # (trên ninh), and it overwrites an r that was going to drop (pác kinh, pát ti).
 _GEMINATES = {"P", "T", "K", "N"}
-# Elsewhere it geminates only a voiceless consonant, between a stressed
-# syllable and an unstressed one: óp phít, súp pơ, phát sừn, tích két. Not ca
+# Elsewhere it geminates only a voiceless consonant, between a primary
+# stressed syllable and an unstressed one. Every gold doubling follows a
+# primary stress; hospital's is secondary, and it is hót pi tồ, not hót pít tồ: óp phít, súp pơ, phát sừn, tích két. Not ca
 # mê ra (voiced), not bờ lu tút (the next vowel is stressed), and not after
 # /eɪ/ or /oʊ/, which would rather keep their offglide: sờ tây sừn, mai cờ rô.
 _VOICELESS = {"P", "T", "K", "F", "S", "SH", "CH", "TH"}
@@ -190,7 +191,7 @@ def _geminate(slots):
         elif suffix and phone in _GEMINATES and left.coda in ((), ("R",)):
             pass
         elif (not left.coda and phone in _VOICELESS
-              and left.stress in ("1", "2") and right.stress in ("", "0")
+              and left.stress == "1" and right.stress in ("", "0")
               and left.nucleus not in _KEEPS_OFFGLIDE):
             pass
         else:

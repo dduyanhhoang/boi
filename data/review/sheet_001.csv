@@ -1,0 +1,252 @@
+id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
+g0001,about,AH0 B AW1 T,a bao,,,,,generated
+g0002,android,AE1 N D R OY2 D,an đờ roi,a nờ đờ roi;en đờ roi;an roi;en roi,,,,generated
+g0003,apple,AE1 P AH0 L,áp pồ,a pờ pờ lê;a pồ;áp pồn;áp pờ,,,,generated
+g0004,autumn,AO1 T AH0 M,ót tom,ao tum;o tom;ót tơm;o tơm,,,,generated
+g0005,canva,K AE1 N V AA2,can va,can vo;ken va;ken vo,,,,generated
+g0006,chain,CH EY1 N,chên,chai;chây,,,,generated
+g0007,chair,CH EH1 R,che,cha;chê,,,,generated
+g0008,coffee,K AA1 F IY0,cóp phi,cốp phi;ca phi;cáp phi;co phi,,,,generated
+g0009,elephant,EH1 L AH0 F AH0 N T,e lê phan,ê lếp han;e le phan;e lê phơn;e le phơn,,,,generated
+g0010,explain,IH0 K S P L EY1 N,ếch pờ lên,ê xờ pờ lai;ếch pờ lây;ếch lên;ếch lây,,,,generated
+g0011,field,F IY1 L D,phít,phiu,,,,generated
+g0012,figma,F IH1 G M AA2,phíc ma,phíc mo;phích ma;phích mo,,,,generated
+g0013,found,F AW1 N D,phao,,,,,generated
+g0014,gojek,G OW1 JH EH2 K,gô giếch,gâu giếch;gô dếch;gâu dếch,,,,generated
+g0015,house,HH AW1 S,hao,,,,,generated
+g0016,jacket,JH AE1 K AH0 T,giách két,giách cết;dách két;gia két;giách kít,,,,generated
+g0017,lazada,L AA1 Z AA0 D AA2,la da đa,la da đo;la do đa;lo da đa,,,,generated
+g0018,lemon,L EH1 M AH0 N,le mon,le môn;lê mon;lê môn,,,,generated
+g0019,mango,M AE1 NG G OW0,mang gâu,man gô;mang gô,,,,generated
+g0020,market,M AA1 R K AH0 T,ma két,ma cết;ma kít;mo két;mo kít,,,,generated
+g0021,medicine,M EH1 D AH0 S AH0 N,me đi sin,me đi xin;mê đi sin;mê đi xin,,,,generated
+g0022,mountain,M AW1 N T AH0 N,mao ton,mao tai;mao tơn,,,,generated
+g0023,movie,M UW1 V IY0,mu vi,mô vi,,,,generated
+g0024,piece,P IY1 S,pít,píc;pi,,,,generated
+g0025,round,R AW1 N D,rao,,,,,generated
+g0026,shield,SH IY1 L D,sít,siu;xít,,,,generated
+g0027,shopee,SH OW1 P IY2,sốp pi,sô pi;xốp pi;sâu pi,,,,generated
+g0028,shuttle,SH AH1 T AH0 L,sắt tồ,sút tờ lê;sơ tồ;sắt tồn;sắt tờ,,,,generated
+g0029,sound,S AW1 N D,sao,xao,,,,generated
+g0030,tomorrow,T AH0 M AA1 R OW2,tô ma râu,tô mơ rao;to ma râu;tô ma rô;tô mo râu,,,,generated
+g0031,tonight,T AH0 N AY1 T,tô nai,tô níc;to nai,,,,generated
+g0032,windows,W IH1 N D OW0 Z,guyn đô,gin đao;guyn đốt;guyn đâu,,,,generated
+g0033,yield,Y IY1 L D,dít,i iu,,,,generated
+g0034,zalo,Z AA1 L OW2,da lâu,da lô;do lâu;do lô,,,,generated
+g0035,zero,Z IH1 R OW0,di râu,dê rô;di rô,,,,generated
+g0036,zone,Z OW1 N,dôn,dâu,,,,generated
+g0037,zoom,Z UW1 M,dum,,,,,generated
+g0038,table,T EY1 B AH0 L,tây bồ,ta bờ lê;tây bồn;tây bờ;tê bồ,,able,,generated
+g0039,terrible,T EH1 R AH0 B AH0 L,te ra bồ,tơ ri bờ lê;te ra bồn;te ra bờ;te rô bồ,,able,,generated
+g0040,visible,V IH1 Z AH0 B AH0 L,vi da bồ,vi si bờ lê;vi da bồn;vi da bờ;vi dô bồ,,able,,generated
+g0041,possible,P AA1 S AH0 B AH0 L,pót sa bồ,pốt si bờ lê;pa sa bồ;po sa bồ;pát sa bồ,,able;compound,,generated
+g0042,available,AH0 V EY1 L AH0 B AH0 L,a vây li bồ,a vai la bờ lê;a vây li bồn;a vây li bờ;a vê li bồ,,able;compound;long,,generated
+g0043,comfortable,K AH1 M F ER0 T AH0 B AH0 L,căm phơ ta bồ,côm phơ ta bờ lê;căm phơ ta bồn;căm phơ ta bờ;căm phơ tô bồ,,able;compound;long,,generated
+g0044,reasonable,R IY1 Z AH0 N AH0 B AH0 L,ri da nô bồ,ri sô na bờ lê;ri da no bồ;ri da nô bồn;ri da nô bờ,,able;compound;long,,generated
+g0045,language,L AE1 NG G W AH0 JH,lang guỵt,lan guốc,,age;coda_jh,,generated
+g0046,village,V IH1 L AH0 JH,vi lịt,viu lách,,age;coda_jh,,generated
+g0047,package,P AE1 K AH0 JH,pách kịt,pách cách;pa kịt;pe kịt,,age;compound;coda_jh,,generated
+g0048,actor,AE1 K T ER0,ách tơ,,,agent_er,,generated
+g0049,character,K EH1 R IH0 K T ER0,ke rách tơ,cha rách tơ;kê rách tơ,,agent_er,,generated
+g0050,junior,JH UW1 N Y ER0,giu nơ,giu ni ơ;du nơ,,agent_er,,generated
+g0051,major,M EY1 JH ER0,mây giơ,ma giơ;mây dơ;mê giơ;mê dơ,,agent_er,,generated
+g0052,monitor,M AA1 N AH0 T ER0,ma ni tơ,mô ni tơ;mo ni tơ,,agent_er,,generated
+g0053,power,P AW1 ER0,pao ơ,,,agent_er,,generated
+g0054,shoulder,SH OW1 L D ER0,sâu đơ,sao đơ;sôn đơ;sô đơ;xâu đơ,,agent_er,,generated
+g0055,shower,SH AW1 ER0,sao ơ,xao ơ,,agent_er,,generated
+g0056,sugar,SH UH1 G ER0,su gơ,su ga;xu gơ,,agent_er,,generated
+g0057,tiger,T AY1 G ER0,tai gơ,ti gơ,,agent_er,,generated
+g0058,tower,T AW1 ER0,tao ơ,,,agent_er,,generated
+g0059,water,W AO1 T ER0,guót tơ,ga tơ;guo tơ,,agent_er,,generated
+g0060,writer,R AY1 T ER0,rai tơ,ri tơ,,agent_er,,generated
+g0061,cleaner,K L IY1 N ER0,cờ li nơ,li nơ,,agent_er;cluster,,generated
+g0062,flower,F L AW1 ER0,phờ lao ơ,lao ơ,,agent_er;cluster,,generated
+g0063,printer,P R IH1 N T ER0,pờ rin tơ,rin tơ,,agent_er;cluster,,generated
+g0064,projector,P R AH0 JH EH1 K T ER0,pờ rô giếch tơ,pờ ro giếch tơ;pờ rô dếch tơ;pờ ro dếch tơ,,agent_er;cluster,,generated
+g0065,scanner,S K AE1 N ER0,sờ ca nơ,sờ can nơ;sờ ke nơ;xờ ca nơ;ca nơ,,agent_er;cluster,,generated
+g0066,scholar,S K AA1 L ER0,sờ ca lơ,sờ chô la;sờ co lơ;xờ ca lơ;ca lơ,,agent_er;cluster,,generated
+g0067,butter,B AH1 T ER0,bắt tơ,bút tơ;bơ tơ;bớt tơ;ba tơ,,agent_er;compound,,generated
+g0068,container,K AH0 N T EY1 N ER0,con tây nơ,côn tai nơ;côn tây nơ;con tê nơ;côn tê nơ,,agent_er;compound,,generated
+g0069,doctor,D AA1 K T ER0,đóc tơ,đốc tơ;đách tơ,,agent_er;compound,,generated
+g0070,editor,EH1 D AH0 T ER0,e đi tơ,ê đi tơ,,agent_er;compound,,generated
+g0071,sensor,S EH1 N S ER0,sen sơ,sen xơ;xen sơ;sên sơ,,agent_er;compound,,generated
+g0072,summer,S AH1 M ER0,sơ mơ,sum mơ;sa mơ;xơ mơ;xa mơ,,agent_er;compound,,generated
+g0073,teacher,T IY1 CH ER0,tích chơ,tíc hơ;ti chơ,,agent_er;compound,,generated
+g0074,winter,W IH1 N T ER0,guyn tơ,gin tơ,,agent_er;compound,,generated
+g0075,generator,JH EH1 N ER0 EY2 T ER0,gie nơ ây tơ,gê nê ra tơ;de nơ ây tơ;gie nơ ê tơ;giê nơ ây tơ,,agent_er;compound;long,,generated
+g0076,operator,AA1 P ER0 EY2 T ER0,óp pơ ây tơ,ô pê ra tơ;a pơ ây tơ;áp pơ ây tơ;óp pơ ê tơ,,agent_er;compound;long,,generated
+g0077,radiator,R EY1 D IY0 EY2 T ER0,rây đi ây tơ,ra đi a tơ;rây đi ê tơ;rê đi ây tơ;rê đi ê tơ,,agent_er;compound;long,,generated
+g0078,calculator,K AE1 L K Y AH0 L EY2 T ER0,ca cu lây tơ,cau cu la tơ;ca cơ lây tơ;keo cu lây tơ;ca cu lê tơ,,agent_er;long,,generated
+g0079,elevator,EH1 L AH0 V EY2 T ER0,e lê vây tơ,ê lê va tơ;e le vây tơ;e lê vê tơ;ê lê vây tơ,,agent_er;long,,generated
+g0080,escalator,EH1 S K AH0 L EY2 T ER0,ét ca lây tơ,ết ca la tơ;e ca lây tơ;ết ca lây tơ;ét ca lê tơ,,agent_er;long,,generated
+g0081,refrigerator,R AH0 F R IH1 JH ER0 EY2 T ER0,rê phờ ri giơ ây tơ,rê phờ ri gê ra tơ;re phờ ri giơ ây tơ;rê phờ ri dơ ây tơ;re phờ ri dơ ây tơ,,agent_er;long,,generated
+g0082,actual,AE1 K CH AH0 W AH0 L,ách chu guồ,ách tua;ách chu guồn;ách chu guờ;ách chơ guồ,,al,,generated
+g0083,annual,AE1 N Y UW0 AH0 L,a nu ồ,an nua;a nu ồn;a nu ờ;e nu ồ,,al,,generated
+g0084,casual,K AE1 ZH AH0 W AH0 L,ca du guồ,ca sua;ca du guồn;ca du guờ;ca dơ guồ,,al,,generated
+g0085,central,S EH1 N T R AH0 L,sen trồ,xê nờ trau;sen trồn;sen trờ;xen trồ,,al,,generated
+g0086,commercial,K AH0 M ER1 SH AH0 L,cô mớt sồ,côm mơ xi au;co mớt sồ;cô mơ sồ;cô mớt sồn,,al,,generated
+g0087,digital,D IH1 JH AH0 T AH0 L,đi di tồ,đi gi tau;đi di tồn;đi di tờ;đi di tờn,,al,,generated
+g0088,essential,EH0 S EH1 N SH AH0 L,e sen sồ,ết sên ti au;e sen sồn;e sen sờ;e sen xồ,,al,,generated
+g0089,financial,F AH0 N AE1 N SH AH0 L,phi nan sồ,phi nan xi au;phi nan sồn;phi nan sờ;phi nan xồ,,al,,generated
+g0090,hospital,HH AA1 S P IH2 T AH0 L,hót pi tồ,hô sờ pi tau;ho pi tồ;hát pi tồ;hót pi tồn,,al,,generated
+g0091,initial,IH2 N IH1 SH AH0 L,i nít sồ,i ni ti au;i ni sồ;i nít sồn;i nít sờ,,al,,generated
+g0092,manual,M AE1 N Y UW0 AH0 L,ma nu ồ,ma nua;ma nu ồn;ma nu ờ;me nu ồ,,al,,generated
+g0093,national,N AE1 SH AH0 N AH0 L,nát sừn nồ,na ti ô nau;na si nồ;nát sờn nồ;nát sừn nồn,,al,,generated
+g0094,official,AH0 F IH1 SH AH0 L,ô phít sồ,ốp phi xi au;o phít sồ;ô phi sồ;ô phít sồn,,al,,generated
+g0095,personal,P ER1 S IH0 N AH0 L,pớt si nồ,pơ sô nau;pơ si nồ;pớt si nồn;pớt si nờ,,al,,generated
+g0096,social,S OW1 SH AH0 L,sô sồ,sô xi au;sâu sồ;sô sồn;sô sờ,,al,,generated
+g0097,structural,S T R AH1 K CH ER0 AH0 L,sờ trắc chu rồ,sờ trúc tu rau;sờ trắc chu rồn;sờ trắc chu rờ;sờ trắc chơ rồ,,al;cluster,,generated
+g0098,cultural,K AH1 L CH ER0 AH0 L,cơn chu rồ,cu tu rau;cơ chu rồ;cơn chu rồn;cơn chu rờ,,al;compound,,generated
+g0099,natural,N AE1 CH ER0 AH0 L,nát chu rồ,na tu rau;na chu rồ;nách chu rồ;nát chu rồn,,al;compound,,generated
+g0100,normal,N AO1 R M AH0 L,no mồ,nơ mau;no mồn;no mờ;no mờn,,al;compound,,generated
+g0101,agricultural,AE2 G R AH0 K AH1 L CH ER0 AH0 L,ách ri cơn chu rồ,a gờ ri cu tu rau;ách ri cơ chu rồ;ách ri cơn chu rồn;ách ri cơn chu rờ,,al;compound;long,,generated
+g0102,international,IH2 N T ER0 N AE1 SH AH0 N AH0 L,in tơ nát sừn nồ,in tơ na ti ô nau;in tơ na si nồ;in tơ nát sờn nồ;in tơ nát sừn nồn,,al;compound;long,,generated
+g0103,additional,AH0 D IH1 SH AH0 N AH0 L,a đít sừn nồ,át đi ti ô nau;a đi si nồ;a đít sờn nồ;a đít sừn nồn,,al;long,,generated
+g0104,operational,AA2 P ER0 EY1 SH AH0 N AH0 L,a pơ ây sừn nồ,ô pê ra ti ô nau;a pơ ây si nồ;a pơ ây sờn nồ;a pơ ây sừn nồn,,al;long,,generated
+g0105,original,ER0 IH1 JH AH0 N AH0 L,ô i di nồ,ô ri gi nau;o i di nồ;ô i di nồn;ô i di nờ,,al;long,,generated
+g0106,chocolate,CH AO1 K L AH0 T,chóc lét,chô cô lát;chóc lít,,ate,,generated
+g0107,operate,AA1 P ER0 EY2 T,óp pơ ết,ô pê rát;a pơ ết;áp pơ ết;o pơ ết,,ate,,generated
+g0108,separate,S EH1 P ER0 EY2 T,sép pơ ết,sê pa rát;se pơ ết;xép pơ ết;sếp pơ ết,,ate,,generated
+g0109,celebrate,S EH1 L AH0 B R EY2 T,se lê bờ rết,xê lê bờ rát;se le bờ rết;xe lê bờ rết;sê lê bờ rết,,ate;compound,,generated
+g0110,educate,EH1 JH AH0 K EY2 T,e giu kết,ê đu cát;e du kết;e giơ kết;ê giu kết,,ate;compound,,generated
+g0111,generate,JH EH1 N ER0 EY2 T,gie nơ ết,gê nê rát;de nơ ết;giê nơ ết;gie nơ ây,,ate;compound,,generated
+g0112,communicate,K AH0 M Y UW1 N AH0 K EY2 T,cô miu ni kết,côm mu ni cát;co miu ni kết;cô miu ni cây;co miu ni cây,,ate;long,,generated
+g0113,brain,B R EY1 N,bờ rên,bờ rai;bờ rây;rên;rây,,cluster,,generated
+g0114,bread,B R EH1 D,bờ rét,bờ rít;bờ rết;rét;rết,,cluster,,generated
+g0115,grab,G R AE1 B,gờ ráp,gờ rép;ráp;rép,,cluster,,generated
+g0116,grape,G R EY1 P,gờ rếp,gờ ráp;gờ rây;rếp;rây,,cluster,,generated
+g0117,plain,P L EY1 N,pờ lên,pờ lai;pờ lây;lên;lây,,cluster,,generated
+g0118,prize,P R AY1 Z,pờ rai,pờ rít;rai,,cluster,,generated
+g0119,proud,P R AW1 D,pờ rao,rao,,cluster,,generated
+g0120,scheme,S K IY1 M,sờ kem,sờ chêm;sờ kêm;xờ kem;kem,,cluster,,generated
+g0121,stomach,S T AH1 M AH0 K,sờ tơ mách,sờ tô mách;sờ ta mách;xờ tơ mách;tơ mách,,cluster,,generated
+g0122,throat,TH R OW1 T,thờ rốt,tờ hờ rót;rốt;thờ râu;râu,,cluster,,generated
+g0123,through,TH R UW1,thờ ru,tờ hờ rao;ru,,cluster,,generated
+g0124,train,T R EY1 N,trên,trai;trây,,cluster,,generated
+g0125,xiaomi,K S AY1 M AY2,cờ sai mai,xi a ô mi;cờ xai mai;sai mai;xai mai,,cluster,,generated
+g0126,speech,S P IY1 CH,sờ pích,xờ pích;pích,,cluster;coda_ch,,generated
+g0127,bridge,B R IH1 JH,bờ rịt,bờ rít;rịt,,cluster;coda_jh,,generated
+g0128,fridge,F R IH1 JH,phờ rịt,phờ rít;rịt,,cluster;coda_jh,,generated
+g0129,beach,B IY1 CH,bích,,,coda_ch,,generated
+g0130,church,CH ER1 CH,chớch,chơ,,coda_ch,,generated
+g0131,each,IY1 CH,ích,,,coda_ch,,generated
+g0132,match,M AE1 CH,mát,mách,,coda_ch,,generated
+g0133,peach,P IY1 CH,pích,,,coda_ch,,generated
+g0134,reach,R IY1 CH,rích,,,coda_ch,,generated
+g0135,teach,T IY1 CH,tích,,,coda_ch,,generated
+g0136,badge,B AE1 JH,bạt,bát;bẹt,,coda_jh,,generated
+g0137,challenge,CH AE1 L AH0 N JH,cha len,chau lênh;che len;cha lên;che lên,,coda_jh,,generated
+g0138,change,CH EY1 N JH,chên,chang;chây,,coda_jh,,generated
+g0139,orange,AO1 R AH0 N JH,o ran,ô rang;o rơn,,coda_jh,,generated
+g0140,airport,EH1 R P AO2 R T,e pọt,a pớt;ê pọt,,compound,,generated
+g0141,around,ER0 AW1 N D,ơ ao,a rao,,compound,,generated
+g0142,basketball,B AE1 S K AH0 T B AO2 L,bát két bon,ba sờ cết bau;ba két bon;bát két bo;bát kít bon,,compound,,generated
+g0143,bathroom,B AE1 TH R UW2 M,bát rum,bát hờ rum;bét rum,,compound,,generated
+g0144,bedroom,B EH1 D R UW2 M,bét rum,bê đờ rum;bết rum,,compound,,generated
+g0145,complain,K AH0 M P L EY1 N,com pờ lên,cô mờ pờ lai;com pờ lây;cơm pờ lên;com lên,,compound,,generated
+g0146,desktop,D EH1 S K T AA2 P,đét tóp,đết cờ tốp;đe tóp;đét táp;đết tóp,,compound,,generated
+g0147,discord,D IH1 S K AO0 R D,đít cót,đít cớt;đi cót,,compound,,generated
+g0148,football,F UH1 T B AO2 L,phút bon,phút bau;phút bo,,compound,,generated
+g0149,garden,G AA1 R D AH0 N,ga đen,go đen;ga đên;go đên,,compound,,generated
+g0150,headphone,HH EH1 D F OW2 N,hét phôn,hít phôn;hết phôn;hét phâu;hết phâu,,compound,,generated
+g0151,homework,HH OW1 M W ER2 K,hôm guốc,hô mê gơ;hâu guốc,,compound,,generated
+g0152,huawei,HH UW1 AH0 W EY2,hu a guây,hua gê;hu a guê,,compound,,generated
+g0153,notebook,N OW1 T B UH2 K,nốt búc,nô tê búc;nâu búc,,compound,,generated
+g0154,rabbit,R AE1 B AH0 T,ra bét,ráp bít;ra bít;re bét;re bít,,compound,,generated
+g0155,samsung,S AE1 M S AH2 NG,sam săng,sam sung;sam xăng;sem săng;xam săng,,compound,,generated
+g0156,season,S IY1 Z AH0 N,si don,si sôn;si dôn;xi don;xi dôn,,compound,,generated
+g0157,shadow,SH AE1 D OW2,sa đâu,sa đao;sa đô;se đâu;xa đâu,,compound,,generated
+g0158,shampoo,SH AE0 M P UW1,sam pu,sem pu;xam pu;xem pu,,compound,,generated
+g0159,telegram,T EH1 L AH0 G R AE2 M,te lê gờ ram,tê lê gờ ram;te le gờ ram;te lê gờ rem;te le gờ rem,,compound,,generated
+g0160,theatre,TH IY1 AH0 T ER0,thi a tơ,thi trê;thi ô tơ;thi ơ tơ,,compound,,generated
+g0161,thousand,TH AW1 Z AH0 N D,thao dan,thao san;thao dơn,,compound,,generated
+g0162,username,Y UW1 Z ER0 N EY2 M,diu dơ nêm,u sơ nam;diu dơ nây,,compound,,generated
+g0163,vinfast,V IH1 N F AE2 S T,vin phát,vin phét,,compound,,generated
+g0164,weekend,W IY1 K EH2 N D,guy ken,gi cên;guy kên,,compound,,generated
+g0165,window,W IH1 N D OW0,guyn đâu,gin đao;guyn đô,,compound,,generated
+g0166,screenshot,S K R IY1 N SH AA2 T,sờ cờ rin sót,sờ cờ rin sốt;sờ cờ rin sát;sờ cờ rin xót;xờ cờ rin sót,,compound;cluster,,generated
+g0167,supermarket,S UW1 P ER0 M AA2 R K IH0 T,súp pơ ma két,su pơ ma cết;su pơ ma két;súp pơ ma kết;súp pơ mo két,,compound;long,,generated
+g0168,insurance,IH2 N SH UH1 R AH0 N S,in su ran,in su rơn;in xu ran;in xu rơn,,ence,,generated
+g0169,performance,P ER0 F AO1 R M AH0 N S,pơ pho man,pơ phơ man;pơ pho mơn,,ence,,generated
+g0170,reference,R EH1 F ER0 AH0 N S,rép phê ren,rê phê rên;rép phe ren;re phê ren;re phe ren,,ence,,generated
+g0171,conference,K AA1 N F ER0 AH0 N S,con phê ren,côn phê rên;con phe ren;can phê ren;can phe ren,,ence;compound,,generated
+g0172,difference,D IH1 F ER0 AH0 N S,đíp phê ren,đíp phê rên;đíp phe ren;đi phê ren;đi phe ren,,ence;compound,,generated
+g0173,experience,IH0 K S P IH1 R IY0 AH0 N S,ếch sờ pê ri en,ếch pê rin;ếch sờ pe ri en;ếch xờ pê ri en;ếch sờ pê ri ên,,ence;long,,generated
+g0174,angry,AE1 NG G R IY0,ang gờ ri,a nờ gờ ri;ang ri,,final_y,,generated
+g0175,battery,B AE1 T ER0 IY0,bát tê ri,bát te ri;ba tê ri;bét tê ri,,final_y,,generated
+g0176,early,ER1 L IY0,ơ li,,,final_y,,generated
+g0177,energy,EH1 N ER0 JH IY0,e nơ di,ê nơ gi;ê nơ di,,final_y,,generated
+g0178,hungry,HH AH1 NG G R IY0,hăng gờ ri,hu nờ gờ ri;hăng ri,,final_y,,generated
+g0179,library,L AY1 B R EH0 R IY2,lai bờ re ri,li bờ ra ri;lai bờ rê ri;lai re ri;lai rê ri,,final_y,,generated
+g0180,lucky,L AH1 K IY0,lắc ki,lúc ci;lơ ki;la ki,,final_y,,generated
+g0181,memory,M EH1 M ER0 IY0,me mô ri,me mo ri;mê mô ri;mê mo ri,,final_y,,generated
+g0182,ready,R EH1 D IY0,re đi,ri đi;rê đi,,final_y,,generated
+g0183,today,T AH0 D EY1,tô đây,to đây;tô đê;to đê,,final_y,,generated
+g0184,spotify,S P AO1 T AH0 F AY2,sờ pót ti phai,sờ pô ti phi;sờ po ti phai;xờ pót ti phai;pót ti phai,,final_y;cluster,,generated
+g0185,birthday,B ER1 TH D EY2,bớt đây,bơ tờ hờ đây;bớt đê,,final_y;compound,,generated
+g0186,factory,F AE1 K T ER0 IY0,phách tô ri,phách to ri,,final_y;compound,,generated
+g0187,history,HH IH1 S T ER0 IY0,hít tô ri,hi sờ tô ri;hi tô ri;hít to ri;hi to ri,,final_y;compound,,generated
+g0188,journey,JH ER1 N IY0,giơn ni,gia nây;dơn ni;giơ ni;dơ ni,,final_y;compound,,generated
+g0189,monkey,M AH1 NG K IY0,măng ki,môn cây,,final_y;compound,,generated
+g0190,recovery,R IH0 K AH1 V R IY0,ri cắp ri,rê cô vê ri;ri cớp ri,,final_y;compound,,generated
+g0191,category,K AE1 T AH0 G AO2 R IY0,cát tê go ri,ca tê gô ri;cát te go ri;ca tê go ri;két tê go ri,,final_y;compound;long,,generated
+g0192,delivery,D IH0 L IH1 V ER0 IY0,đi li vê ri,đê li vê ri;đi li ve ri,,final_y;compound;long,,generated
+g0193,necessary,N EH1 S AH0 S EH2 R IY0,nét sê se ri,nê xết sa ri;nét se se ri;ne sê se ri;nét sê xe ri,,final_y;compound;long,,generated
+g0194,secondary,S EH1 K AH0 N D EH2 R IY0,se con đe ri,sê côn đa ri;sếch con đe ri;se côn đe ri;sếch côn đe ri,,final_y;compound;long,,generated
+g0195,machinery,M AH0 SH IY1 N ER0 IY0,ma si nê ri,mách hi nê ri;ma si ne ri;ma xi nê ri;ma xi ne ri,,final_y;long,,generated
+g0196,ordinary,AO1 R D AH0 N EH2 R IY0,o đi ne ri,ơ đi na ri;o đi nê ri,,final_y;long,,generated
+g0197,temporary,T EH1 M P ER0 EH2 R IY0,tem pô e ri,têm pô ra ri;tem po e ri;têm pô e ri;tem pô ê ri,,final_y;long,,generated
+g0198,basic,B EY1 S IH0 K,bây síc,ba síc;bây sích;bây xíc;bê síc,,ical,,generated
+g0199,public,P AH1 B L IH0 K,pắp líc,pu bờ líc;pắp lích;pớp líc;pớp lích,,ical,,generated
+g0200,physical,F IH1 Z IH0 K AH0 L,phi di cồ,phi si cau;phi di cồn;phi di cờ;phi di cờn,,ical;al,,generated
+g0201,technical,T EH1 K N IH0 K AH0 L,tếch ni cồ,tếch hờ ni cau;tếch ni cồn;tếch ni cờ;tếch ni cờn,,ical;al,,generated
+g0202,practical,P R AE1 K T AH0 K AH0 L,pờ rách ti cồ,pờ rách ti cau;pờ rách ti cồn;pờ rách ti cờ;pờ rách ti cờn,,ical;al;cluster,,generated
+g0203,medical,M EH1 D AH0 K AH0 L,me đi cồ,mê đi cau;me đi cồn;me đi cờ;mê đi cồ,,ical;al;compound,,generated
+g0204,classic,K L AE1 S IH0 K,cờ lát síc,cờ la síc;cờ lát sích;cờ lát xíc,,ical;cluster,,generated
+g0205,music,M Y UW1 Z IH0 K,miu díc,mu síc;miu dích,,ical;cluster,,generated
+g0206,traffic,T R AE1 F IH0 K,tráp phíc,tra phíc;tráp phích;trép phíc,,ical;cluster,,generated
+g0207,electric,IH0 L EH1 K T R IH0 K,i lếch tríc,ê lê cờ tríc;i lếch trích,,ical;compound,,generated
+g0208,plastic,P L AE1 S T IH0 K,pờ lát tíc,pờ la sờ tíc;pờ la tíc;pờ lát tích;pờ lét tíc,,ical;compound;cluster,,generated
+g0209,economic,EH2 K AH0 N AA1 M IH0 K,e cô na míc,ê cô nô míc;e co na míc;e cô na mích;e cô no míc,,ical;long,,generated
+g0210,evening,IY1 V N IH0 NG,íp ninh,ê vê ninh,,ing;compound,,generated
+g0211,morning,M AO1 R N IH0 NG,mo ninh,mơ ninh,,ing;compound,,generated
+g0212,quality,K W AA1 L AH0 T IY0,qua li ti,quua li ti;quo li ti,,ity;final_y;cluster,,generated
+g0213,priority,P R AY0 AO1 R AH0 T IY0,pờ rai o ri ti,pờ ri ô ri ti;rai o ri ti,,ity;final_y;cluster;long,,generated
+g0214,community,K AH0 M Y UW1 N AH0 T IY0,cô miu ni ti,côm mu ni ti;co miu ni ti,,ity;final_y;compound;long,,generated
+g0215,ability,AH0 B IH1 L AH0 T IY2,a bi li ti,,,ity;final_y;long,,generated
+g0216,activity,AE0 K T IH1 V AH0 T IY0,ách ti vi ti,,,ity;final_y;long,,generated
+g0217,capacity,K AH0 P AE1 S AH0 T IY0,ca pát si ti,ca pa xi ti;ca pa si ti;ca pát xi ti;ca pét si ti,,ity;final_y;long,,generated
+g0218,facility,F AH0 S IH1 L IH0 T IY0,pha si li ti,pha xi li ti,,ity;final_y;long,,generated
+g0219,majority,M AH0 JH AO1 R AH0 T IY0,ma gio ri ti,ma giô ri ti;ma do ri ti,,ity;final_y;long,,generated
+g0220,possibility,P AA2 S AH0 B IH1 L AH0 T IY2,pa si bi li ti,pốt si bi li ti;pa xi bi li ti;po si bi li ti;po xi bi li ti,,ity;final_y;long,,generated
+g0221,responsibility,R IY0 S P AA2 N S AH0 B IH1 L AH0 T IY0,ri sờ pon si bi li ti,rê sờ pôn si bi li ti;ri sờ pan si bi li ti;ri sờ pon xi bi li ti;ri xờ pon si bi li ti,,ity;final_y;long,,generated
+g0222,security,S IH0 K Y UH1 R AH0 T IY0,si cu ri ti,sê cu ri ti;xi cu ri ti,,ity;final_y;long,,generated
+g0223,university,Y UW2 N AH0 V ER1 S AH0 T IY0,diu ni vớt si ti,u ni vơ si ti;diu ni vơ si ti;diu ni vớt xi ti;diu ni vơ xi ti,,ity;final_y;long,,generated
+g0224,encyclopedia,IH0 N S AY2 K L AH0 P IY1 D IY0 AH0,en sai cờ lô pê đi a,ên xi cờ lô pê đi a;en sai cờ lô pe đi a;en sai cờ lo pê đi a;en xai cờ lô pê đi a,,long,,generated
+g0225,agreement,AH0 G R IY1 M AH0 N T,a gờ ri men,a gờ ri mên;a ri men;a ri mên,,ment,,generated
+g0226,equipment,IH0 K W IH1 P M AH0 N T,ếch guýp men,ê quui mên;ếch guýp mên,,ment,,generated
+g0227,government,G AH1 V ER0 M AH0 N T,gơ vơ men,gô vơ nờ mên;ga vơ men;gơ vơ mên;ga vơ mên,,ment,,generated
+g0228,management,M AE1 N AH0 JH M AH0 N T,ma nít mon,ma na gê mên;ma nít mơn;me nít mon;me nít mơn,,ment,,generated
+g0229,moment,M OW1 M AH0 N T,mô men,mâu men;mô mên;mâu mên,,ment;compound,,generated
+g0230,development,D IH0 V EH1 L AH0 P M AH0 N T,đi ve lắp men,đê vê lốp mên;đi ve lớp men;đi ve lắp mên;đi vê lắp men,,ment;long,,generated
+g0231,biology,B AY0 AA1 L AH0 JH IY0,bai a lô di,bi ô lô gi;bai a lo di;bai o lô di;bai o lo di,,ology;final_y;long,,generated
+g0232,ecology,IH0 K AA1 L AH0 JH IY0,i ca lô di,ê cô lô gi;i ca lo di;i co lô di;i co lo di,,ology;final_y;long,,generated
+g0233,photography,F AH0 T AA1 G R AH0 F IY0,phô tóc ra phi,phô tô gờ ráp hi;pho tóc ra phi;phô tách ra phi;pho tách ra phi,,ology;final_y;long,,generated
+g0234,psychology,S AY0 K AA1 L AH0 JH IY0,sai ca lô di,pờ síc hô lô gi;sai ca lo di;sai co lô di;xai ca lô di,,ology;final_y;long,,generated
+g0235,technology,T EH0 K N AA1 L AH0 JH IY0,tếch na lô di,tếch hờ nô lô gi;tếch na lo di;tếch no lô di;tếch no lo di,,ology;final_y;long,,generated
+g0236,addition,AH0 D IH1 SH AH0 N,a đít sừn,át đi ti ôn;a đi sừn;a đít sờn;a đít xừn,,tion,,generated
+g0237,ambition,AE0 M B IH1 SH AH0 N,am bít sừn,am bi ti ôn;am bi sừn;am bít sờn;am bít xừn,,tion,,generated
+g0238,attention,AH0 T EH1 N SH AH0 N,a ten sừn,át tên ti ôn;a ten sờn;a ten xừn;a tên sừn,,tion,,generated
+g0239,decision,D IH0 S IH1 ZH AH0 N,đi si dừn,đê xi si ôn;đi si dờn;đi xi dừn;đi xi dờn,,tion,,generated
+g0240,nutrition,N UW0 T R IH1 SH AH0 N,nu trít sừn,nu tri ti ôn;nu tri sừn;nu trít sờn;nu trít xừn,,tion,,generated
+g0241,occasion,AH0 K EY1 ZH AH0 N,ô cây dừn,ốc ca si ôn;o cây dừn;ô cây dờn;ô kê dừn,,tion,,generated
+g0242,tradition,T R AH0 D IH1 SH AH0 N,tra đít sừn,tra đi ti ôn;tra đi sừn;tra đít sờn;tra đít xừn,,tion;cluster,,generated
+g0243,condition,K AH0 N D IH1 SH AH0 N,con đít sừn,côn đi ti ôn;con đi sừn;con đít sờn;con đít xừn,,tion;compound,,generated
+g0244,discussion,D IH0 S K AH1 SH AH0 N,đi sờ cắt sừn,đít cút si ôn;đi sờ cơ sừn;đi sờ cắt sờn;đi sờ cắt xừn,,tion;compound,,generated
+g0245,division,D IH0 V IH1 ZH AH0 N,đi vi dừn,đi vi si ôn;đi vi dờn,,tion;compound,,generated
+g0246,notion,N OW1 SH AH0 N,nô sừn,nô ti ôn;nâu sừn;nô sờn;nô xừn,,tion;compound,,generated
+g0247,permission,P ER0 M IH1 SH AH0 N,pơ mít sừn,pơ mít si ôn;pơ mi sừn;pơ mít sờn;pơ mít xừn,,tion;compound,,generated
+g0248,application,AE2 P L AH0 K EY1 SH AH0 N,áp li cây sừn,a pờ pờ li ca ti ôn;áp li cây sờn;áp li cây xừn;ép li cây sừn,,tion;long,,generated
+g0249,explanation,EH2 K S P L AH0 N EY1 SH AH0 N,ếch pờ la nây sừn,ê xờ pờ la na ti ôn;ếch pờ la nây sờn;ếch pờ la nây xừn;ếch pờ la nê sừn,,tion;long,,generated
+g0250,organization,AO2 R G AH0 N AH0 Z EY1 SH AH0 N,o ga ni dây sừn,ơ ga ni da ti ôn;o ga ni dây sờn;o ga ni dây xừn;o ga ni dê sừn,,tion;long,,generated
+g0251,situation,S IH2 CH UW0 EY1 SH AH0 N,si chu ây sừn,si tua ti ôn;si chu ây sờn;si chu ây xừn;xi chu ây sừn,,tion;long,,generated
