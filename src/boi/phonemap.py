@@ -93,6 +93,16 @@ SCHWA_BY_CODA = {
     "P": [("ă", "", 0), ("ơ", "", 1)],   # ắp đết
 }
 SCHWA_CLOSED = [("ơ", "", 0), ("e", "", 1), ("i", "", 1)]
+# A reduced vowel keeps the letter it was written with, which is the whole
+# difference between ra phờ ri and rê phờ ri. (open syllable, closed syllable)
+SCHWA_BY_LETTER = {
+    "a": ([("a", "", 0)], [("a", "", 0), ("ơ", "", 1)]),
+    "e": ([("ê", "", 0), ("e", "", 1)], [("e", "", 0), ("ê", "", 1)]),
+    "i": ([("i", "", 0)], [("i", "", 0)]),
+    "o": ([("ô", "", 0), ("o", "", 1)], [("o", "", 0), ("ô", "", 1)]),
+    "u": ([("u", "", 0), ("ơ", "", 1)], [("u", "", 0), ("ơ", "", 1)]),
+    "y": ([("i", "", 0)], [("i", "", 0)]),
+}
 
 # --- codas ---------------------------------------------------------------
 CODA = {
@@ -169,7 +179,7 @@ def onset_options(phones):
 
 
 def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
-                    onset=()):
+                    onset=(), letter=""):
     if phone == "ER" and glide:
         return ER_AFTER_GLIDE
     if phone == "OW":
@@ -179,10 +189,17 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
             return OW_FINAL if final else OW_MID
     if phone == "AH" and stress == "0":
         if not closed:
+            if letter and letter[0] in SCHWA_BY_LETTER:
+                return SCHWA_BY_LETTER[letter[0]][0]
             return SCHWA_OPEN
         if next_coda[0] == "N" and onset and onset[-1] not in _FRICATIVES:
             return SCHWA_BEFORE_N_STOP
-        return SCHWA_BY_CODA.get(next_coda[0], SCHWA_CLOSED)
+        by_coda = SCHWA_BY_CODA.get(next_coda[0])
+        if by_coda:
+            return by_coda
+        if letter and letter[0] in SCHWA_BY_LETTER:
+            return SCHWA_BY_LETTER[letter[0]][1]
+        return SCHWA_CLOSED
     table = NUCLEUS_CLOSED if closed else NUCLEUS_OPEN
     return table.get(phone, [("ơ", 3)])
 

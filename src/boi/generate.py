@@ -4,7 +4,7 @@ import argparse
 import itertools
 import sys
 
-from . import g2p, letters, lexicon, phonemap, rank, syllabify, tone, vi
+from . import g2p, letters, lexicon, phonemap, rank, spell, syllabify, tone, vi
 
 BUDGET = 3.0        # how far above the best table penalty to keep exploring
 PER_SLOT = 4        # options kept per syllable
@@ -23,7 +23,7 @@ def _nucleus_options(slot):
     closed = bool(slot.coda) and slot.coda[0] != "R"
     return phonemap.nucleus_options(slot.nucleus, slot.stress, closed, slot.coda,
                                     final=slot.final, glide=slot.glide,
-                                    onset=slot.onset)
+                                    onset=slot.onset, letter=slot.letter)
 
 
 def _slot_options(slot):
@@ -70,8 +70,9 @@ def candidates(word, limit=5):
     if phones is None:
         return [fixed] if fixed else []
 
+    hints = spell.align_vowels(word, phones)
     scored = {}
-    for slots, structural in syllabify.variants(phones):
+    for slots, structural in syllabify.variants(phones, hints):
         options = [_slot_options(s) for s in slots]
         if not all(options):
             continue

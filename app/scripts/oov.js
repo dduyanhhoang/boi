@@ -133,11 +133,33 @@ export function spellPhones(word, T) {
   return out;
 }
 
+/** spell.align_vowels: which letters each vowel phone was written with. */
+export function alignVowels(word, phones, T) {
+  word = [...word.toLowerCase()].filter((c) => /[a-z]/.test(c)).join("");
+  if (word.length > 2 && word.endsWith("e")
+      && !T.spell.vowels.includes(word[word.length - 2])) {
+    word = word.slice(0, -1);
+  }
+  const groups = [];
+  let i = 0;
+  while (i < word.length) {
+    if (T.spell.vowels.includes(word[i])) {
+      let j = i;
+      while (j < word.length && T.spell.vowels.includes(word[j])) j += 1;
+      groups.push(word.slice(i, j));
+      i = j;
+    } else i += 1;
+  }
+  const vowels = phones.filter((p) => T.spell.vowelPhones.includes(p.slice(0, -1))
+    && /\d$/.test(p));
+  return groups.length === vowels.length ? groups : null;
+}
+
 /* syllabify.py -------------------------------------------------------- */
 
 const slot = (o = {}) => ({
   onset: [], nucleus: "", coda: [], stress: "",
-  glide: false, yod: false, inserted: false, final: false, ...o,
+  glide: false, yod: false, inserted: false, final: false, letter: "", ...o,
 });
 
 function isOnsetRun(run, T) {
@@ -175,7 +197,22 @@ function splitRun(run, left, T) {
   return [run, []];
 }
 
-function baseSlots(phones, T) {
+// syllabify._free_the_r: an unstressed ER before a vowel is a schwa plus an
+// r onset, so camera is ca mê ra rather than ca mơ a.
+function freeTheR(phones, T) {
+  const out = [];
+  phones.forEach((phone, i) => {
+    const next = phones[i + 1] ?? "";
+    // Only before a reduced vowel: a stressed one means a compound boundary.
+    if (phone === "ER0" && T.syllabify.phoneVowels.includes(next.slice(0, -1))
+        && next.endsWith("0")) out.push("AH0", "R");
+    else out.push(phone);
+  });
+  return out;
+}
+
+function baseSlots(phones, letters, T) {
+  phones = freeTheR(phones, T);
   const pairs = phones.map((p) => (/\d$/.test(p) ? [p.slice(0, -1), p.slice(-1)] : [p, ""]));
   const bare = pairs.map(([p]) => p);
   const vowels = bare.map((p, i) => (T.syllabify.phoneVowels.includes(p) ? i : -1))
@@ -207,6 +244,7 @@ function baseSlots(phones, T) {
     return slot({
       onset, nucleus: bare[i], coda: codas[n], stress: pairs[i][1],
       glide, yod, final: n === vowels.length - 1,
+      letter: letters && n < letters.length ? letters[n] : "",
     });
   });
 }
@@ -255,8 +293,8 @@ function repair(slots, keepClusters, T) {
   return out;
 }
 
-function variants(phones, T) {
-  const base = baseSlots(phones, T);
+function variants(phones, letters, T) {
+  const base = baseSlots(phones, letters, T);
   if (!base.length) return [];
   const out = [];
   for (const [gem, basePenalty] of [[true, 0], [false, 1]]) {
@@ -287,7 +325,7 @@ function onsetOptions(phones, T) {
   return T.phonemap.onset[phones[phones.length - 1]] ?? [["", 3]];
 }
 
-function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, T) {
+function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, letter, T) {
   const P = T.phonemap;
   if (phone === "ER" && glide) return P.erAfterGlide;
   if (phone === "OW") {
@@ -295,12 +333,15 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, T)
     if (!closed) return final ? P.owFinal : P.owMid;
   }
   if (phone === "AH" && stress === "0") {
-    if (!closed) return P.schwaOpen;
+    const byLetter = letter && P.schwaByLetter[letter[0]];
+    if (!closed) return byLetter ? byLetter[0] : P.schwaOpen;
     if (nextCoda[0] === "N"
         && onset.length && !P.fricatives.includes(onset[onset.length - 1])) {
       return P.schwaBeforeNStop;
     }
-    return P.schwaByCoda[nextCoda[0]] ?? P.schwaClosed;
+    const byCoda = P.schwaByCoda[nextCoda[0]];
+    if (byCoda) return byCoda;
+    return byLetter ? byLetter[1] : P.schwaClosed;
   }
   const table = closed ? P.nucleusClosed : P.nucleusOpen;
   return table[phone] ?? [["ơ", "", 3]];
@@ -385,7 +426,8 @@ function slotNucleusOptions(s, T) {
     return s.nucleus === "UW" ? [["i", "u", 0]] : [["i", "", 0]];
   }
   const closed = s.coda.length > 0 && s.coda[0] !== "R";
-  return nucleusOptions(s.nucleus, s.stress, closed, s.coda, s.final, s.glide, s.onset, T);
+  return nucleusOptions(s.nucleus, s.stress, closed, s.coda, s.final, s.glide,
+                        s.onset, s.letter, T);
 }
 
 function slotOptions(s, T) {
@@ -431,9 +473,9 @@ function score(syls, tablePenalty, structural, T) {
 }
 
 /** Ranked readings for phones the shards did not supply. */
-export function candidatesFromPhones(phones, T, limit = 5) {
+export function candidatesFromPhones(phones, T, limit = 5, letters = null) {
   const scored = new Map();
-  for (const [slots, structural] of variants(phones, T)) {
+  for (const [slots, structural] of variants(phones, letters, T)) {
     const options = slots.map((s) => slotOptions(s, T));
     if (options.some((o) => !o.length)) continue;
     const floor = options.reduce((sum, o) => sum + o[0][1], 0);
@@ -504,7 +546,7 @@ export function readUnknown(word, T, limit = 5) {
   const fixed = T.lexicon[word.toLowerCase()];
   const phones = spellPhones(word, T);
   if (!phones) return { phones: null, readings: fixed ? [fixed] : [] };
-  let readings = candidatesFromPhones(phones, T, limit);
+  let readings = candidatesFromPhones(phones, T, limit, alignVowels(word, phones, T));
   if (fixed) readings = [fixed, ...readings.filter((r) => r !== fixed)].slice(0, limit);
   return { phones, readings };
 }

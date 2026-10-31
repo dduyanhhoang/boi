@@ -39,7 +39,8 @@ def python_reading(word, limit=3):
     import itertools
 
     scored = {}
-    for slots, structural in syllabify.variants(phones):
+    hints = spell.align_vowels(word, phones)
+    for slots, structural in syllabify.variants(phones, hints):
         options = [generate._slot_options(s) for s in slots]
         if not all(options):
             continue

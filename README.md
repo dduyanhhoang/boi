@@ -140,7 +140,13 @@ docs/DESIGN.md         resolved design tokens and the decisions behind them
 
 A word becomes phones, the phones become one or more syllable layouts, each
 slot in a layout offers a few Vietnamese pieces, and the combinations are
-ranked by the penalties that produced them. Illegal rhymes are dropped before
+ranked by the penalties that produced them.
+
+CMUdict reduces an unstressed vowel to a schwa and loses which letter it was,
+but a Vietnamese reader keeps the letter: the *re* of refrigerator is `rê`,
+not `ra`. So the word's vowel letters are lined up against its vowel phones,
+which works for 173 of the 181 gold rows, and a reduced vowel in an open
+syllable takes the value of the letter it was written with. Illegal rhymes are dropped before
 ranking. Nothing is learned end to end, so every output traces back to a named
 rule or a table row.
 

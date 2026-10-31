@@ -44,6 +44,7 @@ class Slot(NamedTuple):
     yod: bool = False        # i-onglide, from Y
     inserted: bool = False
     final: bool = False
+    letter: str = ""        # the vowel letters this phone was written with
 
 
 def _strip_stress(phones):
@@ -101,9 +102,29 @@ def _split_run(run, left=None):
     return run, ()
 
 
-def _slots(phones):
+def _free_the_r(phones):
+    """An unstressed ER before another vowel is a schwa plus an r onset.
+
+    CMUdict writes camera as K AE1 M ER0 AH0, with the r inside the vowel, so
+    nothing is left to open the last syllable and it comes out ca mơ a. Split
+    it and the r opens the syllable it belongs to: ca mê ra.
+    """
+    out = []
+    for i, phone in enumerate(phones):
+        nxt = phones[i + 1] if i + 1 < len(phones) else ""
+        # Only before a reduced vowel. A stressed one after an ER0 means a
+        # compound boundary, where the r belongs to the piece before it:
+        # poweroff is power plus off, not powe plus roff.
+        if phone == "ER0" and nxt[:-1] in VOWELS and nxt[-1:] == "0":
+            out += ["AH0", "R"]
+        else:
+            out.append(phone)
+    return out
+
+
+def _slots(phones, letters=None):
     """One flat pass: every English vowel becomes one Vietnamese syllable."""
-    pairs = _strip_stress(phones)
+    pairs = _strip_stress(_free_the_r(phones))
     bare = [p for p, _ in pairs]
     vowels = [i for i, p in enumerate(bare) if p in VOWELS]
     if not vowels:
@@ -134,7 +155,8 @@ def _slots(phones):
         if yod:
             onset = onset[:-1] or ("Y",)
         out.append(Slot(onset, bare[i], coda, pairs[i][1], glide, yod,
-                        final=n == len(vowels) - 1))
+                        final=n == len(vowels) - 1,
+                        letter=letters[n] if letters and n < len(letters) else ""))
     return out
 
 
@@ -183,9 +205,9 @@ def _repair(slots, keep_clusters):
     return out
 
 
-def variants(phones):
+def variants(phones, letters=None):
     """Structural variants for one word, preferred first, with a penalty each."""
-    base = _slots(phones)
+    base = _slots(phones, letters)
     if not base:
         return []
     out = []

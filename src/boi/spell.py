@@ -188,3 +188,36 @@ def phones(word):
         out.append(vowel + stress)
         out += flat_coda
     return out
+
+
+def align_vowels(word, phones):
+    """Line the word's vowel letters up with its vowel phones, or None.
+
+    CMUdict reduces an unstressed vowel to a schwa and loses which letter it
+    was, but a Vietnamese reader keeps the letter: the re of refrigerator is
+    re, not ra. Where the counts match, which is 173 of the 181 gold rows,
+    this says which letters a phone came from.
+    """
+    word = "".join(c for c in word.lower() if c.isalpha())
+    if len(word) > 2 and word.endswith("e") and word[-2] not in VOWELS:
+        word = word[:-1]
+
+    groups, i = [], 0
+    while i < len(word):
+        if word[i] in VOWELS:
+            j = i
+            while j < len(word) and word[j] in VOWELS:
+                j += 1
+            groups.append(word[i:j])
+            i = j
+        else:
+            i += 1
+
+    vowels = [p for p in phones if p[:-1] in VOWEL_PHONES and p[-1].isdigit()]
+    return groups if len(groups) == len(vowels) else None
+
+
+VOWEL_PHONES = {
+    "AA", "AE", "AH", "AO", "AW", "AY", "EH", "ER", "EY",
+    "IH", "IY", "OW", "OY", "UH", "UW",
+}

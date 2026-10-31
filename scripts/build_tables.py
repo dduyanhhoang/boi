@@ -44,6 +44,7 @@ def main():
             "onsetClusters": sorted(key(t) for t in spell.ONSET_CLUSTERS),
             "glideLetters": spell._GLIDE_LETTERS,
             "ow": spell._OW,
+            "vowelPhones": sorted(spell.VOWEL_PHONES),
         },
         "syllabify": {
             "phoneVowels": sorted(syllabify.VOWELS),
@@ -69,6 +70,7 @@ def main():
             "schwaOpen": phonemap.SCHWA_OPEN,
             "schwaByCoda": phonemap.SCHWA_BY_CODA,
             "schwaClosed": phonemap.SCHWA_CLOSED,
+            "schwaByLetter": {k: list(v) for k, v in phonemap.SCHWA_BY_LETTER.items()},
             "schwaBeforeN": phonemap.SCHWA_BEFORE_N,
             "schwaBeforeNStop": phonemap.SCHWA_BEFORE_N_STOP,
             "fricatives": sorted(phonemap._FRICATIVES),
