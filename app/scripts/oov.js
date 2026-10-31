@@ -371,6 +371,13 @@ function nasalDoublesBefore(right) {
     && (right.letter === "i" || right.letter === "y");
 }
 
+/** Whether each syllable follows a stressed one, once the shape is final. */
+function markAfterStress(slots) {
+  return slots.map((sl, i) => ({
+    ...sl, afterStress: i > 0 && slots[i - 1].stress === "1",
+  }));
+}
+
 function variants(phones, letters, T) {
   const base = baseSlots(phones, letters, T);
   if (!base.length) return [];
@@ -388,7 +395,7 @@ function variants(phones, letters, T) {
     for (const [keep, extra] of [[false, 0], [true, 2]]) {
       const repaired = repair(shape, keep, T);
       if (keep && JSON.stringify(repaired) === JSON.stringify(repair(shape, false, T))) continue;
-      out.push([repaired, penalty + extra]);
+      out.push([markAfterStress(repaired), penalty + extra]);
     }
   }
   return out;
@@ -406,7 +413,8 @@ function onsetOptions(phones, T, doubled) {
   return T.phonemap.onset[phones[phones.length - 1]] ?? [["", 3]];
 }
 
-function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, letter, first, T) {
+function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
+                       letter, first, T, afterStress) {
   const P = T.phonemap;
   if (phone === "ER" && glide) return P.erAfterGlide;
   // ơ is what an er is read as; an or inside a word is not (information is
@@ -423,6 +431,10 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   }
   // -ese is ít: chai nít, việt nam mít. The plain e separates it from chi
   // and pờ li, whose ee and ea keep their z silent.
+  // -ious is ợt: con sợt, đi li sợt. Its letters are iou, which no other
+  // ending gives, so the s closing it is the only other condition.
+  if (phone === "AH" && letter === "iou" && final
+      && joinKey(nextCoda) === "S") return P.iousEnding;
   // -ese is a suffix, so it cannot be the whole word: these keeps di.
   if (phone === "IY" && letter.replace(T.spell.lengthened, "") === "e" && final
       && !first && ["Z", "S"].includes(joinKey(nextCoda))) return P.eseEnding;
@@ -454,6 +466,11 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   if (phone === "AE" && closed && nextCoda.length
       && nextCoda[nextCoda.length - 1] === "D") return P.aeBeforeD;
   if (phone === "AH" && stress === "0") {
+    // -ment is ừn after a stressed syllable and men after a reduced one.
+    if (afterStress && nextCoda[0] === "N" && P.singleLetters.includes(letter)
+        && closed) {
+      return P.schwaBeforeN;
+    }
     const byLetter = letter && P.schwaByLetter[letter[0]];
     if (letter.endsWith(T.spell.lengthened) && P.longByLetter[letter[0]]) {
       return P.longByLetter[letter[0]];
@@ -515,8 +532,10 @@ function codaOptions(phones, nucleus, schwa, vowel, T, doubled, reduced) {
 function toneOf(s, syl, T) {
   if (s.inserted) return "huyen";
   // -tion takes huyền wherever it sits, not only at the end of a word.
-  if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "N"
-      && s.onset.length && T.tone.sibilants.includes(s.onset[s.onset.length - 1])
+  // A reduced ừn takes huyền wherever it sits: sừn for -tion, mừn for a
+  // -ment after a stressed syllable. The ư carries it, not the onset.
+  if (s.nucleus === "AH" && s.stress === "0" && s.coda[0] === "N"
+      && syl.nucleus === "ư"
       && (s.final || s.letter === T.syllabify.tionLetters)) return "huyen";
   if (s.final) {
     if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "L") {
@@ -534,7 +553,9 @@ function toneOf(s, syl, T) {
     }
   }
   if (T.tone.stopCodas.includes(syl.coda)) {
-    if (s.final && T.tone.nangCodas.includes(joinKey(s.coda))) return "nang";
+    // -ious is glottalised like the other final fricatives: con sợt.
+    if (s.final && (T.tone.nangCodas.includes(joinKey(s.coda))
+                    || s.letter === "iou")) return "nang";
     return "sac";
   }
   return "ngang";
@@ -581,7 +602,7 @@ function slotNucleusOptions(s, T) {
   }
   const closed = s.coda.length > 0 && s.coda[0] !== "R";
   return nucleusOptions(s.nucleus, s.stress, closed, s.coda, s.final, s.glide,
-                        s.onset, s.letter, s.first, T);
+                        s.onset, s.letter, s.first, T, Boolean(s.afterStress));
 }
 
 function slotOptions(s, T) {

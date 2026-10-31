@@ -24,7 +24,8 @@ def _nucleus_options(slot):
     return phonemap.nucleus_options(slot.nucleus, slot.stress, closed, slot.coda,
                                     final=slot.final, glide=slot.glide,
                                     onset=slot.onset, letter=slot.letter,
-                                    first=slot.first)
+                                    first=slot.first,
+                                    after_stress=slot.after_stress)
 
 
 def _slot_options(slot):

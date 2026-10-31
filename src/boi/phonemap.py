@@ -69,6 +69,7 @@ EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
 AA_SPELLED_O = [("o", "", 0), ("ô", "", 1), ("a", "", 2)]
 ESE_ENDING = [("i", "t", 0), ("ê", "", 1)]
 AH_BEFORE_M = [("ư", "", 0), ("â", "", 1)]
+IOUS_ENDING = [("ơ", "", 0), ("i", "", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
 NUCLEUS_CLOSED = dict(
@@ -213,7 +214,7 @@ def onset_options(phones, doubled=False):
 
 
 def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
-                    onset=(), letter="", first=False):
+                    onset=(), letter="", first=False, after_stress=False):
     if phone == "ER" and glide:
         return ER_AFTER_GLIDE
     # ơ is what an er is read as. An or inside a word is not: the o of
@@ -267,6 +268,10 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # ê closed by it. Only s: date and update keep đết.
     if phone == "EY" and next_coda == ("S",):
         return EY_BEFORE_S
+    # -ious is ợt: con sợt, đi li sợt. Its letters are iou, which no other
+    # ending gives, so the s closing it is the only other condition.
+    if phone == "AH" and letter == "iou" and final and next_coda == ("S",):
+        return IOUS_ENDING
     # /ɛ/ written ea and closed by a d is ê: đết lai, hết phôn. red keeps rét
     # on its plain e, and sweat sờ goét on its t.
     if phone == "EH" and letter == "ea" and next_coda == ("D",):
@@ -284,6 +289,10 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         # development is lắp men, not lắp mon, and presentation is den. The
         # two rules below only catch what the letters do not: -tion, whose
         # letters are io rather than one plain vowel, and the rest.
+        # -ment is ừn after a stressed syllable and men after a reduced one:
+        # im pờ rúp mừn against đi ve lắp men.
+        if after_stress and next_coda[0] == "N" and letter in SINGLE_LETTERS:
+            return SCHWA_BEFORE_N
         if next_coda[0] in ("N", "M") and letter in SINGLE_LETTERS:
             by_letter = SCHWA_BY_LETTER.get(letter)
             if by_letter:

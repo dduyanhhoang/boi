@@ -17,10 +17,11 @@ def tone_of(slot, syl):
     """slot is a syllabify.Slot, syl the vi.Syl built from it (tone ignored)."""
     if slot.inserted:
         return "huyen"                      # sờ, cờ, bờ, pờ
-    # -tion takes huyền wherever it sits, not only at the end of a word:
-    # in phô mây sừn, and in tơ nát sừn nồ.
-    if (slot.nucleus == "AH" and slot.stress == "0" and slot.coda == ("N",)
-            and slot.onset and slot.onset[-1] in _SIBILANTS
+    # A reduced ừn takes huyền wherever it sits: in phô mây sừn and in tơ
+    # nát sừn nồ for -tion, im pờ rúp mừn for a -ment after a stressed
+    # syllable. The ư is what carries it, so the onset does not matter.
+    if (slot.nucleus == "AH" and slot.stress == "0" and slot.coda[:1] == ("N",)
+            and syl.nucleus == "ư"
             and (slot.final or slot.letter == "io")):
         return "huyen"
     if slot.final:
@@ -43,8 +44,9 @@ def tone_of(slot, syl):
             before = slot.onset[-1] if slot.onset else ""
             return "ngang" if before in _NGANG_BEFORE_ER else "huyen"
     if syl.coda in _STOP_CODAS:
-        if slot.final and slot.coda in _NANG_CODAS:
-            return "nang"                   # rì pọt, i mịt
+        # -ious is glottalised like the other final fricatives: con sợt.
+        if slot.final and (slot.coda in _NANG_CODAS or slot.letter == "iou"):
+            return "nang"                   # rì pọt, i mịt, con sợt
         return "sac"                        # con tếch, láp tốp, nét
     return "ngang"
 

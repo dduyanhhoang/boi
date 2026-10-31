@@ -63,6 +63,7 @@ class Slot(NamedTuple):
     letter: str = ""        # the vowel letters this phone was written with
     doubled: bool = False   # the coda is a copy of the next syllable's onset
     onset_doubled: bool = False   # this onset was copied back as the last coda
+    after_stress: bool = False    # the syllable before this one carries it
 
 
 def _strip_stress(phones):
@@ -299,5 +300,16 @@ def variants(phones, letters=None):
             repaired = _repair(shapes[0], keep)
             if keep and repaired == _repair(shapes[0], False):
                 continue
-            out.append((repaired, penalty + extra))
+            out.append((_mark_after_stress(repaired), penalty + extra))
     return out
+
+
+def _mark_after_stress(slots):
+    """Whether each syllable follows a stressed one, once the shape is final.
+
+    Stamped last because the repair inserts syllables, and -ment reads ừn
+    after a stressed syllable and men after a reduced one: im pờ rúp mừn
+    against đi ve lắp men.
+    """
+    return [slot._replace(after_stress=i > 0 and slots[i - 1].stress == "1")
+            for i, slot in enumerate(slots)]

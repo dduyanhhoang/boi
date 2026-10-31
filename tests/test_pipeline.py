@@ -278,8 +278,11 @@ def test_dev_exact_match_floor():
     ("sarcasm", "sa ca dừm"),
     ("rhythm", "ri dừm"),
     ("capitalism", "cáp pi ta li dừm"),
-    ("improvement", "im pờ rúp men"),   # a medial silent e, and a kept p
-    ("movement", "múp men"),
+    ("improvement", "im pờ rúp mừn"),   # -ment is ừn after a stressed syllable
+    ("movement", "múp mừn"),
+    ("development", "đi ve lắp men"),   # and men after a reduced one
+    ("conscious", "con sợt"),       # -ious is ợt
+    ("delicious", "đi lít sợt"),
     ("friendly", "phờ ren li"),     # a voiced stop after a nasal still goes
     ("these", "di"),                # -ese is a suffix, not a whole word
     ("album", "ao bum"),            # a plain letter before m reads as itself
