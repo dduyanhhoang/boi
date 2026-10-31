@@ -80,19 +80,28 @@ Two independent sets, each preferring a different reading, which is the case
 for keeping both. It also gives `letters.py` a measurement it otherwise has
 none of. Nothing is fitted on the Ngo data; `--split dev` holds half back.
 
-Their repo also carries their own system's output, so the comparison can be
-like for like on the same 2,391 words:
+Their code is in the repo too, and it runs, so the comparison goes both ways.
+`third_party/ngo/` holds it (MIT, fifteen `print` statements converted to
+Python 3 and nothing else), and `scripts/build_web_data.py` runs it over every
+CMUdict word so the playground can show their reading for anything, not only
+the 2,400 they published.
 
-| | agreement with their reference |
-|---|---|
-| Ngo et al.'s own system | 0.354 |
-| this, letters | 0.213 |
-| this, either reading | 0.269 |
-| this, heard | 0.125 |
+Each system wins on the task it was built for, by a wide margin both times:
 
-Their system was built and trained for exactly that task. This one was built
-for a different one and has never seen a name, so the gap is the expected
-shape; what the number gives is a calibrated sense of how far off it is.
+| | their 2,391 names | our 181 loanwords |
+|---|---|---|
+| Ngo et al.'s system | **0.354** | 0.213 |
+| this, heard | 0.125 | **0.742** |
+| this, letters | 0.213 | 0.265 |
+
+Theirs is name transliteration for ASR; this is everyday loanwords as written
+bồi. Neither number is a target for the other.
+
+One caveat the page carries too. Their input is one phone symbol per letter,
+and their own lexicon had pronunciations CMUdict does not list, so for words
+outside their 2,400 the input is rebuilt here from CMUdict by an aligner that
+reproduces their own alignment on 82% of held-out words. Those readings are
+labelled "rebuilt"; the 2,391 published ones are not.
 
 Reproduce:
 

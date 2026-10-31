@@ -41,13 +41,27 @@ def main():
     vocabulary = sorted(
         {w for w in pronunciations if w.isalpha()} | set(g2p.COMPOUNDS))
 
+    # Ngo et al.'s reading for the same word, so the page can show a second
+    # opinion without another request. Their published output wins where it
+    # exists; the rest is their system run on input rebuilt from CMUdict, and
+    # is marked with a leading ~ so the page can say which is which.
+    print("running Ngo et al.'s transliterator ...", flush=True)
+    published = {w: sorted(f) for w, f in ngo.pairs().items()}
+    theirs = {w: ["~" + r for r in forms] for w, forms in
+              ngo.run_their_system(
+                  [w for w in vocabulary if w in pronunciations and w not in published],
+                  pronunciations).items()}
+    theirs.update(published)
+    print(f"  {len(published)} published, {len(theirs) - len(published)} rebuilt")
+
     shards, total = {}, 0
     for word in vocabulary:
         readings = generate.candidates(word, limit=TOP_N)
         if not readings:
             continue
         phones = " ".join(g2p.phones(word, predict=False))
-        shards.setdefault(word[0], {})[word] = f"{phones}|{';'.join(readings)}"
+        shards.setdefault(word[0], {})[word] = (
+            f"{phones}|{';'.join(readings)}|{';'.join(theirs.get(word, []))}")
         total += 1
 
     size = 0
@@ -62,11 +76,6 @@ def main():
     index = sorted(w for w in vocabulary if len(w) >= 3)
     (OUT / "words.txt").write_text("\n".join(index), encoding="utf-8")
     size += (OUT / "words.txt").stat().st_size
-
-    # Ngo et al.'s readings, for the words they cover, so the page can show a
-    # second opinion from outside this project.
-    size += write(OUT / "ngo.json",
-                  {word: ";".join(sorted(forms)) for word, forms in ngo.pairs().items()})
 
     # The review tool reads the open sheet from here.
     sheet = ROOT / "data" / "review" / "sheet_001.csv"

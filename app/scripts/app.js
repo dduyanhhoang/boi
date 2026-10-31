@@ -30,7 +30,6 @@ const shards = new Map();
 let oov = null;       // promise for the browser pipeline
 let oovReady = null;  // its resolved value, once it is in
 let gold = {};
-let ngo = {};
 let index = { examples: [], words: 0, gold: 0, agree: 0 };
 let active = -1;
 let suggestions = [];
@@ -106,9 +105,13 @@ function renderLoading() {
 }
 
 /** The other readings, offered next to the main one rather than buried. */
-function otherReadings(word, best, asLetters) {
+function otherReadings(word, best, asLetters, theirsRaw) {
   const rows = [];
-  const theirsAll = (ngo[word] || "").split(";").filter(Boolean);
+  // Their reading rides along in the shard entry. A leading ~ means their
+  // system run on input rebuilt from CMUdict rather than their own lexicon.
+  const rebuilt = (theirsRaw || "").startsWith("~");
+  const theirsAll = (theirsRaw || "").split(";").filter(Boolean)
+    .map((r) => r.replace(/^~/, ""));
   // Only merge the two when the letters row is actually being shown; if the
   // letter reading is the main one, their row still has to say it agrees.
   const lettersShown = Boolean(asLetters) && asLetters !== best;
@@ -116,7 +119,7 @@ function otherReadings(word, best, asLetters) {
   if (lettersShown) {
     rows.push([shared
       ? `as letters, and <a href="https://arxiv.org/abs/1810.03184"
-          rel="noopener">Ngo et al.</a>`
+          rel="noopener">Ngo et al.</a>${rebuilt ? ", rebuilt" : ""}`
       : "as letters", asLetters]);
   }
   // A second opinion from outside this project, for the words it covers.
@@ -124,7 +127,7 @@ function otherReadings(word, best, asLetters) {
   // differs only there is agreement, and repeating it would read as a
   // disagreement that is not there.
   const link = `<a href="https://arxiv.org/abs/1810.03184" rel="noopener"
-    >Ngo et al.</a>`;
+    >Ngo et al.</a>${rebuilt ? ", rebuilt" : ""}`;
   if (theirsAll.length && !shared) {
     rows.push([link, theirsAll.includes(best) ? null : theirsAll[0]]);
   }
@@ -139,8 +142,9 @@ function otherReadings(word, best, asLetters) {
 }
 
 
-function renderResult(word, phones, readings, spelled = false, pieces = null) {
-  current = { word, phones, readings, spelled, pieces };
+function renderResult(word, phones, readings, spelled = false, pieces = null,
+                      theirs = "") {
+  current = { word, phones, readings, spelled, pieces, theirs };
   const [best, ...alts] = readings;
   const asLetters = oovReady ? oovReady.module.readLetters(word, oovReady.tables) : null;
   const syllables = best.split(" ");
@@ -183,7 +187,7 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
       ${syllables.map((s, i) => `<li class="syllable" style="--i:${i}">
         <b lang="vi">${escapeHtml(s)}</b><span>${toneOf(s)}</span></li>`).join("")}
     </ul>
-    ${otherReadings(word, best, asLetters)}
+    ${otherReadings(word, best, asLetters, theirs)}
     ${note}
     <details class="source">
       <summary>${icon("chevron")}How it got there</summary>
@@ -205,7 +209,8 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
       if (!current || current.word !== word) return;
       const slot = el.result.querySelector(".second");
       if (!slot) return;
-      slot.outerHTML = otherReadings(word, best, module.readLetters(word, tables));
+      slot.outerHTML = otherReadings(word, best,
+                                     module.readLetters(word, tables), theirs);
     });
   }
 }
@@ -231,8 +236,8 @@ async function show(word, { push = true } = {}) {
 
   const entry = shard[w];
   if (entry) {
-    const [phones, readings] = entry.split("|");
-    renderResult(w, phones, readings.split(";"));
+    const [phones, readings, theirs] = entry.split("|");
+    renderResult(w, phones, readings.split(";"), false, null, theirs);
   } else {
     // Not one of the precomputed words, so run the pipeline here instead.
     renderLoading();
@@ -383,7 +388,7 @@ document.addEventListener("click", (e) => {
     if (reading === current.readings[0]) return;
     const reordered = [reading, ...current.readings.filter((r) => r !== reading)];
     renderResult(current.word, current.phones, reordered,
-                 current.spelled, current.pieces);
+                 current.spelled, current.pieces, current.theirs);
   }
 });
 
@@ -409,14 +414,12 @@ async function boot() {
   try { applyTheme(localStorage.getItem("boi-theme") || "auto"); }
   catch { applyTheme("auto"); }
 
-  const [idx, g, n] = await Promise.all([
+  const [idx, g] = await Promise.all([
     fetch("./data/index.json").then((r) => r.json()).catch(() => index),
     fetch("./data/gold.json").then((r) => r.json()).catch(() => ({})),
-    fetch("./data/ngo.json").then((r) => r.json()).catch(() => ({})),
   ]);
   index = idx;
   gold = g;
-  ngo = n;
 
   el.examples.querySelector(".chips").innerHTML = index.examples
     .map((w) => `<button type="button" class="chip" data-word="${w}">${w}</button>`).join("");

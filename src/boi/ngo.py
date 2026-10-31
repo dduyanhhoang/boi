@@ -8,7 +8,16 @@ this one.
 Where the notation cannot tell two Vietnamese spellings apart, which it
 cannot for s and x, d and gi, or ch and tr, every possibility comes back and
 any of them counts as a match.
+
+It also builds the input their transliterator wants, which is one phone
+symbol per letter with `_` where a letter is silent, so their system can be
+run on any word rather than only the 2,400 they published.
 """
+
+import collections
+import subprocess
+import sys
+import tempfile
 
 import itertools
 import unicodedata
@@ -56,6 +65,8 @@ def spell_onset(onset, nucleus):
 def decode(syllable):
     """One X-SAMPA syllable -> every quốc ngữ spelling it could be."""
     parts = syllable.split()
+    if not parts:
+        return []
     tone = TONES.get(parts[-1], "") if parts[-1].startswith("_") else ""
     body = [p for p in parts if not p.startswith("_")]
     if not body:
@@ -113,4 +124,129 @@ def pairs(reference=True):
         got = readings(line)
         if got:
             out[word] = got
+    return out
+
+
+# --- feeding their transliterator ---------------------------------------
+#
+# Their input is one symbol per letter in a stress-free ARPAbet with
+# allophones. These are the regular substitutions, counted off their own
+# aligned lexicon: AH -> AX 392 times, ER -> AXR 117, IH -> IX 92, and a
+# final stop goes unreleased.
+ALLOPHONES = {"AH0": "AX", "ER0": "AXR", "IH0": "IX", "IH2": "IX"}
+UNRELEASED = {"T": "TD", "D": "DD", "K": "KD", "P": "PD", "B": "BD", "G": "GD"}
+
+_LETTER_PHONE = None
+
+
+def _letter_phone_counts():
+    """How often each letter carries each symbol, from their aligned lexicon."""
+    global _LETTER_PHONE
+    if _LETTER_PHONE is None:
+        counts = collections.Counter()
+        for line in open(DATA / "large_test.lex", encoding="utf-8"):
+            if "\t\t" not in line:
+                continue
+            word, phones = line.strip().split("\t\t")
+            symbols = phones.split()
+            if len(symbols) == len(word):
+                counts.update(zip(word, symbols))
+        _LETTER_PHONE = counts
+    return _LETTER_PHONE
+
+
+def their_phones(phones):
+    """CMUdict phones -> their symbol set, stress dropped, allophones applied."""
+    out = []
+    for i, phone in enumerate(phones):
+        if phone in ALLOPHONES:
+            out.append(ALLOPHONES[phone])
+            continue
+        bare = phone.rstrip("012")
+        # A stop at the end of a word is unreleased in their transcription.
+        if i == len(phones) - 1 and bare in UNRELEASED:
+            out.append(UNRELEASED[bare])
+        else:
+            out.append(bare)
+    return out
+
+
+def align_to_letters(word, phones):
+    """One symbol per letter, _ where a letter is silent. None if it will not fit.
+
+    Scored by how often their own lexicon puts that symbol on that letter.
+    Reproduces their alignment on 82% of held-out words; the misses are which
+    of two adjacent letters takes a phone, which does not change the syllable.
+    """
+    counts = _letter_phone_counts()
+    n, m = len(word), len(phones)
+    if m > n:
+        return None
+    worst = float("-inf")
+    best = [[worst] * (m + 1) for _ in range(n + 1)]
+    back = [[None] * (m + 1) for _ in range(n + 1)]
+    best[0][0] = 0.0
+    for i in range(n):
+        for j in range(m + 1):
+            if best[i][j] == worst:
+                continue
+            if best[i][j] - 0.5 > best[i + 1][j]:
+                best[i + 1][j] = best[i][j] - 0.5
+                back[i + 1][j] = ("_", i, j)
+            if j < m:
+                seen = counts.get((word[i], phones[j]), 0)
+                value = best[i][j] + (1 + seen ** 0.5 if seen else -0.2)
+                if value > best[i + 1][j + 1]:
+                    best[i + 1][j + 1] = value
+                    back[i + 1][j + 1] = (phones[j], i, j)
+    if best[n][m] == worst:
+        return None
+    out, i, j = [], n, m
+    while back[i][j]:
+        symbol, i, j = back[i][j][0], back[i][j][1], back[i][j][2]
+        out.append(symbol)
+    return out[::-1]
+
+
+def input_line(word, phones):
+    """The line their transliterator reads, or None if the word will not align."""
+    aligned = align_to_letters(word, their_phones(phones))
+    return f"{word}\t\t{' '.join(aligned)}" if aligned else None
+
+
+CODE = Path(__file__).resolve().parents[2] / "third_party" / "ngo"
+
+
+def run_their_system(words, pronunciations):
+    """Their transliterator over a word list -> {word: quốc ngữ readings}.
+
+    The input is reconstructed from CMUdict, since their own lexicon covered
+    words CMUdict does not. Close to what they fed it, not identical, so
+    callers should keep these apart from the published readings in DATA.
+    """
+    lines, kept = [], []
+    for word in words:
+        line = input_line(word, pronunciations[word][0])
+        if line:
+            lines.append(line)
+            kept.append(word)
+    if not kept:
+        return {}
+
+    with tempfile.TemporaryDirectory() as tmp:
+        source = Path(tmp) / "in.lex"
+        target = Path(tmp) / "out.txt"
+        source.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        done = subprocess.run(
+            [sys.executable, "transliterator.py", str(source), str(target)],
+            cwd=CODE, capture_output=True, text=True, check=False)
+        if done.returncode or not target.exists():
+            raise RuntimeError(done.stderr[-2000:])
+        produced = target.read_text(encoding="utf-8").splitlines()
+
+    out = {}
+    for word, line in zip(kept, produced):
+        decoded = readings(line)
+        if decoded:
+            out[word] = sorted(decoded)
     return out

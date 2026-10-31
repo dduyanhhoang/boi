@@ -56,3 +56,26 @@ def test_known_pairs_decode_as_expected():
     }
     for sampa, want in expected.items():
         assert want in run_ngo.readings(sampa), f"{sampa} -> {run_ngo.readings(sampa)}"
+
+
+def test_input_matches_their_own_example():
+    """buffet is in their example_inputs.txt; we must rebuild it exactly."""
+    import cmudict
+
+    from boi import ngo as ngo_mod
+
+    line = ngo_mod.input_line("buffet", cmudict.dict()["buffet"][0])
+    assert line == "buffet\t\tB AH _ F AX TD"
+
+
+def test_their_system_runs_and_answers():
+    import cmudict
+
+    from boi import ngo as ngo_mod
+
+    words = ["camera", "laptop", "buffet", "information"]
+    got = ngo_mod.run_their_system(words, cmudict.dict())
+    assert set(got) == set(words), got
+    for readings in got.values():
+        for reading in readings:
+            assert vi.render_word(vi.parse_word(reading)) == reading
