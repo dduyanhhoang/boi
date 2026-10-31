@@ -279,6 +279,7 @@ function geminate(slots, T) {
                 && (codaKey === "" || codaKey === "R"))
       || (!left.coda.length && T.syllabify.voiceless.includes(phone)
           && !(right.letter === T.syllabify.tionLetters && right.final)
+          && !right.yod
           && left.stress === "1" && ["", "0"].includes(right.stress)
           && !T.syllabify.keepsOffglide.includes(left.nucleus));
     if (!ok) continue;
@@ -420,6 +421,9 @@ function toneOf(s, syl, T) {
     if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "L") {
       return "huyen";
     }
+    // A final -er is ngang by default, but huyền after a d: phâu đờ, o đờ.
+    if (s.nucleus === "ER" && s.stress === "0"
+        && s.onset.length && s.onset[s.onset.length - 1] === "D") return "huyen";
   }
   if (T.tone.stopCodas.includes(syl.coda)) {
     if (s.final && T.tone.nangCodas.includes(joinKey(s.coda))) return "nang";

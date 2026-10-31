@@ -26,9 +26,12 @@ def tone_of(slot, syl):
         if slot.nucleus == "AH" and slot.stress == "0":
             if slot.coda == ("L",):
                 return "huyen"              # -le/-al: gu gồ, mo đồ, le vồ
-        # docs/brief.md reads a final -er as huyền with lexical exceptions. In dev the
-        # exceptions are the majority (sơ vơ, com piu tơ, súp pơ, bơ gơ against
-        # phâu đờ), so ngang is the default and the huyền forms are lexical.
+        # docs/brief.md reads a final -er as huyền with lexical exceptions.
+        # The dev rows split evenly, so ngang is the default; but after a d it
+        # is huyền both times it appears, in phâu đờ and o đờ.
+        if slot.nucleus == "ER" and slot.stress == "0" \
+                and slot.onset and slot.onset[-1] == "D":
+            return "huyen"
     if syl.coda in _STOP_CODAS:
         if slot.final and slot.coda in _NANG_CODAS:
             return "nang"                   # rì pọt, i mịt
