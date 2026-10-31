@@ -65,11 +65,27 @@ the gold reduces vowels in ways the phone string does not predict. `taxi` wants
 wants `cu` and gets `cun`, because `school` is `sờ cun` on the same vowel and
 the same stress and no rule tells the two apart.
 
+There is a second, outside measure. `data/ngo/` holds 2,400 English words with
+Vietnamese readings from [Ngo et al.](https://arxiv.org/abs/1810.03184) (MIT),
+produced for a different purpose by people who never saw this project. They
+are names, which people meet in writing, and the verdict there is the opposite
+way round:
+
+| | spoken loanwords (181) | written names (2,394) |
+|---|---|---|
+| heard reading, from CMUdict | **0.707** | 0.125 |
+| letter reading | 0.420 | **0.211** |
+
+Two independent sets, each preferring a different reading, which is the case
+for keeping both. It also gives `letters.py` a measurement it otherwise has
+none of. Nothing is fitted on the Ngo data; `--split dev` holds half back.
+
 Reproduce:
 
 ```sh
 uv run eval/run_eval.py dev --errors --tags
 uv run eval/run_eval.py test
+uv run eval/run_ngo.py --reading letters --split dev
 ```
 
 ## Playground

@@ -240,7 +240,11 @@ function baseSlots(phones, letters, T) {
     let onset = onsets[n];
     const glide = onset.length > 0 && onset[onset.length - 1] === "W";
     const yod = onset.length > 0 && onset[onset.length - 1] === "Y";
-    if (glide && onset.length > 1) onset = onset.slice(0, -1);
+    // k takes the glide with it and spells qu; anything else leaves the w as
+    // the onset on its own and peels off what came before: sweet is sờ guýt.
+    if (glide && onset.length > 1 && onset[onset.length - 2] === "K") {
+      onset = onset.slice(0, -1);
+    }
     if (yod) onset = onset.slice(0, -1).length ? onset.slice(0, -1) : ["Y"];
     return slot({
       onset, nucleus: bare[i], coda: codas[n], stress: pairs[i][1],

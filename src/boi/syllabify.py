@@ -160,7 +160,11 @@ def _slots(phones, letters=None):
         glide = bool(onset) and onset[-1] == "W"
         yod = bool(onset) and onset[-1] == "Y"
         if glide and len(onset) > 1:
-            onset = onset[:-1]
+            # k takes the glide with it and spells qu: quét, sờ que. Anything
+            # else leaves the w to be the onset on its own, g, and peels off
+            # what came before: sweet is sờ guýt, not suýt.
+            if onset[-2] == "K":
+                onset = onset[:-1]
         if yod:
             onset = onset[:-1] or ("Y",)
         out.append(Slot(onset, bare[i], coda, pairs[i][1], glide, yod,
