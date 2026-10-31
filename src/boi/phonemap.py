@@ -69,7 +69,6 @@ EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
 AA_SPELLED_O = [("o", "", 0), ("ô", "", 1), ("a", "", 2)]
 ESE_ENDING = [("i", "t", 0), ("ê", "", 1)]
 AH_BEFORE_M = [("ư", "", 0), ("â", "", 1)]
-OW_BEFORE_FINAL_SIBILANT = [("â", "u", 0), ("ô", "", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
 NUCLEUS_CLOSED = dict(
@@ -213,42 +212,41 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     if phone == "OW":
         if next_coda == ("L",) and not final:
             return OW_FINAL          # phâu đờ
+        # A final s or z closes it on paper and goes unheard: close and
+        # clothes are both cờ lâu. post keeps pốt, its coda ending in a stop.
+        if final and next_coda and next_coda[-1] in ("S", "Z"):
+            return OW_FINAL
         if not closed:
             # âu only where a w is written: sâu, sờ nâu, pho lâu against
             # hê lô and vi đi ô.
             return OW_FINAL if final and "w" in (letter or "") else OW_MID
+    # -ese is ít: chai nít, việt nam mít. The z is heard, where a final z
+    # after a tense vowel is usually not, and the plain e is what separates
+    # this from chi and pờ li, whose ee and ea keep theirs silent.
+    if phone == "IY" and letter == "e" and final and next_coda in (("Z",), ("S",)):
+        return ESE_ENDING
     # /ɪ/ and /i/ written with a single plain letter take that letter's
     # Vietnamese value: the e of encyclopedia is en and pê, not in and pi.
     # Only when the syllable is stressed or closed, because an unstressed open
     # one keeps CMUdict's vowel: event is i ven, not ê ven.
     # A word-initial open one is a prefix read as the English letter name,
     # which is where email gets i meo and esport i sờ pọt.
-    # -ese is ít: chai nít, việt nam mít. The z is heard, where a final z
-    # after a tense vowel is usually not, and the plain e is what separates
-    # this from chi and pờ li, whose ee and ea keep theirs silent.
-    if phone == "IY" and letter == "e" and final and next_coda in (("Z",), ("S",)):
-        return ESE_ENDING
     if phone in ("IH", "IY") and letter in SINGLE_LETTERS \
             and (stress in ("1", "2") or closed) and not (first and not closed):
         by_letter = SCHWA_BY_LETTER.get(letter)
         if by_letter:
             return by_letter[1] if closed else by_letter[0]
-    # /eɪ/ before an s is ây with the s unheard (phây búc, đa ta bây), not
-    # ê closed by it. Only s: date and update keep đết.
-    # /oʊ/ is ô, but âu when a final s or z closes it on paper and goes
-    # unheard: close and clothes are both cờ lâu. post keeps pốt, its coda
-    # ending in a stop rather than the sibilant.
-    if phone == "OW" and final and next_coda and next_coda[-1] in ("S", "Z"):
-        return OW_BEFORE_FINAL_SIBILANT
-    # /ɑ/ takes the letter it is written with, and the dev rows never cross:
-    # an a is a in all nine of ma két tinh, pát ti, gia va and the rest, an o
-    # is o or ô in all ten of com men, xóp, mo đồ, láp tốp.
     # A reduced vowel closed by m is ừm: ao go ri dừm, en thu di a dừm,
     # xít từm. tone.py gives it the huyền.
     if phone == "AH" and stress == "0" and next_coda == ("M",) and final:
         return AH_BEFORE_M
+    # /ɑ/ takes the letter it is written with, and the dev rows never cross:
+    # an a is a in all nine of ma két tinh, pát ti, gia va and the rest, an o
+    # is o or ô in all ten of com men, xóp, mo đồ, láp tốp.
     if phone == "AA" and letter == "o":
         return AA_SPELLED_O
+    # /eɪ/ before an s is ây with the s unheard (phây búc, đa ta bây), not
+    # ê closed by it. Only s: date and update keep đết.
     if phone == "EY" and next_coda == ("S",):
         return EY_BEFORE_S
     # /ɛ/ written ea and closed by a d is ê: đết lai, hết phôn. red keeps rét

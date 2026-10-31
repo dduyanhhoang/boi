@@ -31,7 +31,8 @@ def _slot_options(slot):
     """Every (vi.Syl, penalty) this slot can become, best first."""
     if slot.inserted:
         onsets = phonemap.onset_options(slot.onset)
-        return [(vi.Syl(o, "", "ơ", "", "ngang"), p) for o, p in onsets][:PER_SLOT]
+        return [(vi.Syl(o, "", syllabify._INSERTED_NUCLEUS, "", "ngang"), p)
+                for o, p in onsets][:PER_SLOT]
 
     out, illegal = {}, {}
     for onset, p_on in phonemap.onset_options(slot.onset):

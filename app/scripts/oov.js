@@ -386,16 +386,20 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   if (phone === "ER" && letter === "o" && !final) return P.erSpelledOr;
   if (phone === "OW") {
     if (joinKey(nextCoda) === "L" && !final) return P.owFinal;
+    // A final s or z closes it on paper and goes unheard: close and clothes
+    // are both cờ lâu. post keeps pốt, its coda ending in a stop.
+    if (final && nextCoda.length
+        && ["S", "Z"].includes(nextCoda[nextCoda.length - 1])) return P.owFinal;
     // âu only where a w is written: sâu, pho lâu against hê lô, vi đi ô.
     if (!closed) return final && (letter || "").includes("w") ? P.owFinal : P.owMid;
   }
-  // A single plain vowel letter takes its Vietnamese value when the syllable
-  // is stressed or closed: en and pê in encyclopedia, but i ven in event.
-  // A word-initial open one is a prefix read as the English letter name.
   // -ese is ít: chai nít, việt nam mít. The plain e separates it from chi
   // and pờ li, whose ee and ea keep their z silent.
   if (phone === "IY" && letter === "e" && final
       && ["Z", "S"].includes(joinKey(nextCoda))) return P.eseEnding;
+  // A single plain vowel letter takes its Vietnamese value when the syllable
+  // is stressed or closed: en and pê in encyclopedia, but i ven in event.
+  // A word-initial open one is a prefix read as the English letter name.
   if (["IH", "IY"].includes(phone) && P.singleLetters.includes(letter)
       && (["1", "2"].includes(stress) || closed) && !(first && !closed)) {
     const byLetter = P.schwaByLetter[letter];
@@ -405,17 +409,12 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   if (phone === "EH" && letter === "ea" && joinKey(nextCoda) === "D") {
     return P.ehEaBeforeD;
   }
-  // /oʊ/ is âu when a final s or z closes it on paper and goes unheard.
-  if (phone === "OW" && final && nextCoda.length
-      && ["S", "Z"].includes(nextCoda[nextCoda.length - 1])) {
-    return P.owBeforeFinalSibilant;
-  }
-  // /ɑ/ takes the letter it is written with: com men and xóp against
-  // ma két tinh and gia va.
   // A reduced vowel closed by m is ừm: dừm, từm. tone gives it the huyền.
   if (phone === "AH" && stress === "0" && joinKey(nextCoda) === "M" && final) {
     return P.ahBeforeM;
   }
+  // /ɑ/ takes the letter it is written with: com men and xóp against
+  // ma két tinh and gia va.
   if (phone === "AA" && letter === "o") return P.aaSpelledO;
   // /eɪ/ before an s is ây with the s unheard: phây búc, đa ta bây.
   if (phone === "EY" && joinKey(nextCoda) === "S") return P.eyBeforeS;

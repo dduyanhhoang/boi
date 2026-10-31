@@ -38,7 +38,6 @@ _VOICELESS = {"P", "T", "K", "F", "S", "SH", "CH", "TH"}
 # rather than becoming a syllable of its own: phờ ren ly, like sen guých.
 _SWALLOWED_AFTER_NASAL = {"P", "B", "T", "D", "K", "G"}
 _NASAL_CODAS = {"M", "N", "NG"}
-_FRONT_LETTERS = {"e", "i", "y"}
 _KEEPS_OFFGLIDE = {"EY", "OW"}
 # A Vietnamese reader sees -tion as one piece and says sừn wherever it sits.
 # CMUdict gives it away: the vowel letters are io and the onset is a sibilant.
