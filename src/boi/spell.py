@@ -241,6 +241,11 @@ def align_vowels(word, phones):
                 break
         else:
             return None
+    # More vowel letters than vowel phones means a silent one inside the word,
+    # which is the e of improve before -ment. Only a lone e, and never the
+    # first group, which is nobody's silent letter.
+    while len(groups) > len(vowels) and "e" in groups[1:]:
+        groups.pop(groups.index("e", 1))
     if len(groups) != len(vowels):
         return None
     if syllabic:

@@ -278,6 +278,9 @@ def test_dev_exact_match_floor():
     ("sarcasm", "sa ca dừm"),
     ("rhythm", "ri dừm"),
     ("capitalism", "cáp pi ta li dừm"),
+    ("improvement", "im pờ rúp men"),   # a medial silent e, and a kept p
+    ("movement", "múp men"),
+    ("friendly", "phờ ren li"),     # a voiced stop after a nasal still goes
     ("these", "di"),                # -ese is a suffix, not a whole word
     ("album", "ao bum"),            # a plain letter before m reads as itself
     ("problem", "pờ ro bờ lừm"),    # lexicon: the cluster, not the reading
