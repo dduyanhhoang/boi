@@ -71,6 +71,7 @@ def main():
             "schwaByCoda": phonemap.SCHWA_BY_CODA,
             "schwaClosed": phonemap.SCHWA_CLOSED,
             "schwaByLetter": {k: list(v) for k, v in phonemap.SCHWA_BY_LETTER.items()},
+            "singleLetters": list(phonemap.SINGLE_LETTERS),
             "schwaBeforeN": phonemap.SCHWA_BEFORE_N,
             "schwaBeforeNStop": phonemap.SCHWA_BEFORE_N_STOP,
             "fricatives": sorted(phonemap._FRICATIVES),

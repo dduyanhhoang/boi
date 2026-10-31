@@ -49,6 +49,35 @@ def test_known_reading(word, expected):
 #                                    stress, so no rule separates the two)
 
 
+@pytest.mark.parametrize("word,expected", [
+    # A single plain vowel letter is read as that letter.
+    ("encyclopedia", "en sai cờ lô pê đi a"),
+    ("refrigerator", "rê phờ ri giơ ây tơ"),   # not ra: the letter is an e
+    ("camera", "ca mê ra"),                    # the r in ER0 opens the last one
+    ("solution", "sô lút sừn"),
+    # A digraph keeps CMUdict's vowel, and an unstressed open one does too.
+    ("free", "phờ ri"),
+    ("team", "tim"),
+    ("meeting", "mít tinh"),
+    ("event", "i ven"),
+    ("email", "i mêu"),
+])
+def test_reduced_vowel_follows_the_spelling(word, expected):
+    assert generate.read(word) == expected
+
+
+def test_vowel_alignment_covers_most_of_the_gold():
+    import csv
+    from boi import spell as spell_mod
+
+    path = Path(__file__).resolve().parents[1] / "data" / "eval_v0.csv"
+    with open(path, encoding="utf-8") as f:
+        words = [r["word"] for r in csv.DictReader(f)]
+    aligned = sum(1 for w in words
+                  if spell_mod.align_vowels(w, g2p.phones(w)) is not None)
+    assert aligned >= 170, f"only {aligned}/{len(words)} words align"
+
+
 def test_every_candidate_is_a_legal_syllable():
     for word in ("information", "schedule", "microsoft", "bluetooth", "netflix"):
         for form in generate.candidates(word, limit=5):

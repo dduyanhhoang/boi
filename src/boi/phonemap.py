@@ -95,6 +95,10 @@ SCHWA_BY_CODA = {
 SCHWA_CLOSED = [("ơ", "", 0), ("e", "", 1), ("i", "", 1)]
 # A reduced vowel keeps the letter it was written with, which is the whole
 # difference between ra phờ ri and rê phờ ri. (open syllable, closed syllable)
+# Only a single plain vowel letter is read this way. A digraph is an English
+# spelling convention that a Vietnamese reader does not apply: the ee of free
+# and the ea of team are /i/, not two letters to sound out.
+SINGLE_LETTERS = ("a", "e", "i", "o", "u")
 SCHWA_BY_LETTER = {
     "a": ([("a", "", 0)], [("a", "", 0), ("ơ", "", 1)]),
     "e": ([("ê", "", 0), ("e", "", 1)], [("e", "", 0), ("ê", "", 1)]),
@@ -179,7 +183,7 @@ def onset_options(phones):
 
 
 def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
-                    onset=(), letter=""):
+                    onset=(), letter="", first=False):
     if phone == "ER" and glide:
         return ER_AFTER_GLIDE
     if phone == "OW":
@@ -187,6 +191,17 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
             return OW_FINAL          # phâu đờ
         if not closed:
             return OW_FINAL if final else OW_MID
+    # /ɪ/ and /i/ written with a single plain letter take that letter's
+    # Vietnamese value: the e of encyclopedia is en and pê, not in and pi.
+    # Only when the syllable is stressed or closed, because an unstressed open
+    # one keeps CMUdict's vowel: event is i ven, not ê ven.
+    # A word-initial open one is a prefix read as the English letter name,
+    # which is where email gets i meo and esport i sờ pọt.
+    if phone in ("IH", "IY") and letter in SINGLE_LETTERS \
+            and (stress in ("1", "2") or closed) and not (first and not closed):
+        by_letter = SCHWA_BY_LETTER.get(letter)
+        if by_letter:
+            return by_letter[1] if closed else by_letter[0]
     if phone == "AH" and stress == "0":
         if not closed:
             if letter and letter[0] in SCHWA_BY_LETTER:

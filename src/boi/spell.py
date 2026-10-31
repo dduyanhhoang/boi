@@ -214,6 +214,19 @@ def align_vowels(word, phones):
             i += 1
 
     vowels = [p for p in phones if p[:-1] in VOWEL_PHONES and p[-1].isdigit()]
+
+    # A run of vowel letters can be more than one syllable: the ia of
+    # encyclopedia is two phones, the eo of video is two. Split a run when the
+    # phones ask for more, leaving the known digraphs (ea, ee, oo) whole.
+    while len(groups) < len(vowels):
+        for pool in (lambda g: len(g) > 1 and g not in DIGRAPHS,
+                     lambda g: len(g) > 1):
+            index = next((i for i, g in enumerate(groups) if pool(g)), None)
+            if index is not None:
+                groups[index : index + 1] = list(groups[index])
+                break
+        else:
+            return None
     return groups if len(groups) == len(vowels) else None
 
 

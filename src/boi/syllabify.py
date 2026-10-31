@@ -44,6 +44,7 @@ class Slot(NamedTuple):
     yod: bool = False        # i-onglide, from Y
     inserted: bool = False
     final: bool = False
+    first: bool = False
     letter: str = ""        # the vowel letters this phone was written with
 
 
@@ -155,7 +156,7 @@ def _slots(phones, letters=None):
         if yod:
             onset = onset[:-1] or ("Y",)
         out.append(Slot(onset, bare[i], coda, pairs[i][1], glide, yod,
-                        final=n == len(vowels) - 1,
+                        final=n == len(vowels) - 1, first=n == 0,
                         letter=letters[n] if letters and n < len(letters) else ""))
     return out
 

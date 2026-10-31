@@ -142,11 +142,21 @@ A word becomes phones, the phones become one or more syllable layouts, each
 slot in a layout offers a few Vietnamese pieces, and the combinations are
 ranked by the penalties that produced them.
 
-CMUdict reduces an unstressed vowel to a schwa and loses which letter it was,
-but a Vietnamese reader keeps the letter: the *re* of refrigerator is `rê`,
-not `ra`. So the word's vowel letters are lined up against its vowel phones,
-which works for 173 of the 181 gold rows, and a reduced vowel in an open
-syllable takes the value of the letter it was written with. Illegal rhymes are dropped before
+CMUdict is right about some vowels and loses the rest. It reduces an
+unstressed vowel to a schwa, which throws away which letter it was, so
+refrigerator read as `ra phờ ri` where a Vietnamese reader says `rê`. So the
+word's vowel letters are lined up against its vowel phones, which works for
+175 of the 181 gold rows, and the letter is used where it is the better
+evidence:
+
+- a reduced vowel in an open syllable takes its letter's value
+- /ɪ/ and /i/ written with one plain letter take that letter's value when the
+  syllable is stressed or closed, which is how encyclopedia gets `en` and `pê`
+
+and CMUdict keeps the rest. A digraph is an English spelling convention a
+Vietnamese reader does not apply, so `free` stays `phờ ri` and `team` stays
+`tim`. A word-initial open vowel is a prefix read as the English letter name,
+so `email` is `i meo` and `esport` is `i sờ pọt`. Illegal rhymes are dropped before
 ranking. Nothing is learned end to end, so every output traces back to a named
 rule or a table row.
 

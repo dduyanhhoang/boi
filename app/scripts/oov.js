@@ -159,7 +159,8 @@ export function alignVowels(word, phones, T) {
 
 const slot = (o = {}) => ({
   onset: [], nucleus: "", coda: [], stress: "",
-  glide: false, yod: false, inserted: false, final: false, letter: "", ...o,
+  glide: false, yod: false, inserted: false, final: false, first: false,
+  letter: "", ...o,
 });
 
 function isOnsetRun(run, T) {
@@ -243,7 +244,7 @@ function baseSlots(phones, letters, T) {
     if (yod) onset = onset.slice(0, -1).length ? onset.slice(0, -1) : ["Y"];
     return slot({
       onset, nucleus: bare[i], coda: codas[n], stress: pairs[i][1],
-      glide, yod, final: n === vowels.length - 1,
+      glide, yod, final: n === vowels.length - 1, first: n === 0,
       letter: letters && n < letters.length ? letters[n] : "",
     });
   });
@@ -325,12 +326,20 @@ function onsetOptions(phones, T) {
   return T.phonemap.onset[phones[phones.length - 1]] ?? [["", 3]];
 }
 
-function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, letter, T) {
+function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, letter, first, T) {
   const P = T.phonemap;
   if (phone === "ER" && glide) return P.erAfterGlide;
   if (phone === "OW") {
     if (joinKey(nextCoda) === "L" && !final) return P.owFinal;
     if (!closed) return final ? P.owFinal : P.owMid;
+  }
+  // A single plain vowel letter takes its Vietnamese value when the syllable
+  // is stressed or closed: en and pê in encyclopedia, but i ven in event.
+  // A word-initial open one is a prefix read as the English letter name.
+  if (["IH", "IY"].includes(phone) && P.singleLetters.includes(letter)
+      && (["1", "2"].includes(stress) || closed) && !(first && !closed)) {
+    const byLetter = P.schwaByLetter[letter];
+    if (byLetter) return closed ? byLetter[1] : byLetter[0];
   }
   if (phone === "AH" && stress === "0") {
     const byLetter = letter && P.schwaByLetter[letter[0]];
@@ -427,7 +436,7 @@ function slotNucleusOptions(s, T) {
   }
   const closed = s.coda.length > 0 && s.coda[0] !== "R";
   return nucleusOptions(s.nucleus, s.stress, closed, s.coda, s.final, s.glide,
-                        s.onset, s.letter, T);
+                        s.onset, s.letter, s.first, T);
 }
 
 function slotOptions(s, T) {

@@ -23,7 +23,8 @@ def _nucleus_options(slot):
     closed = bool(slot.coda) and slot.coda[0] != "R"
     return phonemap.nucleus_options(slot.nucleus, slot.stress, closed, slot.coda,
                                     final=slot.final, glide=slot.glide,
-                                    onset=slot.onset, letter=slot.letter)
+                                    onset=slot.onset, letter=slot.letter,
+                                    first=slot.first)
 
 
 def _slot_options(slot):
