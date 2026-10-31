@@ -66,6 +66,14 @@ and `warning` wash for a reviewed word whose gold reading differs from the
 generated one. Both carry their meaning as text in the pill, so colour is never
 the only channel.
 
+## The second reading
+
+A word carries two readings: the heard one, from CMUdict, and the letter one.
+The page leads with the heard reading and puts the letter reading inside "How
+it got there" as a chip that swaps in when clicked. It is not a third emphasis
+style: it is a row in the panel, so the two-emphasis rule still holds, and the
+panel is where the rest of the provenance already lives.
+
 ## Icons
 
 Authored inline SVG on Lucide's geometry: 24px box, 1.75px stroke, round caps

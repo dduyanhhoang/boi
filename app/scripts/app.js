@@ -25,11 +25,13 @@ const el = {
 };
 
 const shards = new Map();
-let oov = null;   // { readUnknown, tables }, loaded on the first unknown word
+let oov = null;       // promise for the browser pipeline
+let oovReady = null;  // its resolved value, once it is in
 let gold = {};
 let index = { examples: [], words: 0, gold: 0, agree: 0 };
 let active = -1;
 let suggestions = [];
+let current = null;   // what is on screen, so alternatives can swap in place
 
 /** Tone of one Vietnamese syllable, from its combining mark. */
 function toneOf(syllable) {
@@ -46,7 +48,10 @@ async function loadOov() {
       fetch("./data/tables.json").then((r) => r.json()),
       fetch("./data/words.txt").then((r) => r.text())
         .then((t) => new Set(t.split("\n"))),
-    ]).then(([module, tables, known]) => ({ module, tables, known }));
+    ]).then(([module, tables, known]) => {
+      oovReady = { module, tables, known };
+      return oovReady;
+    });
   }
   return oov;
 }
@@ -98,7 +103,9 @@ function renderLoading() {
 }
 
 function renderResult(word, phones, readings, spelled = false, pieces = null) {
+  current = { word, phones, readings, spelled, pieces };
   const [best, ...alts] = readings;
+  const asLetters = oovReady ? oovReady.module.readLetters(word, oovReady.tables) : null;
   const syllables = best.split(" ");
   const g = gold[word];
 
@@ -126,6 +133,10 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
           .map((a) => `<button type="button" data-swap="${escapeHtml(a)}">${escapeHtml(a)}</button>`)
           .join("")}</span>`]
       : null,
+    asLetters && asLetters !== best
+      ? ["As letters", `<span class="alts"><button type="button" data-swap="${
+          escapeHtml(asLetters)}">${escapeHtml(asLetters)}</button></span>`]
+      : null,
     g && g.native ? ["Vietnamese word", escapeHtml(g.native)] : null,
     g && g.tags.length ? ["Tags", `<span class="tags">${escapeHtml(g.tags.join(" "))}</span>`] : null,
     g ? ["Reviewed in", `${escapeHtml(g.split)} split, ${escapeHtml(g.status)}`] : null,
@@ -152,6 +163,20 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
 
   el.status.textContent = `${word} reads as ${best}, ${syllables.length} syllable${
     syllables.length === 1 ? "" : "s"}`;
+
+  // A word from the shards paints before the browser pipeline has loaded, so
+  // the second reading fills in behind it rather than holding up the first.
+  if (!asLetters) {
+    loadOov().then(({ module, tables }) => {
+      if (!current || current.word !== word) return;
+      const reading = module.readLetters(word, tables);
+      const list = el.result.querySelector(".source dl");
+      if (!reading || reading === best || !list) return;
+      list.insertAdjacentHTML("beforeend",
+        `<dt>As letters</dt><dd><span class="alts"><button type="button"
+          data-swap="${escapeHtml(reading)}">${escapeHtml(reading)}</button></span></dd>`);
+    });
+  }
 }
 
 /* Lookup --------------------------------------------------------------- */
@@ -322,16 +347,12 @@ document.addEventListener("click", (e) => {
   const chip = e.target.closest("[data-word]");
   if (chip) show(chip.dataset.word);
   const swap = e.target.closest("[data-swap]");
-  if (swap) {
+  if (swap && current) {
     const reading = swap.dataset.swap;
-    const word = el.input.value.trim().toLowerCase();
-    const current = el.result.querySelector(".reading").textContent;
-    const entry = shards.get(word[0]);
-    if (entry) entry.then((shard) => {
-      const [phones, readings] = shard[word].split("|");
-      const reordered = [reading, ...readings.split(";").filter((r) => r !== reading)];
-      if (reading !== current) renderResult(word, phones, reordered);
-    });
+    if (reading === current.readings[0]) return;
+    const reordered = [reading, ...current.readings.filter((r) => r !== reading)];
+    renderResult(current.word, current.phones, reordered,
+                 current.spelled, current.pieces);
   }
 });
 
@@ -371,6 +392,9 @@ async function boot() {
   const word = new URLSearchParams(location.search).get("w");
   if (word) show(word, { push: false });
   else renderEmpty();
+
+  // The second reading needs the pipeline, so fetch it once the page is up.
+  requestIdleCallback?.(() => loadOov()) ?? setTimeout(loadOov, 1200);
 }
 
 boot();

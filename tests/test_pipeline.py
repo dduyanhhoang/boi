@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from boi import generate, g2p, lexicon, spell, syllabify, tone, vi
+from boi import generate, g2p, letters, lexicon, spell, syllabify, tone, vi
 
 DEV = Path(__file__).resolve().parents[1] / "data" / "splits" / "dev.csv"
 DEV_EXACT_FLOOR = 0.70
@@ -107,6 +107,29 @@ def test_compound_splits_into_known_words(word, pieces, expected):
 ])
 def test_spelling_grapheme_rules(word, phones):
     assert spell.phones(word) == phones
+
+
+@pytest.mark.parametrize("word,expected", [
+    ("ecology", "ê cô lô gi"),      # e is ê, o is ô, final y is i
+    ("medicine", "mê đi xin"),      # c before i is x, final e is silent
+    ("power", "pao ơ"),             # ow is ao, er is r-coloured
+    ("server", "sơ vơ"),
+    ("street", "sờ trít"),          # no onset cluster: s peels off, tr stays
+    ("project", "pờ rô giếch"),
+    ("laptop", "láp tốp"),
+    ("video", "vi đê ô"),
+    ("banana", "ba na na"),
+    ("camera", "ca mê ra"),
+])
+def test_letter_reading(word, expected):
+    assert letters.read(word) == expected
+
+
+def test_letter_reading_is_always_a_legal_syllable():
+    for word in ("ecology", "medicine", "problem", "english", "strong",
+                 "information", "google", "qwertyuiop"):
+        for syl in vi.parse_word(letters.read(word)):
+            assert vi.is_legal(syl), f"{word}: {letters.read(word)}"
 
 
 def test_every_word_gets_a_reading():

@@ -4,7 +4,7 @@ import argparse
 import itertools
 import sys
 
-from . import g2p, lexicon, phonemap, rank, syllabify, tone, vi
+from . import g2p, letters, lexicon, phonemap, rank, syllabify, tone, vi
 
 BUDGET = 3.0        # how far above the best table penalty to keep exploring
 PER_SLOT = 4        # options kept per syllable
@@ -104,17 +104,28 @@ def main(argv=None):
         prog="boi", description="Read English words the way Vietnamese speakers do.")
     ap.add_argument("words", nargs="+")
     ap.add_argument("-a", "--all", action="store_true", help="show ranked alternatives")
+    ap.add_argument("-r", "--read", action="store_true",
+                    help="read the letters as Vietnamese instead of the sound")
     args = ap.parse_args(argv)
 
     status = 0
     for word in args.words:
+        if args.read:
+            reading = letters.read(word)
+            if reading:
+                print(f"{word}\t{reading}")
+            else:
+                print(f"{word}\tno letters to read", file=sys.stderr)
+                status = 1
+            continue
+
         ranked = candidates(word, limit=5 if args.all else 1)
         if not ranked:
-            print(f"{word}\t?  (not in CMUdict; install the oov extra for g2p_en)",
-                  file=sys.stderr)
+            print(f"{word}\tno reading", file=sys.stderr)
             status = 1
         elif args.all:
             print(f"{word}\t" + "  |  ".join(ranked))
+            print(f"{'':{len(word)}}\tas letters: {letters.read(word)}")
         else:
             print(f"{word}\t{ranked[0]}")
     return status

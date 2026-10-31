@@ -15,7 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from boi import lexicon, phonemap, rank, spell, syllabify, tone, vi  # noqa: E402
+from boi import letters, lexicon, phonemap, rank, spell, syllabify, tone, vi  # noqa: E402
 from boi.rhymes import RHYMES  # noqa: E402
 
 OUT = ROOT / "app" / "data" / "tables.json"
@@ -98,6 +98,17 @@ def main():
             "rhymes": sorted(f"{n}|{c}" for n, c in RHYMES),
         },
         "generate": {"budget": 3.0, "perSlot": 4},
+        "letters": {
+            "vowels": letters.VOWELS,
+            "nucleus": {k: list(v) for k, v in letters.NUCLEUS.items()},
+            "onset": letters.ONSET,
+            "fronted": letters.FRONTED,
+            "coda": letters.CODA,
+            "rColoured": letters.R_COLOURED,
+            "onsetClusters": sorted(letters.ONSET_CLUSTERS),
+            "glideLetters": letters._GLIDE_LETTERS,
+            "stops": letters._STOPS,
+        },
         "lexicon": lexicon.LEXICON,
     }
     # app/data is generated and gitignored, so a fresh checkout has no

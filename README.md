@@ -96,12 +96,34 @@ fails the build on any disagreement.
 Design follows the owner's UIUX spec, recorded with its resolved token values
 in `docs/DESIGN.md`.
 
+## Two readings
+
+A speaker who has heard a word says it the way they heard it; a speaker
+meeting it in writing sounds the letters out with Vietnamese values. Both are
+real, and no rule tells which applies, so both are available.
+
+```sh
+uv run boi ecology            # i ca la di      the heard reading, the default
+uv run boi --read ecology     # ê cô lô gi      the letters, read as Vietnamese
+uv run boi --all ecology      # both, with alternatives
+```
+
+The page shows the second one under "How it got there", and clicking it makes
+it the main reading.
+
+The default is the heard reading because the data says so: over the 181
+reviewed rows it matches 0.707 against 0.420 for the letters, winning 54 words
+and losing 2. The letter reading is better for words people meet in writing
+(`ecology`, `medicine`) and worse for the loanwords people say (`information`,
+`software`, `google`), which is what the reviewed set is made of.
+
 ## How it works
 
 ```
 src/boi/vi.py          quốc ngữ <-> syllable slots, and the rhyme inventory
 src/boi/g2p.py         word -> ARPAbet (CMUdict, then g2p_en, then spelling)
 src/boi/spell.py       spelling -> ARPAbet, for words CMUdict lacks
+src/boi/letters.py     spelling -> Vietnamese directly, the second reading
 src/boi/phonemap.py    ARPAbet -> Vietnamese slot options, each with a penalty
 src/boi/syllabify.py   phones -> syllable slots: cluster repair, gemination
 src/boi/tone.py        tone per syllable

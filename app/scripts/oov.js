@@ -506,3 +506,130 @@ export function readUnknown(word, T, limit = 5) {
   if (fixed) readings = [fixed, ...readings.filter((r) => r !== fixed)].slice(0, limit);
   return { phones, readings };
 }
+
+/* letters.py: read the spelling with Vietnamese letter values -------- */
+
+function vowelRuns(group, T) {
+  const out = [];
+  let i = 0;
+  while (i < group.length) {
+    let taken = false;
+    for (const size of [2, 1]) {
+      const piece = group.slice(i, i + size);
+      if (piece.length === size && piece in T.letters.nucleus) {
+        out.push(piece);
+        i += size;
+        taken = true;
+        break;
+      }
+    }
+    if (!taken) { out.push(group[i]); i += 1; }
+  }
+  return out;
+}
+
+function letterChunks(word, T) {
+  const L = T.letters;
+  const groups = [];
+  let i = 0;
+  while (i < word.length) {
+    if (L.vowels.includes(word[i])) {
+      let j = i;
+      while (j < word.length && L.vowels.includes(word[j])) j += 1;
+      if (j < word.length && L.glideLetters.includes(word[j])
+          && word.slice(i, j + 1) in L.nucleus) j += 1;
+      groups.push(["v", word.slice(i, j)]);
+      i = j;
+    } else {
+      let j = i;
+      while (j < word.length && !L.vowels.includes(word[j])) j += 1;
+      groups.push(["c", word.slice(i, j)]);
+      i = j;
+    }
+  }
+
+  const nuclei = [];
+  groups.forEach(([kind, text], n) => {
+    if (kind !== "v") return;
+    vowelRuns(text, T).forEach((piece, k) => nuclei.push([n, k, piece]));
+  });
+  if (!nuclei.length) return word ? [[word, "", ""]] : [];
+
+  return nuclei.map(([groupIndex, place, piece], n) => {
+    let run = "";
+    if (place === 0 && groupIndex && groups[groupIndex - 1][0] === "c") {
+      run = groups[groupIndex - 1][1];
+      if (n && run.length > 1 && !L.onsetClusters.includes(run.slice(-2))) {
+        run = run.slice(1);
+      }
+    }
+    let coda = "";
+    const lastOfGroup = place === vowelRuns(groups[groupIndex][1], T).length - 1;
+    if (lastOfGroup && groupIndex + 1 < groups.length) {
+      const tail = groups[groupIndex + 1][1];
+      if (n === nuclei.length - 1) coda = tail;
+      else if (tail.length > 1 && !L.onsetClusters.includes(tail.slice(-2))) {
+        coda = tail.slice(0, 1);
+      }
+    }
+    return [run, piece, coda];
+  });
+}
+
+function letterOnset(lettersRun, nucleus, T) {
+  if (!lettersRun) return "";
+  for (const size of [2, 1]) {
+    if (lettersRun.length < size) continue;
+    const piece = lettersRun.slice(-size);
+    if (piece in T.letters.onset) {
+      if (size === 1 && piece in T.letters.fronted && nucleus && "iê".includes(nucleus[0])) {
+        return T.letters.fronted[piece];
+      }
+      return T.letters.onset[piece];
+    }
+  }
+  return "";
+}
+
+/** Read a word as if its letters were Vietnamese. The second reading. */
+export function readLetters(word, T) {
+  const L = T.letters;
+  word = [...word.toLowerCase()].filter((c) => /[a-z]/.test(c)).join("");
+  if (!word) return null;
+  if (word.length > 2 && word.endsWith("e") && !L.vowels.includes(word[word.length - 2])
+      && !"lr".includes(word[word.length - 2])) {
+    word = word.slice(0, -1);
+  }
+
+  const syllables = [];
+  for (let [onsetLetters, vowelLetters, codaLetters] of letterChunks(word, T)) {
+    while (onsetLetters.length > 1 && !(onsetLetters in L.onset)) {
+      const head = onsetLetters[0];
+      onsetLetters = onsetLetters.slice(1);
+      const spelled = L.onset[head] ?? "";
+      if (spelled) {
+        syllables.push({ onset: spelled, glide: "", nucleus: "ơ", coda: "", tone: "huyen" });
+      }
+    }
+    let [nucleus, offglide] = L.nucleus[vowelLetters]
+      ?? L.nucleus[vowelLetters.slice(0, 1)] ?? ["ơ", ""];
+    const onset = letterOnset(onsetLetters, nucleus, T);
+    if (codaLetters.slice(0, 1) === "r" && nucleus in L.rColoured) {
+      nucleus = L.rColoured[nucleus];
+      offglide = "";
+      codaLetters = codaLetters.slice(1);
+    }
+    let coda = offglide || L.coda[codaLetters] || L.coda[codaLetters.slice(0, 1)] || "";
+    if (coda === "c" && "aê".includes(nucleus)) coda = "ch";
+    else if (coda === "ng" && "iê".includes(nucleus)) coda = "nh";
+
+    let syl = { onset, glide: "", nucleus, coda, tone: "ngang" };
+    if (!isLegal(syl, T)) {
+      const fallback = { ...syl, coda: offglide };
+      syl = isLegal(fallback, T) ? fallback : { ...syl, coda: "" };
+    }
+    if (syl.coda && L.stops.includes(syl.coda)) syl.tone = "sac";
+    syllables.push(syl);
+  }
+  return syllables.length ? syllables.map((s) => render(s, T)).join(" ") : null;
+}

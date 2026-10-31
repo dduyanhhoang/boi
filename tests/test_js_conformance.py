@@ -19,7 +19,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from boi import g2p, generate, spell, syllabify, tone, vi  # noqa: E402
+from boi import g2p, generate, letters, spell, syllabify, tone, vi  # noqa: E402
 from boi import rank as rank_mod  # noqa: E402
 
 TABLES = ROOT / "app" / "data" / "tables.json"
@@ -99,6 +99,9 @@ def test_browser_pipeline_matches_python():
         if (got["phones"] or None) != phones or got["readings"] != readings:
             mismatches.append(
                 f"{word}\n  py {phones} {readings}\n  js {got['phones']} {got['readings']}")
+        if got["letters"] != letters.read(word):
+            mismatches.append(
+                f"{word} letters\n  py {letters.read(word)}\n  js {got['letters']}")
         if got["split"] != g2p._split(word):
             mismatches.append(
                 f"{word} split\n  py {g2p._split(word)}\n  js {got['split']}")
