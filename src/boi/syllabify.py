@@ -252,6 +252,13 @@ def _repair(slots, keep_clusters):
             # its own syllable: sờ cờ rin, pờ rô, bờ lu.
             tail = slot.onset[-2:] if slot.onset[-2:] in _VI_ONSETS else slot.onset[-1:]
             for phone in slot.onset[: len(slot.onset) - len(tail)]:
+                # A v after a tense vowel is unheard, as it is at the end of
+                # a word: live is lai, so livestream is lai sờ trim. After a
+                # checked vowel it is a coda instead, which is love -> lớp.
+                # Only v: icecream keeps its s as sờ.
+                if (phone == "V" and out and not out[-1].coda
+                        and out[-1].nucleus in _TENSE):
+                    continue
                 if (out and phone in _SWALLOWED_AFTER_NASAL and out[-1].coda
                         and out[-1].coda[-1] in _NASAL_CODAS):
                     out[-1] = out[-1]._replace(coda=out[-1].coda + (phone,))

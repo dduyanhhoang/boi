@@ -258,6 +258,9 @@ def test_dev_exact_match_floor():
     ("camera", "ca mê ra"),         # but not before an open mid-word e
     ("drama", "đờ ra ma"),          # nor before an a
     ("banana", "ba na na"),
+    ("livestream", "lai sờ trim"),  # a v after a tense vowel is unheard
+    ("live", "lai"),
+    ("icecream", "ai sờ cờ rim"),   # only a v, an s still gives sờ
     ("friendly", "phờ ren li"),     # a stop after a nasal coda is unheard
     ("handle", "han đồ"),           # unless a vowel follows, making it an onset
 ])

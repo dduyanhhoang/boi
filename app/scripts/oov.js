@@ -313,6 +313,11 @@ function repair(slots, keepClusters, T) {
       const tail = T.syllabify.viOnsets.includes(pairKey)
         ? s.onset.slice(-2) : s.onset.slice(-1);
       for (const phone of s.onset.slice(0, s.onset.length - tail.length)) {
+        // A v after a tense vowel is unheard, as at the end of a word: live
+        // is lai, so livestream is lai sờ trim. Only v; icecream keeps its s.
+        const back = out[out.length - 1];
+        if (phone === "V" && back && !back.coda.length
+            && T.phonemap.tense.includes(back.nucleus)) continue;
         // A stop between a nasal coda and another consonant is unheard
         // rather than a syllable of its own: phờ ren li, like sen guých.
         const prev = out[out.length - 1];

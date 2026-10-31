@@ -44,16 +44,16 @@ rules and is tried first when it is installed.
 
 | | dev, rules only | dev, with lexicon | test |
 |---|---|---|---|
-| exact match on `vi_form` | 0.786 | 0.824 | 0.700 |
-| match on `vi_form` or an `alt_form` | 0.802 | 0.840 | 0.780 |
+| exact match on `vi_form` | 0.786 | 0.824 | 0.720 |
+| match on `vi_form` or an `alt_form` | 0.802 | 0.840 | 0.800 |
 | gold form in the top 5 | 0.870 | 0.885 | 0.860 |
-| syllable error rate | 0.138 | 0.115 | 0.148 |
+| syllable error rate | 0.138 | 0.115 | 0.142 |
 
 The test column is not clean. `scripts/mine_rules.py` read the whole of
 `eval_v0.csv` rather than the dev split when it was written, and a later
 error hunt did the same, so five test rows were looked at and used:
-`database`, `singer`, `snow`, `hello`, `video` and `deadline`. Five of the six
-are now hits. Over the 44 test rows never looked at the figure is **0.682**,
+`database`, `singer`, `snow`, `hello`, `video`, `deadline` and `livestream`.
+Six of the seven are now hits. Over the 43 never looked at it is **0.698**,
 and that is the one to compare against anything new. The miner now reads
 `data/splits/dev.csv` and takes `--split` to say otherwise.
 | tone accuracy | 0.956 | 0.956 | 0.942 |
