@@ -33,6 +33,13 @@ _GEMINATES = {"P", "T", "K", "N"}
 # /eɪ/ or /oʊ/, which would rather keep their offglide: sờ tây sừn, mai cờ rô.
 _VOICELESS = {"P", "T", "K", "F", "S", "SH", "CH", "TH"}
 _KEEPS_OFFGLIDE = {"EY", "OW"}
+# A Vietnamese reader sees -tion as one piece and says sừn wherever it sits.
+# CMUdict gives it away: the vowel letters are io and the onset is a sibilant.
+# At the end of a word the n already closes it, but inside one the n runs off
+# to the next syllable and international reads na-ti-o-nal. The n doubles
+# instead, so the piece keeps its coda: in tơ nát sừn nồ.
+_TION_LETTERS = "io"
+_SIBILANTS = {"SH", "ZH", "CH", "S", "Z"}
 
 
 class Slot(NamedTuple):
@@ -175,7 +182,12 @@ def _geminate(slots):
         is_y = right.nucleus == "IY" and not right.coda
         suffix = (right.final and right.stress in ("", "0", "2")
                   and (is_ing or (is_y and left.stress in ("1", "2"))))
-        if suffix and phone in _GEMINATES and left.coda in ((), ("R",)):
+        tion = (left.letter == _TION_LETTERS and left.nucleus == "AH"
+                and left.stress == "0" and phone == "N"
+                and left.onset and left.onset[-1] in _SIBILANTS)
+        if tion and not left.coda:
+            pass
+        elif suffix and phone in _GEMINATES and left.coda in ((), ("R",)):
             pass
         elif (not left.coda and phone in _VOICELESS
               and left.stress in ("1", "2") and right.stress in ("", "0")

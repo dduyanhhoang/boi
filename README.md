@@ -150,8 +150,12 @@ word's vowel letters are lined up against its vowel phones, which works for
 evidence:
 
 - a reduced vowel in an open syllable takes its letter's value
+- so does one before a coda n, which is how development gets `lắp men`
 - /ɪ/ and /i/ written with one plain letter take that letter's value when the
   syllable is stressed or closed, which is how encyclopedia gets `en` and `pê`
+- `er` is `ơ` but `or` inside a word is `ô`, so information is `in phô mây sừn`
+- `-tion` is one piece wherever it sits, not only at the end of a word, so
+  international is `in tơ nát sừn nồ`
 
 and CMUdict keeps the rest. A digraph is an English spelling convention a
 Vietnamese reader does not apply, so `free` stays `phờ ri` and `team` stays

@@ -58,6 +58,8 @@ def main():
             "insertedNucleus": syllabify._INSERTED_NUCLEUS,
             "sClusters": sorted(key(t) for t in syllabify._S_CLUSTERS),
             "tense": sorted(syllabify._TENSE),
+            "tionLetters": syllabify._TION_LETTERS,
+            "sibilants": sorted(syllabify._SIBILANTS),
         },
         "phonemap": {
             "onset": phonemap.ONSET,

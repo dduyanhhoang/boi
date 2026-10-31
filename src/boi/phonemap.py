@@ -213,6 +213,14 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
             if letter and letter[0] in SCHWA_BY_LETTER:
                 return SCHWA_BY_LETTER[letter[0]][0]
             return SCHWA_OPEN
+        # Before a coda n the letter decides, which is what -ment needs:
+        # development is lắp men, not lắp mon, and presentation is den. The
+        # two rules below only catch what the letters do not: -tion, whose
+        # letters are io rather than one plain vowel, and the rest.
+        if next_coda[0] == "N" and letter in SINGLE_LETTERS:
+            by_letter = SCHWA_BY_LETTER.get(letter)
+            if by_letter:
+                return by_letter[1]
         if next_coda[0] == "N" and onset and onset[-1] not in _FRICATIVES:
             return SCHWA_BEFORE_N_STOP
         by_coda = SCHWA_BY_CODA.get(next_coda[0])

@@ -264,8 +264,14 @@ function geminate(slots, T) {
     const isY = right.nucleus === "IY" && !right.coda.length;
     const suffix = right.final && ["", "0", "2"].includes(right.stress)
       && (isIng || (isY && ["1", "2"].includes(left.stress)));
+    // -tion is one piece wherever it sits, so its n doubles rather than
+    // running off to the next syllable: in tơ nát sừn nồ.
+    const tion = left.letter === T.syllabify.tionLetters && left.nucleus === "AH"
+      && left.stress === "0" && phone === "N"
+      && left.onset.length && T.syllabify.sibilants.includes(left.onset[left.onset.length - 1]);
     const codaKey = joinKey(left.coda);
-    const ok = (suffix && T.syllabify.geminates.includes(phone)
+    const ok = (tion && !left.coda.length)
+      || (suffix && T.syllabify.geminates.includes(phone)
                 && (codaKey === "" || codaKey === "R"))
       || (!left.coda.length && T.syllabify.voiceless.includes(phone)
           && ["1", "2"].includes(left.stress) && ["", "0"].includes(right.stress)
@@ -349,6 +355,11 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   if (phone === "AH" && stress === "0") {
     const byLetter = letter && P.schwaByLetter[letter[0]];
     if (!closed) return byLetter ? byLetter[0] : P.schwaOpen;
+    // Before a coda n the letter decides: development is lắp men, not mon.
+    if (nextCoda[0] === "N" && P.singleLetters.includes(letter)) {
+      const byLetterN = P.schwaByLetter[letter];
+      if (byLetterN) return byLetterN[1];
+    }
     if (nextCoda[0] === "N"
         && onset.length && !P.fricatives.includes(onset[onset.length - 1])) {
       return P.schwaBeforeNStop;
@@ -386,11 +397,13 @@ function codaOptions(phones, nucleus, schwa, T) {
 
 function toneOf(s, syl, T) {
   if (s.inserted) return "huyen";
+  // -tion takes huyền wherever it sits, not only at the end of a word.
+  if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "N"
+      && s.onset.length && T.tone.sibilants.includes(s.onset[s.onset.length - 1])
+      && (s.final || s.letter === T.syllabify.tionLetters)) return "huyen";
   if (s.final) {
-    if (s.nucleus === "AH" && s.stress === "0") {
-      if (joinKey(s.coda) === "N" && s.onset.length
-          && T.tone.sibilants.includes(s.onset[s.onset.length - 1])) return "huyen";
-      if (joinKey(s.coda) === "L") return "huyen";
+    if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "L") {
+      return "huyen";
     }
   }
   if (T.tone.stopCodas.includes(syl.coda)) {

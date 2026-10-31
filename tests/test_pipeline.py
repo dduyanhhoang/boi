@@ -69,6 +69,13 @@ def test_known_reading(word, expected):
     ("responsibility", "ri sờ pon si bi li ti"),
     ("happy", "háp pi"),
     ("marketing", "ma két tinh"),
+    # -tion is one piece wherever it sits, not only at the end of a word.
+    ("international", "in tơ nát sừn nồ"),
+    ("national", "nát sừn nồ"),
+    ("additional", "a đít sừn nồ"),
+    # and the letter decides before a coda n
+    ("development", "đi ve lắp men"),
+    ("government", "gơ vơ men"),
 ])
 def test_reduced_vowel_follows_the_spelling(word, expected):
     assert generate.read(word) == expected

@@ -16,10 +16,14 @@ def tone_of(slot, syl):
     """slot is a syllabify.Slot, syl the vi.Syl built from it (tone ignored)."""
     if slot.inserted:
         return "huyen"                      # sờ, cờ, bờ, pờ
+    # -tion takes huyền wherever it sits, not only at the end of a word:
+    # in phô mây sừn, and in tơ nát sừn nồ.
+    if (slot.nucleus == "AH" and slot.stress == "0" and slot.coda == ("N",)
+            and slot.onset and slot.onset[-1] in _SIBILANTS
+            and (slot.final or slot.letter == "io")):
+        return "huyen"
     if slot.final:
         if slot.nucleus == "AH" and slot.stress == "0":
-            if slot.coda == ("N",) and slot.onset and slot.onset[-1] in _SIBILANTS:
-                return "huyen"              # -tion: sừn, phăng sừn, óp sừn
             if slot.coda == ("L",):
                 return "huyen"              # -le/-al: gu gồ, mo đồ, le vồ
         # docs/brief.md reads a final -er as huyền with lexical exceptions. In dev the
