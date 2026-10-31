@@ -152,7 +152,14 @@ export function alignVowels(word, phones, T) {
   }
   const vowels = phones.filter((p) => T.spell.vowelPhones.includes(p.slice(0, -1))
     && /\d$/.test(p));
-  return groups.length === vowels.length ? groups : null;
+  if (groups.length !== vowels.length) return null;
+  // A word-final w belongs to the vowel before it: sâu and sờ nâu against
+  // hê lô and vi đi ô. Appended after the counting so it cannot be split.
+  if (groups.length && word.endsWith("w") && word.length > 1
+      && T.spell.vowels.includes(word[word.length - 2])) {
+    groups[groups.length - 1] += "w";
+  }
+  return groups;
 }
 
 /* syllabify.py -------------------------------------------------------- */
@@ -353,7 +360,8 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   if (phone === "ER" && letter === "o" && !final) return P.erSpelledOr;
   if (phone === "OW") {
     if (joinKey(nextCoda) === "L" && !final) return P.owFinal;
-    if (!closed) return final ? P.owFinal : P.owMid;
+    // âu only where a w is written: sâu, pho lâu against hê lô, vi đi ô.
+    if (!closed) return final && (letter || "").includes("w") ? P.owFinal : P.owMid;
   }
   // A single plain vowel letter takes its Vietnamese value when the syllable
   // is stressed or closed: en and pê in encyclopedia, but i ven in event.

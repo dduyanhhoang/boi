@@ -6,8 +6,12 @@ at once: align each gold reading to the slots that produced it, record what
 the speaker chose, and report any context where two or more rows agree with
 each other and none of them agree with us.
 
-    uv run scripts/mine_rules.py            # nucleus choices
+    uv run scripts/mine_rules.py            # nucleus choices, dev only
     uv run scripts/mine_rules.py --slot coda
+
+Reads the dev split, never the whole of eval_v0.csv. It mined dev and test
+together when first written, which leaked five test rows into rules; the
+README records which.
 """
 import argparse
 import collections
@@ -19,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from boi import align, generate, g2p, phonemap, spell, syllabify, vi  # noqa: E402
 
-GOLD = ROOT / "data" / "eval_v0.csv"
+SPLITS = ROOT / "data" / "splits"
 
 
 def contexts(slot, syl, index, total):
@@ -41,9 +45,11 @@ def main():
     ap.add_argument("--slot", choices=["nucleus", "coda", "onset"],
                     default="nucleus")
     ap.add_argument("--min-rows", type=int, default=2)
+    ap.add_argument("--split", default="dev",
+                    help="dev by default; test is held out, see README")
     args = ap.parse_args()
 
-    with open(GOLD, encoding="utf-8") as f:
+    with open(SPLITS / f"{args.split}.csv", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
 
     # (phone, context) -> {gold piece: [words]}, and the rows we get wrong

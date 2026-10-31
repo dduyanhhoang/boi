@@ -210,7 +210,9 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         if next_coda == ("L",) and not final:
             return OW_FINAL          # phâu đờ
         if not closed:
-            return OW_FINAL if final else OW_MID
+            # âu only where a w is written: sâu, sờ nâu, pho lâu against
+            # hê lô and vi đi ô.
+            return OW_FINAL if final and "w" in (letter or "") else OW_MID
     # /ɪ/ and /i/ written with a single plain letter take that letter's
     # Vietnamese value: the e of encyclopedia is en and pê, not in and pi.
     # Only when the syllable is stressed or closed, because an unstressed open

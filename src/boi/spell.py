@@ -227,7 +227,14 @@ def align_vowels(word, phones):
                 break
         else:
             return None
-    return groups if len(groups) == len(vowels) else None
+    if len(groups) != len(vowels):
+        return None
+    # A word-final w belongs to the vowel before it: show and snow are sâu
+    # where hello and video are lô and ô, and only the w says so. Appended
+    # after the counting above so it cannot be split as a run of letters.
+    if groups and word.endswith("w") and len(word) > 1 and word[-2] in VOWELS:
+        groups[-1] += "w"
+    return groups
 
 
 VOWEL_PHONES = {
