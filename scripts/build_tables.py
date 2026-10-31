@@ -87,6 +87,8 @@ def main():
             "longByLetter": phonemap.LONG_BY_LETTER,
             "ahBeforeM": phonemap.AH_BEFORE_M,
             "iousEnding": phonemap.IOUS_ENDING,
+            "aBeforeTure": phonemap.A_BEFORE_TURE,
+            "longABeforeT": phonemap.LONG_A_BEFORE_T,
             "ehEaBeforeD": phonemap.EH_EA_BEFORE_D,
             "schwaOpen": phonemap.SCHWA_OPEN,
             "schwaByCoda": phonemap.SCHWA_BY_CODA,

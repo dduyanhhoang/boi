@@ -372,9 +372,13 @@ function nasalDoublesBefore(right) {
 }
 
 /** Whether each syllable follows a stressed one, once the shape is final. */
-function markAfterStress(slots) {
+function markAfterStress(slots, T) {
   return slots.map((sl, i) => ({
-    ...sl, afterStress: i > 0 && slots[i - 1].stress === "1",
+    ...sl,
+    afterStress: i > 0 && slots[i - 1].stress === "1",
+    afterNasal: i > 0 && slots[i - 1].coda.length > 0
+      && T.syllabify.nasalCodas.includes(slots[i - 1].coda.at(-1)),
+    nextOnset: i + 1 < slots.length ? slots[i + 1].onset : [],
   }));
 }
 
@@ -395,7 +399,7 @@ function variants(phones, letters, T) {
     for (const [keep, extra] of [[false, 0], [true, 2]]) {
       const repaired = repair(shape, keep, T);
       if (keep && JSON.stringify(repaired) === JSON.stringify(repair(shape, false, T))) continue;
-      out.push([markAfterStress(repaired), penalty + extra]);
+      out.push([markAfterStress(repaired, T), penalty + extra]);
     }
   }
   return out;
@@ -414,7 +418,7 @@ function onsetOptions(phones, T, doubled) {
 }
 
 function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
-                       letter, first, T, afterStress) {
+                       letter, first, T, afterStress, nextOnset = []) {
   const P = T.phonemap;
   if (phone === "ER" && glide) return P.erAfterGlide;
   // ơ is what an er is read as; an or inside a word is not (information is
@@ -431,6 +435,10 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
   }
   // -ese is ít: chai nít, việt nam mít. The plain e separates it from chi
   // and pờ li, whose ee and ea keep their z silent.
+  // The a of -ature is ây: tem pơ rây chờ. Before anything but that /tʃ/
+  // it is read as written, which is what paranoid needs for pa ra noi.
+  if (phone === "AH" && stress === "0" && letter === "a" && !closed
+      && nextOnset.at(-1) === "CH") return P.aBeforeTure;
   // -ious is ợt: con sợt, đi li sợt. Its letters are iou, which no other
   // ending gives, so the s closing it is the only other condition.
   if (phone === "AH" && letter === "iou" && final
@@ -475,6 +483,11 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
       return P.schwaBeforeN;
     }
     const byLetter = letter && P.schwaByLetter[letter[0]];
+    // -ate is ết: tem pờ lết, a cu rết. -age is not, so the t has to be
+    // there; i mịt and mét sịt take their coda's reading instead.
+    if (letter === "a" + T.spell.lengthened && joinKey(nextCoda) === "T") {
+      return P.longABeforeT;
+    }
     if (letter.endsWith(T.spell.lengthened) && P.longByLetter[letter[0]]) {
       return P.longByLetter[letter[0]];
     }
@@ -608,7 +621,8 @@ function slotNucleusOptions(s, T) {
   }
   const closed = s.coda.length > 0 && s.coda[0] !== "R";
   return nucleusOptions(s.nucleus, s.stress, closed, s.coda, s.final, s.glide,
-                        s.onset, s.letter, s.first, T, Boolean(s.afterStress));
+                        s.onset, s.letter, s.first, T, Boolean(s.afterStress),
+                        s.nextOnset || []);
 }
 
 function slotOptions(s, T) {

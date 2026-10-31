@@ -70,6 +70,7 @@ AA_SPELLED_O = [("o", "", 0), ("ô", "", 1), ("a", "", 2)]
 ESE_ENDING = [("i", "t", 0), ("ê", "", 1)]
 AH_BEFORE_M = [("ư", "", 0), ("â", "", 1)]
 IOUS_ENDING = [("ơ", "", 0), ("i", "", 1)]
+A_BEFORE_TURE = [("â", "y", 0), ("a", "", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
 NUCLEUS_CLOSED = dict(
@@ -112,6 +113,7 @@ SCHWA_CLOSED = [("ơ", "", 0), ("e", "", 1), ("i", "", 1)]
 # as mét sệt, against both gold rows, because the silent e of -age does not
 # lengthen anything. accurate wants ê by this rule and does not get it.
 LONG_BY_LETTER = {"e": [("i", "", 0)]}
+LONG_A_BEFORE_T = [("ê", "", 0), ("e", "", 1)]
 
 # A reduced vowel keeps the letter it was written with, which is the whole
 # difference between ra phờ ri and rê phờ ri. (open syllable, closed syllable)
@@ -214,7 +216,8 @@ def onset_options(phones, doubled=False):
 
 
 def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
-                    onset=(), letter="", first=False, after_stress=False):
+                    onset=(), letter="", first=False, after_stress=False,
+                    next_onset=()):
     if phone == "ER" and glide:
         return ER_AFTER_GLIDE
     # ơ is what an er is read as. An or inside a word is not: the o of
@@ -272,6 +275,11 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # ê closed by it. Only s: date and update keep đết.
     if phone == "EY" and next_coda == ("S",):
         return EY_BEFORE_S
+    # The a of -ature is ây: tem pơ rây chờ. Before anything but that /tʃ/
+    # it is read as written, which is what paranoid needs for pa ra noi.
+    if (phone == "AH" and stress == "0" and letter == "a" and not closed
+            and next_onset[-1:] == ("CH",)):
+        return A_BEFORE_TURE
     # -ious is ợt: con sợt, đi li sợt. Its letters are iou, which no other
     # ending gives, so the s closing it is the only other condition.
     if phone == "AH" and letter == "iou" and final and next_coda == ("S",):
@@ -283,6 +291,10 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     if phone == "AE" and closed and next_coda and next_coda[-1] == "D":
         return AE_BEFORE_D
     if phone == "AH" and stress == "0":
+        # -ate is ết: tem pờ lết, a cu rết. -age is not, so the t has to be
+        # there; i mịt and mét sịt take their coda's reading instead.
+        if letter == "a" + spell.LENGTHENED and next_coda == ("T",):
+            return LONG_A_BEFORE_T
         if letter.endswith(spell.LENGTHENED) and letter[0] in LONG_BY_LETTER:
             return LONG_BY_LETTER[letter[0]]
         if not closed:

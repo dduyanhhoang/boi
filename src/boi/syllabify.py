@@ -64,6 +64,8 @@ class Slot(NamedTuple):
     doubled: bool = False   # the coda is a copy of the next syllable's onset
     onset_doubled: bool = False   # this onset was copied back as the last coda
     after_stress: bool = False    # the syllable before this one carries it
+    after_nasal: bool = False     # the syllable before this one ends in a nasal
+    next_onset: tuple = ()        # the onset of the syllable after this one
 
 
 def _strip_stress(phones):
@@ -305,11 +307,16 @@ def variants(phones, letters=None):
 
 
 def _mark_after_stress(slots):
-    """Whether each syllable follows a stressed one, once the shape is final.
+    """What the syllable before each one was, once the shape is final.
 
-    Stamped last because the repair inserts syllables, and -ment reads ừn
-    after a stressed syllable and men after a reduced one: im pờ rúp mừn
-    against đi ve lắp men.
+    Stamped last because the repair inserts syllables. -ment reads ừn after a
+    stressed syllable and men after a reduced one, im pờ rúp mừn against đi
+    ve lắp men; and an inserted syllable is ngang after a closed one and
+    huyền otherwise, tem pơ lết against nét phờ lích and ai sờ cờ rim.
     """
-    return [slot._replace(after_stress=i > 0 and slots[i - 1].stress == "1")
+    return [slot._replace(after_stress=i > 0 and slots[i - 1].stress == "1",
+                          after_nasal=i > 0 and slots[i - 1].coda[-1:]
+                          and slots[i - 1].coda[-1] in _NASAL_CODAS,
+                          next_onset=slots[i + 1].onset if i + 1 < len(slots)
+                          else ())
             for i, slot in enumerate(slots)]

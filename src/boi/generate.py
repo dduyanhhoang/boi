@@ -25,7 +25,8 @@ def _nucleus_options(slot):
                                     final=slot.final, glide=slot.glide,
                                     onset=slot.onset, letter=slot.letter,
                                     first=slot.first,
-                                    after_stress=slot.after_stress)
+                                    after_stress=slot.after_stress,
+                                    next_onset=slot.next_onset)
 
 
 def _slot_options(slot):

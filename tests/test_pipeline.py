@@ -236,7 +236,7 @@ def test_dev_exact_match_floor():
     ("server", "sơ vơ"),
     ("burger", "bơ gơ"),
     ("super", "súp pơ"),
-    ("accurate", "a cu rét"),   # ê would need the silent-e rule an a cannot have       # nothing doubles into a yod
+    ("accurate", "a cu rết"),       # the same -ate       # nothing doubles into a yod
     ("taxi", "tắc xi"),             # lexicon: no rule predicts ă or x here
     ("bag", "bác"),                 # ch after a is for a plain k, not a g
     ("bug", "bắc"),
@@ -279,8 +279,15 @@ def test_dev_exact_match_floor():
     ("rhythm", "ri dừm"),
     ("capitalism", "cáp pi ta li dừm"),
     ("improvement", "im pờ rúp mừn"),   # -ment is ừn after a stressed syllable
+    ("private", "pờ rai vết"),
+    ("message", "mét sịt"),         # but -age is not: the coda decides
     ("movement", "múp mừn"),
     ("development", "đi ve lắp men"),   # and men after a reduced one
+    ("temperature", "tem pơ rây chờ"),  # inserted ngang after a nasal; -ature
+    ("template", "tem pờ lết"),     # -ate is ết, and the inserted ơ is huyền
+    ("netflix", "nét phờ lích"),    # huyền after a stop coda
+    ("icecream", "ai sờ cờ rim"),   # and after an open syllable
+    ("paranoid", "pe ra noi"),      # an a not before -ture stays a
     ("english", "inh lích"),        # /ɪ/ before a velar nasal is always i
     ("link", "linh"),
     ("encyclopedia", "en sai cờ lô pê đi a"),   # elsewhere the letter decides

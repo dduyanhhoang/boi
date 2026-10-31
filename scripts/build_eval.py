@@ -74,7 +74,7 @@ budget|bắt giét||coda_t|m
 plan|pờ lan|plan|cluster|h
 target|ta ghét||coda_t|m
 slide|sờ lai||cluster;coda_d|h
-template|tem pơ lết|tem lết|cluster;coda_t|m
+template|tem pờ lết|tem pơ lết;tem lết|cluster;coda_t|h
 design|đì dai||stress2;coda_n|h
 layout|lây ao||coda_t|h
 video|vi đi ô||open|h

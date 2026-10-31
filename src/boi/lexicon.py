@@ -26,6 +26,11 @@ LEXICON = {
     # leaving one to repair, which is ắp lốt, óp lai and đết lai. All three
     # are compounds, where that consonant ends the first word; problem is not,
     # and the syllabifier works on phones so it cannot tell them apart.
+    # The pơ stands for the written per of tem-per-a-ture, so it is ngang
+    # where an epenthetic one is huyền. Every other inserted syllable in the
+    # gold is huyền, and the syllabifier works on phones, so it cannot see
+    # that this one answers to a letter.
+    "temperature": "tem pơ rây chờ",
     "problem": "pờ ro bờ lừm",
     "system": "xít từm",
     "taxi": "tắc xi",         # AE + k is a in action, bách, nách, lách; s is x in 3 of 37

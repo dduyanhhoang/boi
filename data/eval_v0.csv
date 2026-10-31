@@ -44,7 +44,7 @@ id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
 043,plan,P L AE1 N,pờ lan,plan,,cluster,h,approved
 044,target,T AA1 R G AH0 T,ta ghét,,,coda_t,m,approved
 045,slide,S L AY1 D,sờ lai,,,cluster;coda_d,h,approved
-046,template,T EH1 M P L AH0 T,tem pơ lết,tem lết,,cluster;coda_t,m,approved
+046,template,T EH1 M P L AH0 T,tem pờ lết,tem pơ lết;tem lết,,cluster;coda_t,h,approved
 047,design,D IH0 Z AY1 N,đì dai,,,stress2;coda_n,h,corrected
 048,layout,L EY1 AW2 T,lây ao,,,coda_t,h,approved
 049,video,V IH1 D IY0 OW0,vi đi ô,,,open,h,approved
