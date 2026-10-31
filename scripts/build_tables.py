@@ -71,6 +71,7 @@ def main():
             "erAfterGlide": phonemap.ER_AFTER_GLIDE,
             "erSpelledOr": phonemap.ER_SPELLED_OR,
             "aeBeforeD": phonemap.AE_BEFORE_D,
+            "eyBeforeS": phonemap.EY_BEFORE_S,
             "schwaOpen": phonemap.SCHWA_OPEN,
             "schwaByCoda": phonemap.SCHWA_BY_CODA,
             "schwaClosed": phonemap.SCHWA_CLOSED,

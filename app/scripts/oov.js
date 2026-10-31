@@ -278,6 +278,7 @@ function geminate(slots, T) {
       || (suffix && T.syllabify.geminates.includes(phone)
                 && (codaKey === "" || codaKey === "R"))
       || (!left.coda.length && T.syllabify.voiceless.includes(phone)
+          && !(right.letter === T.syllabify.tionLetters && right.final)
           && left.stress === "1" && ["", "0"].includes(right.stress)
           && !T.syllabify.keepsOffglide.includes(left.nucleus));
     if (!ok) continue;
@@ -356,6 +357,8 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
     const byLetter = P.schwaByLetter[letter];
     if (byLetter) return closed ? byLetter[1] : byLetter[0];
   }
+  // /eɪ/ before an s is ây with the s unheard: phây búc, đa ta bây.
+  if (phone === "EY" && joinKey(nextCoda) === "S") return P.eyBeforeS;
   // /æ/ is a, but e when a d closes the syllable: bét, sen, đít ni len.
   if (phone === "AE" && closed && nextCoda.length
       && nextCoda[nextCoda.length - 1] === "D") return P.aeBeforeD;

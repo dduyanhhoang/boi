@@ -44,10 +44,10 @@ rules and is tried first when it is installed.
 
 | | dev, rules only | dev, with lexicon | test |
 |---|---|---|---|
-| exact match on `vi_form` | 0.740 | 0.771 | 0.600 |
-| match on `vi_form` or an `alt_form` | 0.756 | 0.786 | 0.700 |
-| gold form in the top 5 | 0.847 | 0.855 | 0.820 |
-| syllable error rate | 0.154 | 0.138 | 0.200 |
+| exact match on `vi_form` | 0.756 | 0.786 | 0.600 |
+| match on `vi_form` or an `alt_form` | 0.771 | 0.802 | 0.700 |
+| gold form in the top 5 | 0.840 | 0.847 | 0.820 |
+| syllable error rate | 0.146 | 0.130 | 0.200 |
 | tone accuracy | 0.956 | 0.956 | 0.942 |
 
 All four lexicon words are dev rows, so the lexicon column is partly
@@ -116,9 +116,17 @@ second.
 The playground shows it as "their method, reimplemented", kept distinct from
 the 2,391 readings they published, which stay labelled as theirs.
 
+`scripts/mine_rules.py` is how the last few rules were found rather than
+guessed. It aligns every gold reading to the slots that produced it and
+reports any context where the gold agrees with itself across two or more rows
+and this generator disagrees with it. Run against all three slots it is
+currently empty, so what is left is either lexical or a context the gold
+itself splits on.
+
 Reproduce:
 
 ```sh
+uv run scripts/mine_rules.py --slot nucleus
 uv run eval/run_eval.py dev --errors --tags
 uv run eval/run_eval.py test
 uv run eval/run_ngo.py --reading letters --split dev

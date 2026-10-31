@@ -196,6 +196,7 @@ def _geminate(slots):
         elif suffix and phone in _GEMINATES and left.coda in ((), ("R",)):
             pass
         elif (not left.coda and phone in _VOICELESS
+              and not (right.letter == _TION_LETTERS and right.final)
               and left.stress == "1" and right.stress in ("", "0")
               and left.nucleus not in _KEEPS_OFFGLIDE):
             pass

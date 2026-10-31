@@ -54,7 +54,7 @@ def test_known_reading(word, expected):
     ("encyclopedia", "en sai cờ lô pê đi a"),
     ("refrigerator", "rê phờ ri giơ ây tơ"),   # not ra: the letter is an e
     ("camera", "ca mê ra"),                    # the r in ER0 opens the last one
-    ("solution", "sô lút sừn"),
+    ("solution", "sô lu sừn"),   # the gold; it used to read sô lút sừn
     # A digraph keeps CMUdict's vowel, and an unstressed open one does too.
     ("free", "phờ ri"),
     ("team", "tim"),
@@ -89,6 +89,12 @@ def test_known_reading(word, expected):
     ("sandwich", "sen guých"),
     ("plan", "pờ lan"),
     ("fan", "phan"),
+    # /eɪ/ before an s is ây, the s unheard; a d still closes it
+    ("facebook", "phây búc"),
+    ("date", "đết"),
+    # nothing doubles before a -tion syllable
+    ("position", "pô di sừn"),
+    ("solution", "sô lu sừn"),
 ])
 def test_reduced_vowel_follows_the_spelling(word, expected):
     assert generate.read(word) == expected

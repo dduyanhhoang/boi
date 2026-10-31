@@ -63,6 +63,7 @@ NUCLEUS_OPEN = {
 # /æ/ is a, but e when a d closes the syllable: bad is bét and sandwich sen,
 # against plan and fan, whose coda is a bare n. So disneyland is đít ni len.
 AE_BEFORE_D = [("e", "", 0), ("a", "", 1)]
+EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
 
 NUCLEUS_CLOSED = dict(
     NUCLEUS_OPEN,
@@ -218,6 +219,10 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         by_letter = SCHWA_BY_LETTER.get(letter)
         if by_letter:
             return by_letter[1] if closed else by_letter[0]
+    # /eɪ/ before an s is ây with the s unheard (phây búc, đa ta bây), not
+    # ê closed by it. Only s: date and update keep đết.
+    if phone == "EY" and next_coda == ("S",):
+        return EY_BEFORE_S
     if phone == "AE" and closed and next_coda and next_coda[-1] == "D":
         return AE_BEFORE_D
     if phone == "AH" and stress == "0":
