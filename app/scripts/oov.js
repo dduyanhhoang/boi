@@ -310,6 +310,15 @@ function repair(slots, keepClusters, T) {
       const tail = T.syllabify.viOnsets.includes(pairKey)
         ? s.onset.slice(-2) : s.onset.slice(-1);
       for (const phone of s.onset.slice(0, s.onset.length - tail.length)) {
+        // A stop between a nasal coda and another consonant is unheard
+        // rather than a syllable of its own: phờ ren li, like sen guých.
+        const prev = out[out.length - 1];
+        if (prev && T.syllabify.swallowedAfterNasal.includes(phone)
+            && prev.coda.length
+            && T.syllabify.nasalCodas.includes(prev.coda[prev.coda.length - 1])) {
+          out[out.length - 1] = { ...prev, coda: [...prev.coda, phone] };
+          continue;
+        }
         out.push(slot({ onset: [phone], inserted: true }));
       }
       out.push({ ...s, onset: tail });
@@ -370,6 +379,10 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
       && (["1", "2"].includes(stress) || closed) && !(first && !closed)) {
     const byLetter = P.schwaByLetter[letter];
     if (byLetter) return closed ? byLetter[1] : byLetter[0];
+  }
+  // /ɛ/ written ea and closed by a d is ê: đết lai, hết phôn.
+  if (phone === "EH" && letter === "ea" && joinKey(nextCoda) === "D") {
+    return P.ehEaBeforeD;
   }
   // /oʊ/ is âu when a final s or z closes it on paper and goes unheard.
   if (phone === "OW" && final && nextCoda.length

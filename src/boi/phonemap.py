@@ -67,6 +67,7 @@ NUCLEUS_OPEN = {
 AE_BEFORE_D = [("e", "", 0), ("a", "", 1)]
 EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
 OW_BEFORE_FINAL_SIBILANT = [("â", "u", 0), ("ô", "", 1)]
+EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
 NUCLEUS_CLOSED = dict(
     NUCLEUS_OPEN,
@@ -233,6 +234,10 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         return OW_BEFORE_FINAL_SIBILANT
     if phone == "EY" and next_coda == ("S",):
         return EY_BEFORE_S
+    # /ɛ/ written ea and closed by a d is ê: đết lai, hết phôn. red keeps rét
+    # on its plain e, and sweat sờ goét on its t.
+    if phone == "EH" and letter == "ea" and next_coda == ("D",):
+        return EH_EA_BEFORE_D
     if phone == "AE" and closed and next_coda and next_coda[-1] == "D":
         return AE_BEFORE_D
     if phone == "AH" and stress == "0":

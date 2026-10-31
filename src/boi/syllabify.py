@@ -34,6 +34,10 @@ _GEMINATES = {"P", "T", "K", "N"}
 # mê ra (voiced), not bờ lu tút (the next vowel is stressed), and not after
 # /eɪ/ or /oʊ/, which would rather keep their offglide: sờ tây sừn, mai cờ rô.
 _VOICELESS = {"P", "T", "K", "F", "S", "SH", "CH", "TH"}
+# A stop wedged between a nasal coda and another consonant goes unheard
+# rather than becoming a syllable of its own: phờ ren ly, like sen guých.
+_SWALLOWED_AFTER_NASAL = {"P", "B", "T", "D", "K", "G"}
+_NASAL_CODAS = {"M", "N", "NG"}
 _KEEPS_OFFGLIDE = {"EY", "OW"}
 # A Vietnamese reader sees -tion as one piece and says sừn wherever it sits.
 # CMUdict gives it away: the vowel letters are io and the onset is a sibilant.
@@ -229,6 +233,10 @@ def _repair(slots, keep_clusters):
             # its own syllable: sờ cờ rin, pờ rô, bờ lu.
             tail = slot.onset[-2:] if slot.onset[-2:] in _VI_ONSETS else slot.onset[-1:]
             for phone in slot.onset[: len(slot.onset) - len(tail)]:
+                if (out and phone in _SWALLOWED_AFTER_NASAL and out[-1].coda
+                        and out[-1].coda[-1] in _NASAL_CODAS):
+                    out[-1] = out[-1]._replace(coda=out[-1].coda + (phone,))
+                    continue
                 out.append(Slot(onset=(phone,), nucleus="", inserted=True))
             out.append(slot._replace(onset=tail))
             continue
