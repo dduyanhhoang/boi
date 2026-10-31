@@ -82,6 +82,7 @@ def main():
             "erSpelledOr": phonemap.ER_SPELLED_OR,
             "aeBeforeD": phonemap.AE_BEFORE_D,
             "eyBeforeS": phonemap.EY_BEFORE_S,
+            "aaSpelledO": phonemap.AA_SPELLED_O,
             "owBeforeFinalSibilant": phonemap.OW_BEFORE_FINAL_SIBILANT,
             "ehEaBeforeD": phonemap.EH_EA_BEFORE_D,
             "schwaOpen": phonemap.SCHWA_OPEN,

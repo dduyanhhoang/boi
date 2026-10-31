@@ -403,6 +403,9 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
       && ["S", "Z"].includes(nextCoda[nextCoda.length - 1])) {
     return P.owBeforeFinalSibilant;
   }
+  // /ɑ/ takes the letter it is written with: com men and xóp against
+  // ma két tinh and gia va.
+  if (phone === "AA" && letter === "o") return P.aaSpelledO;
   // /eɪ/ before an s is ây with the s unheard: phây búc, đa ta bây.
   if (phone === "EY" && joinKey(nextCoda) === "S") return P.eyBeforeS;
   // /æ/ is a, but e when a d closes the syllable: bét, sen, đít ni len.

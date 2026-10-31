@@ -66,6 +66,7 @@ NUCLEUS_OPEN = {
 # against plan and fan, whose coda is a bare n. So disneyland is đít ni len.
 AE_BEFORE_D = [("e", "", 0), ("a", "", 1)]
 EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
+AA_SPELLED_O = [("o", "", 0), ("ô", "", 1), ("a", "", 2)]
 OW_BEFORE_FINAL_SIBILANT = [("â", "u", 0), ("ô", "", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
@@ -232,6 +233,11 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # ending in a stop rather than the sibilant.
     if phone == "OW" and final and next_coda and next_coda[-1] in ("S", "Z"):
         return OW_BEFORE_FINAL_SIBILANT
+    # /ɑ/ takes the letter it is written with, and the dev rows never cross:
+    # an a is a in all nine of ma két tinh, pát ti, gia va and the rest, an o
+    # is o or ô in all ten of com men, xóp, mo đồ, láp tốp.
+    if phone == "AA" and letter == "o":
+        return AA_SPELLED_O
     if phone == "EY" and next_coda == ("S",):
         return EY_BEFORE_S
     # /ɛ/ written ea and closed by a d is ê: đết lai, hết phôn. red keeps rét

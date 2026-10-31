@@ -258,6 +258,12 @@ def test_dev_exact_match_floor():
     ("camera", "ca mê ra"),         # but not before an open mid-word e
     ("drama", "đờ ra ma"),          # nor before an a
     ("banana", "ba na na"),
+    ("opportunity", "o pô tun ni ti"),  # /ɑ/ takes its letter
+    ("model", "mo đồ"),
+    ("sorry", "so ri"),
+    ("java", "gia va"),             # an a stays a
+    ("marketing", "ma két tinh"),
+    ("vietnamese", "việt nam mít"),  # lexicon: read as Vietnamese
     ("livestream", "lai sờ trim"),  # a v after a tense vowel is unheard
     ("live", "lai"),
     ("icecream", "ai sờ cờ rim"),   # only a v, an s still gives sờ
