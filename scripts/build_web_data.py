@@ -63,6 +63,13 @@ def main():
     (OUT / "words.txt").write_text("\n".join(index), encoding="utf-8")
     size += (OUT / "words.txt").stat().st_size
 
+    # The review tool reads the open sheet from here.
+    sheet = ROOT / "data" / "review" / "sheet_001.csv"
+    if sheet.exists():
+        (OUT / "review.csv").write_text(sheet.read_text(encoding="utf-8"),
+                                        encoding="utf-8")
+        size += (OUT / "review.csv").stat().st_size
+
     split_of = {}
     for name in ("dev", "test"):
         with open(SPLITS / f"{name}.csv", encoding="utf-8") as f:

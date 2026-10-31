@@ -207,11 +207,15 @@ here, which is how wrong readings keep surfacing one at a time.
 `data/review/sheet_001.csv` is the next round: 251 words covering the classes
 the first set misses, grouped by tag so similar words sit together.
 
-To review it, edit `vi_form` where the reading is wrong and leave it where it
-is right, then set `status` to `approved` or `corrected`. `alt_forms` already
-holds the generator's other candidates and its letter reading, so the right
-answer is often a copy rather than a retype. Rows left as `generated` are
-treated as unreviewed, so the sheet can come back in batches.
+Review it at [/review](https://dduyanhhoang.github.io/boi/review/) rather than
+in the CSV: one word at a time, the generator's candidates as buttons, 1 to 5
+to pick, Enter for the first, S to skip, and a field for anything else.
+Progress is kept in the browser, so it can be done in sittings. Export writes
+the sheet back out.
+
+Editing the CSV by hand works too: change `vi_form` where the reading is
+wrong, leave it where it is right, and set `status` to `approved` or
+`corrected`. Rows left as `generated` count as unreviewed either way.
 
 ```sh
 uv run scripts/merge_review.py data/review/sheet_001.csv --dry-run
