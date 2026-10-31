@@ -26,9 +26,7 @@ ONSET = {
     "JH": [("gi", 0), ("d", 1)], # gia va, giút / pờ rô dếch
     "M": [("m", 0)],
     "N": [("n", 0)],
-    # An onset ŋ only ever comes from an intervocalic ng, where the nasal is
-    # already carried by the coda the gemination left behind: sinh gờ.
-    "NG": [("g", 0)],
+    "NG": [("ng", 0)],
     "L": [("l", 0)],
     "R": [("r", 0)],
     "W": [("g", 0)],             # w -> g: sóp goe, goai, guốc
@@ -192,9 +190,14 @@ _CH_CODA_AFTER_A = "t"
 _NH_AFTER = "iê"
 
 
-def onset_options(phones):
+def onset_options(phones, doubled=False):
     if not phones:
         return [("", 0)]
+    # A doubled ŋ has already left the nasal behind as the previous coda, so
+    # the copy is just g: singer is sinh gờ. An ordinary onset ŋ keeps it,
+    # which is what singing needs; reading that one as g loses the nasal.
+    if doubled and tuple(phones) == ("NG",):
+        return [("g", 0)]
     if tuple(phones) in ONSET_RUNS:
         return ONSET_RUNS[tuple(phones)]
     return ONSET.get(phones[-1], [("", 3)])

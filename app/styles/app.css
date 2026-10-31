@@ -80,6 +80,17 @@ body {
   font-weight: 600;
   letter-spacing: -0.01em;
 }
+.wordmark a {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  margin-inline-start: calc(var(--space-2) * -1);
+  border-radius: var(--radius-capsule);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duration-state) var(--ease),
+              color var(--duration-state) var(--ease);
+}
+.wordmark a:hover { background: var(--accent-wash); color: var(--accent-text); }
 
 /* Scroll edge effect: content fades out under the bar. */
 .scroll-edge {
@@ -309,6 +320,79 @@ main {
 .note .note-label { font-weight: 500; }
 
 /* Source panel ------------------------------------------------------- */
+/* The derivation. One thread, three stages hanging off it, so the sequence
+   is carried by the thread and the motion rather than by three boxes. */
+.trace { margin-top: var(--space-6); }
+.stages {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--space-6);
+  border-inline-start: 1px solid var(--separator);
+  display: grid;
+  gap: var(--space-6);
+}
+.stage { position: relative; display: grid; gap: var(--space-1); }
+.stage::before {
+  content: "";
+  position: absolute;
+  /* Centred on the thread: half the dot past the padding edge. */
+  inset-inline-start: calc((var(--space-6) + 2.5px) * -1);
+  top: 0.5em;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-capsule);
+  background: var(--label-tertiary);
+}
+.stage:last-child::before { background: var(--accent); }
+.stage h2 {
+  margin: 0;
+  font-size: var(--text-caption-1);
+  font-weight: 600;
+  color: var(--label-secondary);
+}
+.stage-text { margin: 0; font-size: var(--text-title-3); font-weight: 600; }
+.stage-text--quiet { font-weight: 400; color: var(--label-tertiary); }
+.stage-text--reading { color: var(--accent-text); }
+.stage-sounds { margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.stage-sounds span {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-card);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-footnote);
+  color: var(--label-secondary);
+}
+.replay {
+  margin-top: var(--space-4);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  background: none;
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-capsule);
+  color: var(--label-secondary);
+  font: inherit;
+  font-size: var(--text-subheadline);
+  cursor: pointer;
+  transition: background var(--duration-state) var(--ease),
+              color var(--duration-state) var(--ease);
+}
+.replay:hover { background: var(--accent-wash); color: var(--accent-text); }
+
+/* Plays after the reading has landed, so the answer is read first. */
+.trace[data-playing] .stage {
+  animation: sharpen var(--duration-enter) var(--ease) both;
+  animation-delay: calc(480ms + var(--i) * 320ms);
+}
+.trace[data-playing] .stage-sounds span {
+  animation: rise var(--duration-enter) var(--ease) both;
+  animation-delay: calc(800ms + var(--j) * 45ms);
+}
+.trace[data-playing] .replay {
+  animation: rise var(--duration-enter) var(--ease) both;
+  animation-delay: 1440ms;
+}
+
 .source { margin-top: var(--space-6); }
 .source summary {
   display: flex;

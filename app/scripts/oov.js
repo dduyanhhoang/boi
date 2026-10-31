@@ -300,6 +300,7 @@ function geminate(slots, T) {
     // A doubled /tʃ/ is only the stop closure, so it returns as t.
     out[i] = { ...left, coda: [...left.coda, phone === "CH" ? "T" : phone],
                doubled: true };
+    out[i + 1] = { ...out[i + 1], onsetDoubled: true };
     changed = true;
   }
   return changed ? out : null;
@@ -371,7 +372,10 @@ function variants(phones, letters, T) {
 
 /* phonemap.py --------------------------------------------------------- */
 
-function onsetOptions(phones, T) {
+function onsetOptions(phones, T, doubled) {
+  // A doubled ŋ left the nasal behind as the previous coda, so the copy is
+  // just g: sinh gờ. An ordinary onset ŋ keeps it, which singing needs.
+  if (doubled && joinKey(phones) === "NG") return [["g", 0]];
   if (!phones.length) return [["", 0]];
   const run = T.phonemap.onsetRuns[joinKey(phones)];
   if (run) return run;
@@ -558,7 +562,7 @@ function slotOptions(s, T) {
   const legal = new Map();
   const illegal = new Map();
   const schwa = s.nucleus === "AH" && s.stress === "0";
-  for (const [onset, pOn] of onsetOptions(s.onset, T)) {
+  for (const [onset, pOn] of onsetOptions(s.onset, T, s.onsetDoubled)) {
     for (const [nucleus, offglide, pNu] of slotNucleusOptions(s, T)) {
       const codas = offglide
         ? [[offglide, s.coda.length ? 1 : 0]]
@@ -629,6 +633,7 @@ const MIN_PIECE = 3;
  */
 /** g2p.undoubled: the word with one doubled letter collapsed, if known. */
 export function undoubled(word, known) {
+  if (known(word)) return null;     // mousse is a word, not a misspelt mouse
   for (let i = 0; i + 1 < word.length; i += 1) {
     if (word[i] === word[i + 1]) {
       const candidate = word.slice(0, i) + word.slice(i + 1);
@@ -676,7 +681,11 @@ export function compoundPhones(pieces, phonesOf, T) {
 
 /** Read a word the shards do not have, off its spelling. */
 export function readUnknown(word, T, limit = 5) {
-  const fixed = T.lexicon[word.toLowerCase()];
+  const lower = word.toLowerCase();
+  // A memorised reading is about the word, not its spelling: scheedule is
+  // sờ ke đùa too.
+  const fixed = T.lexicon[lower]
+    ?? T.lexicon[undoubled(lower, (c) => c in T.lexicon) ?? ""];
   const phones = spellPhones(word, T);
   if (!phones) return { phones: null, readings: fixed ? [fixed] : [] };
   let readings = candidatesFromPhones(phones, T, limit, alignVowels(word, phones, T));

@@ -60,6 +60,7 @@ class Slot(NamedTuple):
     first: bool = False
     letter: str = ""        # the vowel letters this phone was written with
     doubled: bool = False   # the coda is a copy of the next syllable's onset
+    onset_doubled: bool = False   # this onset was copied back as the last coda
 
 
 def _strip_stress(phones):
@@ -242,6 +243,7 @@ def _geminate(slots):
         # teacher is tít chờ. A real final one keeps ch, as in sen guých.
         out[i] = out[i]._replace(
             coda=left.coda + ("T" if phone == "CH" else phone,), doubled=True)
+        out[i + 1] = out[i + 1]._replace(onset_doubled=True)
         changed = True
     return out if changed else None
 

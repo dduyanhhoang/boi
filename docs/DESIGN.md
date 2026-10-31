@@ -54,8 +54,27 @@ owner on 2026-10-30.
 ## The authored moment
 
 The result composes once per lookup: the reading rises 8px and fades in while
-the syllable chips stagger in from `blur(6px)`. Nothing else on the page
-animates beyond its own state change. Disabled under reduced motion.
+the syllable chips stagger in from `blur(6px)`. Disabled under reduced motion.
+
+A second moment follows it, and only one other: the derivation plays itself
+through from 480ms, a stage every 320ms, after the reading has landed. The
+owner asked for the answer first and the working second, and a sequence is
+the one thing a static list cannot show. It replaces the `How it got there`
+disclosure, which hid the derivation behind a click nobody made. `Play again`
+replays it; under reduced motion all three stages are simply present.
+
+Nothing else on the page animates beyond its own state change.
+
+## The derivation
+
+Three stages on one 1px thread, a dot per stage, the last dot in `accent`:
+the word, its sounds as ARPAbet chips, the reading. Not three cards — a
+stack of same-shaped boxes would make the sequence look like three unrelated
+facts, and the thread is what says one thing became the next.
+
+It does not claim which phone became which syllable. The slots that would say
+so are internal to `candidatesFromPhones`, and an alignment drawn by eye
+would be a guess wearing the clothes of a derivation.
 
 ## Emphasis
 
@@ -74,6 +93,13 @@ line directly under the syllables, as a capsule that swaps in when clicked. It
 first sat inside "How it got there", where nobody found it. It is not a third
 emphasis style: it carries no wash, only a secondary label and a bordered
 capsule, so the two-emphasis rule still holds.
+
+## Getting back
+
+The wordmark is a real link to `./`, so it reads as a link, opens in a new
+tab, and offers its context menu. In this tab it resets in place rather than
+reloading the shards. Before it, a lookup had no route back to the empty
+state but the browser's own Back button.
 
 ## Icons
 

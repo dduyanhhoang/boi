@@ -35,7 +35,7 @@ def _slot_options(slot):
                 for o, p in onsets][:PER_SLOT]
 
     out, illegal = {}, {}
-    for onset, p_on in phonemap.onset_options(slot.onset):
+    for onset, p_on in phonemap.onset_options(slot.onset, slot.onset_doubled):
         for nucleus, offglide, p_nu in _nucleus_options(slot):
             if offglide:
                 # Two codas are illegal, so the English coda goes.

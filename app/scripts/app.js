@@ -151,6 +151,33 @@ function otherReadings(word, best, asLetters, theirsRaw, methodRaw) {
 }
 
 
+/** The derivation, as the three things the generator actually knows.
+ *
+ * It does not claim which phone became which syllable: the slots that would
+ * say so are internal to the pipeline, and inventing an alignment would be a
+ * guess dressed as a derivation.
+ */
+function trace(word, phones, best, spelled) {
+  const sounds = (phones || "").split(" ").filter(Boolean);
+  const stages = [
+    ["The word", `<p class="stage-text">${escapeHtml(word)}</p>`],
+    [spelled ? "Its letters, as sounds" : "Its sounds",
+     sounds.length
+       ? `<p class="stage-sounds">${sounds
+           .map((ph, i) => `<span style="--j:${i}">${escapeHtml(ph)}</span>`).join("")}</p>`
+       : `<p class="stage-text stage-text--quiet">no phones to show</p>`],
+    ["Read in Vietnamese",
+     `<p class="stage-text stage-text--reading" lang="vi">${escapeHtml(best)}</p>`],
+  ];
+  return `<section class="trace" data-playing>
+    <ol class="stages">
+      ${stages.map(([label, body], i) => `<li class="stage" style="--i:${i}">
+        <h2>${label}</h2>${body}</li>`).join("")}
+    </ol>
+    <button type="button" class="replay" id="replay">Play again</button>
+  </section>`;
+}
+
 function renderResult(word, phones, readings, spelled = false, pieces = null,
                       theirs = "", method = "") {
   current = { word, phones, readings, spelled, pieces, theirs, method };
@@ -175,7 +202,6 @@ function renderResult(word, phones, readings, spelled = false, pieces = null,
   }
 
   const rows = [
-    ["Phones", `<span class="phones">${escapeHtml(phones)}</span>`],
     ["From", spelled ? "the spelling, letter by letter"
       : pieces ? `${escapeHtml(pieces.join(" + "))}, from CMUdict` : "CMUdict"],
     alts.length
@@ -198,8 +224,9 @@ function renderResult(word, phones, readings, spelled = false, pieces = null,
     </ul>
     ${otherReadings(word, best, asLetters, theirs, method)}
     ${note}
+    ${trace(word, phones, best, spelled)}
     <details class="source">
-      <summary>${icon("chevron")}How it got there</summary>
+      <summary>${icon("chevron")}More about this word</summary>
       <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
     </details>`;
 
@@ -272,7 +299,10 @@ async function show(word, { push = true } = {}) {
         return found ? found.split("|")[0].split(" ") : null;
       };
       const phones = module.compoundPhones(pieces, phonesOf, tables);
-      const readings = module.candidatesFromPhones(phones, tables, 5);
+      // The letters have to go with the phones or every rule keyed on
+      // spelling reads blind: in phô mây sừn, not in phơ mây sa.
+      const readings = module.candidatesFromPhones(
+        phones, tables, 5, module.alignVowels(w, phones, tables));
       if (readings.length) {
         renderResult(w, phones.join(" "), readings, false, pieces);
         if (push) setUrl(w);
@@ -401,6 +431,12 @@ document.addEventListener("click", (e) => {
   if (!el.form.contains(e.target)) closeSuggestions();
   const chip = e.target.closest("[data-word]");
   if (chip) show(chip.dataset.word);
+  if (e.target.closest("#replay")) {
+    const played = el.result.querySelector(".trace");
+    played.removeAttribute("data-playing");
+    void played.offsetWidth;          // restart the stages
+    played.setAttribute("data-playing", "");
+  }
   const swap = e.target.closest("[data-swap]");
   if (swap && current) {
     const reading = swap.dataset.swap;
@@ -414,6 +450,26 @@ document.addEventListener("click", (e) => {
 el.theme.addEventListener("click", () => {
   applyTheme(THEMES[(THEMES.indexOf(el.theme.dataset.theme) + 1) % THEMES.length]);
 });
+
+// The wordmark is the route back to the empty state. It is a real link, so
+// it opens in a new tab and reads as a link, but in this tab it resets in
+// place rather than reloading the shards.
+document.querySelector("#home").addEventListener("click", (e) => {
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+  e.preventDefault();
+  goHome();
+  el.input.focus();
+});
+
+function goHome() {
+  current = null;
+  el.input.value = "";
+  el.clear.hidden = true;
+  el.submit.disabled = true;
+  closeSuggestions();
+  renderEmpty();
+  if (location.search) history.pushState({ word: "" }, "", location.pathname);
+}
 
 window.addEventListener("popstate", () => {
   const word = new URLSearchParams(location.search).get("w") || "";
