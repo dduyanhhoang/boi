@@ -283,7 +283,8 @@ def test_dev_exact_match_floor():
     ("message", "mét sịt"),         # but -age is not: the coda decides
     ("movement", "múp mừn"),
     ("development", "đi ve lắp men"),   # and men after a reduced one
-    ("time", "tam"),                # /aɪ/ before an m drops its glide
+    ("time", "tham"),               # lexicon, for the th alone
+    ("lifetime", "lai phờ tam"),    # the /aɪ/ before an m is the rule
     ("style", "sờ tai"),            # before every other coda it keeps it
     ("schedule", "sờ ke đùa"),      # by rule now, not memorised
     ("module", "mo đùa"),

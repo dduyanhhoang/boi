@@ -30,6 +30,11 @@ LEXICON = {
     # that this one answers to a letter.
     "temperature": "tem pơ rây chờ",
     "problem": "pờ ro bờ lừm",
+    # Only the aspiration is memorised here: tam comes from the rule for an
+    # /aɪ/ before an m. hotel is hô theo and this is tham, but test is tét,
+    # team tim, target ta ghét, taxi tắc xi and style sờ tai, all plain t on
+    # the same /t/, so a rule for it would break five rows to fix two.
+    "time": "tham",
     "system": "xít từm",
     "taxi": "tắc xi",         # AE + k is a in action, bách, nách, lách; s is x in 3 of 37
 }
