@@ -459,18 +459,30 @@ async function boot() {
   index = idx;
   gold = g;
 
+  // Each example shows its reading, so the empty page says what the tool does
+  // before anyone types anything.
   el.examples.querySelector(".chips").innerHTML = index.examples
-    .map((w) => `<button type="button" class="chip" data-word="${w}">${w}</button>`).join("");
+    .map(([w, vi]) => `<li><button type="button" class="chip" data-word="${escapeHtml(w)}">
+        <span class="chip-en">${escapeHtml(w)}</span>
+        <span class="chip-vi" lang="vi">${escapeHtml(vi)}</span></button></li>`).join("");
   // Read from the data rather than hard-coded, so the footer cannot go stale.
   el.count.textContent = index.words.toLocaleString("en-US");
   if (el.gold) el.gold.textContent = index.gold;
   if (el.agree) el.agree.textContent = index.agree;
 
   const word = new URLSearchParams(location.search).get("w");
-  if (word) show(word, { push: false });
-  else renderEmpty();
+  // The head's guard keeps the empty page hidden until something replaces
+  // it. show() only hides the examples once its shard arrives, so the guard
+  // is lifted after that and not as soon as show() is called; finally, so a
+  // failed lookup cannot leave the empty page hidden for good.
+  try {
+    if (word) await show(word, { push: false });
+    else renderEmpty();
+  } finally {
+    document.documentElement.classList.remove("opening-word");
+  }
 
-  // The second reading needs the pipeline, so fetch it once the page is up.
+  // The derivation needs the pipeline, so fetch it once the page is up.
   requestIdleCallback?.(() => loadOov()) ?? setTimeout(loadOov, 1200);
 }
 

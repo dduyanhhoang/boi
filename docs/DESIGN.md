@@ -128,6 +128,30 @@ start at their own heading's edge while the arrows stay aligned to each other.
 Running text in the footer is Subheadline, not Footnote. Footnote is 13px and
 these are paragraphs; the scale was right and the role was not.
 
+## The empty page
+
+A visitor arriving cold used to see the wordmark, a search field and ten bare
+words, and had to read the footer to learn what any of it was for. The empty
+page now opens with one line in Large Title saying what this is, and each
+example shows its reading under the word, so the page demonstrates the tool
+before anyone types. The readings travel in `index.json`, so this costs no
+shard fetch.
+
+The line is a paragraph, not a heading. The app's one `h1` is the wordmark on
+every view, because an app screen names itself in its shell and the reading
+on a result is the content under that name, not its title. Making the
+reading the `h1` read better in the markup and broke that convention; the
+live region announces the reading to a screen reader either way.
+
+The example chips use the card radius, not the capsule. With a reading under
+the word they hold two lines, and a capsule turned a short one into a
+near-circle. They are 44px at the least, Apple's minimum target.
+
+A shared link opens on a result, and the empty page used to paint first and
+then vanish when the script arrived. A line in the head marks the page before
+the body is drawn and the script lifts it once the result is up, in a
+`finally` so a failed lookup cannot leave the page blank.
+
 ## Getting back
 
 The wordmark is a real link to `./`, so it reads as a link, opens in a new

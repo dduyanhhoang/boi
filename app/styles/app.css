@@ -74,6 +74,8 @@ body {
   .toolbar { background: var(--material-opaque); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
 
+/* The app's one h1, on every view: an app screen names itself in the shell,
+   and the reading on a result is the content under it, not its title. */
 .wordmark {
   margin: 0 auto 0 0;
   font-size: var(--text-headline);
@@ -82,8 +84,8 @@ body {
 }
 .wordmark a {
   display: inline-block;
-  padding: var(--space-1) var(--space-2);
   margin-inline-start: calc(var(--space-2) * -1);
+  padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-capsule);
   color: inherit;
   text-decoration: none;
@@ -216,14 +218,33 @@ main {
 .suggestions .s-read { margin-left: auto; color: var(--label-secondary); font-size: var(--text-subheadline); }
 
 /* Examples (empty state) --------------------------------------------- */
+/* Says what this is, on the empty page only, where a visitor arrives cold. It
+   follows the examples out of view once there is a result to look at. */
+.lede {
+  margin: 0 0 var(--space-6);
+  font-size: var(--text-large-title);
+  line-height: var(--leading-large-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+main:has(#examples[hidden]) .lede { display: none; }
+.opening-word .lede, .opening-word #examples { display: none; }
+
 .examples { margin-top: var(--space-8); }
 .examples p { margin: 0 0 var(--space-3); color: var(--label-secondary); font-size: var(--text-subheadline); }
 .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
 .chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   padding: var(--space-2) var(--space-4);
-  min-height: 36px;
+  min-height: 44px;           /* Apple's minimum target */
   border: 1px solid var(--separator);
-  border-radius: var(--radius-capsule);
+  /* The card radius, not the capsule: with a reading under the word these
+     hold two lines, and a capsule turns a short one into a near-circle. */
+  border-radius: var(--radius-card);
   background: var(--bg-elevated);
   color: var(--label);
   font: inherit;
@@ -232,7 +253,10 @@ main {
   transition: background var(--duration-state) var(--ease),
               border-color var(--duration-state) var(--ease);
 }
-.chip:hover { background: var(--accent-wash); border-color: var(--accent); color: var(--accent-text); }
+.chip:hover { background: var(--accent-wash); border-color: var(--accent); }
+.chip-en { font-size: var(--text-footnote); color: var(--label-secondary); }
+.chip-vi { font-weight: 600; color: var(--label); }
+.chip:hover .chip-vi { color: var(--accent-text); }
 
 /* Result ------------------------------------------------------------- */
 .result { margin-top: var(--space-8); }

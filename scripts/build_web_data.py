@@ -98,7 +98,7 @@ def main():
     size += write(OUT / "index.json", {
         "words": total,
         "counts": counts,
-        "examples": EXAMPLES,
+        "examples": [[w, generate.candidates(w, limit=1)[0]] for w in EXAMPLES],
         "gold": len(gold),
         "agree": agree,
     })
