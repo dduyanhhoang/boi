@@ -66,6 +66,7 @@ NUCLEUS_OPEN = {
 # against plan and fan, whose coda is a bare n. So disneyland is đít ni len.
 AE_BEFORE_D = [("e", "", 0), ("a", "", 1)]
 EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
+OW_BEFORE_FINAL_SIBILANT = [("â", "u", 0), ("ô", "", 1)]
 
 NUCLEUS_CLOSED = dict(
     NUCLEUS_OPEN,
@@ -223,6 +224,11 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
             return by_letter[1] if closed else by_letter[0]
     # /eɪ/ before an s is ây with the s unheard (phây búc, đa ta bây), not
     # ê closed by it. Only s: date and update keep đết.
+    # /oʊ/ is ô, but âu when a final s or z closes it on paper and goes
+    # unheard: close and clothes are both cờ lâu. post keeps pốt, its coda
+    # ending in a stop rather than the sibilant.
+    if phone == "OW" and final and next_coda and next_coda[-1] in ("S", "Z"):
+        return OW_BEFORE_FINAL_SIBILANT
     if phone == "EY" and next_coda == ("S",):
         return EY_BEFORE_S
     if phone == "AE" and closed and next_coda and next_coda[-1] == "D":
@@ -271,9 +277,10 @@ def coda_options(phones, nucleus, schwa=False, vowel=""):
         return [(_CH_CODA_AFTER_A, 0), ("ch", 1)]
     out = []
     for coda, penalty in options:
-        # ch after a only for a plain k (sờ nách, bờ lách); a cluster coda keeps
-        # c (pác kinh, tắc xi).
-        if coda == "c" and nucleus in _CH_AFTER and (nucleus != "a" or len(key) == 1):
+        # ch after a only for a plain k (sờ nách, bờ lách). A cluster keeps c
+        # (pác kinh, tắc xi), and so does a g: bag is bác, not bách.
+        if coda == "c" and nucleus in _CH_AFTER and (nucleus != "a"
+                                                     or key == ("K",)):
             out.append(("ch", penalty))
         elif coda == "ng" and nucleus in _NH_AFTER:
             out.append(("nh", penalty))

@@ -363,6 +363,11 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
     const byLetter = P.schwaByLetter[letter];
     if (byLetter) return closed ? byLetter[1] : byLetter[0];
   }
+  // /oʊ/ is âu when a final s or z closes it on paper and goes unheard.
+  if (phone === "OW" && final && nextCoda.length
+      && ["S", "Z"].includes(nextCoda[nextCoda.length - 1])) {
+    return P.owBeforeFinalSibilant;
+  }
   // /eɪ/ before an s is ây with the s unheard: phây búc, đa ta bây.
   if (phone === "EY" && joinKey(nextCoda) === "S") return P.eyBeforeS;
   // /æ/ is a, but e when a d closes the syllable: bét, sen, đít ni len.
@@ -406,7 +411,9 @@ function codaOptions(phones, nucleus, schwa, vowel, T) {
   const out = [];
   for (const [coda, penalty] of options) {
     if (coda === "c" && P.chAfter.includes(nucleus)
-        && (nucleus !== "a" || phones.length === 1)) out.push(["ch", penalty]);
+        && (nucleus !== "a" || (phones.length === 1 && phones[0] === "K"))) {
+      out.push(["ch", penalty]);
+    }
     else if (coda === "ng" && P.nhAfter.includes(nucleus)) out.push(["nh", penalty]);
     else out.push([coda, penalty]);
     if (coda === "c" && nucleus === "i") out.push(["ch", penalty + 1]);
