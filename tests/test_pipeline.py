@@ -25,7 +25,7 @@ DEV_EXACT_FLOOR = 0.70
     ("meeting", "mít tinh"),        # gemination before -ing
     ("office", "óp phít"),          # gemination of a voiceless consonant
     ("pizza", "pi da"),             # ts -> d, no coda
-    ("computer", "com piu tơ"),     # yod after a labial survives
+    ("computer", "com piu tờ"),     # yod after a labial survives
     ("sale", "sêu"),                # final l becomes the u glide
     ("google", "gu gồ"),            # final schwa + l drops
     ("control", "con trôn"),        # final l after a stressed vowel -> n
@@ -52,7 +52,7 @@ def test_known_reading(word, expected):
 @pytest.mark.parametrize("word,expected", [
     # A single plain vowel letter is read as that letter.
     ("encyclopedia", "en sai cờ lô pê đi a"),
-    ("refrigerator", "rê phờ ri giơ ây tơ"),   # not ra: the letter is an e
+    ("refrigerator", "rê phờ ri giơ ây tờ"),   # not ra: the letter is an e
     ("camera", "ca mê ra"),                    # the r in ER0 opens the last one
     ("solution", "sô lu sừn"),   # the gold; it used to read sô lút sừn
     # A digraph keeps CMUdict's vowel, and an unstressed open one does too.
@@ -63,8 +63,8 @@ def test_known_reading(word, expected):
     ("email", "i mêu"),
     # ơ is what an er is read as, not an or.
     ("information", "in phô mây sừn"),
-    ("server", "sơ vơ"),
-    ("burger", "bơ gơ"),
+    ("server", "sơ vờ"),
+    ("burger", "bơ gờ"),
     # -y doubles only after a stressed syllable.
     ("responsibility", "ri sờ pon si bi li ti"),
     ("happy", "háp pi"),

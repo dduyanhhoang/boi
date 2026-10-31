@@ -422,11 +422,8 @@ function toneOf(s, syl, T) {
     if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "L") {
       return "huyen";
     }
-    // A final -er is ngang by default, but huyền after a d: phâu đờ, o đờ.
-    if (s.nucleus === "ER" && s.stress === "0" && s.onset.length
-        && T.tone.huyenBeforeEr.includes(s.onset[s.onset.length - 1])) {
-      return "huyen";
-    }
+    // A final -er is always ờ.
+    if (s.nucleus === "ER" && s.stress === "0") return "huyen";
   }
   if (T.tone.stopCodas.includes(syl.coda)) {
     if (s.final && T.tone.nangCodas.includes(joinKey(s.coda))) return "nang";

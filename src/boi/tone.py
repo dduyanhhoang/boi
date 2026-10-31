@@ -10,7 +10,6 @@ _STOP_CODAS = {"p", "t", "c", "ch"}
 _SIBILANTS = {"SH", "ZH", "CH"}
 # Word-final -rt and -ge come out glottalised: rì pọt, sờ pọt, i mịt, mét sịt.
 _NANG_CODAS = {("R", "T"), ("JH",)}
-_HUYEN_BEFORE_ER = {"D", "CH"}
 
 
 def tone_of(slot, syl):
@@ -27,13 +26,11 @@ def tone_of(slot, syl):
         if slot.nucleus == "AH" and slot.stress == "0":
             if slot.coda == ("L",):
                 return "huyen"              # -le/-al: gu gồ, mo đồ, le vồ
-        # docs/brief.md reads a final -er as huyền with lexical exceptions.
-        # The gold splits five ngang against four huyền with nothing
-        # separating them, so this is observation rather than derivation:
-        # these are the onsets seen to take huyền, in phâu đờ, o đờ and
-        # tít chờ. Everything else is ngang.
-        if slot.nucleus == "ER" and slot.stress == "0" \
-                and slot.onset and slot.onset[-1] in _HUYEN_BEFORE_ER:
+        # A final -er is always ờ. docs/brief.md says so and the owner
+        # confirms it; the five dev rows reading it as ngang (com piu tơ, sơ
+        # vơ, sờ pích cơ, bơ gơ, súp pơ) are transcription, not evidence
+        # against the rule.
+        if slot.nucleus == "ER" and slot.stress == "0":
             return "huyen"
     if syl.coda in _STOP_CODAS:
         if slot.final and slot.coda in _NANG_CODAS:
