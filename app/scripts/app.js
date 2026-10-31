@@ -118,7 +118,7 @@ function otherReadings(word, best, asLetters, theirsRaw) {
   const shared = lettersShown && theirsAll.includes(asLetters);
   if (lettersShown) {
     rows.push([shared
-      ? `as letters, and <a href="https://arxiv.org/abs/1810.03184"
+      ? `as letters, and <a href="https://github.com/ngohgia/transliteration"
           rel="noopener">Ngo et al.</a>${rebuilt ? ", rebuilt" : ""}`
       : "as letters", asLetters]);
   }
@@ -126,7 +126,7 @@ function otherReadings(word, best, asLetters, theirsRaw) {
   // Their notation cannot separate s from x or d from gi, so a reading that
   // differs only there is agreement, and repeating it would read as a
   // disagreement that is not there.
-  const link = `<a href="https://arxiv.org/abs/1810.03184" rel="noopener"
+  const link = `<a href="https://github.com/ngohgia/transliteration" rel="noopener"
     >Ngo et al.</a>${rebuilt ? ", rebuilt" : ""}`;
   if (theirsAll.length && !shared) {
     rows.push([link, theirsAll.includes(best) ? null : theirsAll[0]]);

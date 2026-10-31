@@ -41,18 +41,14 @@ def main():
     vocabulary = sorted(
         {w for w in pronunciations if w.isalpha()} | set(g2p.COMPOUNDS))
 
-    # Ngo et al.'s reading for the same word, so the page can show a second
-    # opinion without another request. Their published output wins where it
-    # exists; the rest is their system run on input rebuilt from CMUdict, and
-    # is marked with a leading ~ so the page can say which is which.
-    print("running Ngo et al.'s transliterator ...", flush=True)
-    published = {w: sorted(f) for w, f in ngo.pairs().items()}
-    theirs = {w: ["~" + r for r in forms] for w, forms in
-              ngo.run_their_system(
-                  [w for w in vocabulary if w in pronunciations and w not in published],
-                  pronunciations).items()}
-    theirs.update(published)
-    print(f"  {len(published)} published, {len(theirs) - len(published)} rebuilt")
+    # Ngo et al.'s published readings only. Their code is vendored in
+    # third_party/ngo, but this project's Python 3 port of it reproduces their
+    # own shipped output for only 28% of their own inputs, and on the example
+    # in their paper (disneyland, đi sờ ni len) it gives đi ni lan. Until that
+    # is understood, running it would put readings on screen under their name
+    # that are not theirs.
+    theirs = {w: sorted(f) for w, f in ngo.pairs().items()}
+    print(f"  {len(theirs)} readings from Ngo et al.'s published output")
 
     shards, total = {}, 0
     for word in vocabulary:

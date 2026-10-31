@@ -66,8 +66,8 @@ wants `cu` and gets `cun`, because `school` is `sờ cun` on the same vowel and
 the same stress and no rule tells the two apart.
 
 There is a second, outside measure. `data/ngo/` holds 2,400 English words with
-Vietnamese readings from [Ngo et al.](https://arxiv.org/abs/1810.03184) (MIT),
-produced for a different purpose by people who never saw this project. They
+Vietnamese readings from [Ngo et al. 2014](https://github.com/ngohgia/transliteration)
+(MIT), produced for a different purpose by people who never saw this project. They
 are names, which people meet in writing, and the verdict there is the opposite
 way round:
 
@@ -80,28 +80,26 @@ Two independent sets, each preferring a different reading, which is the case
 for keeping both. It also gives `letters.py` a measurement it otherwise has
 none of. Nothing is fitted on the Ngo data; `--split dev` holds half back.
 
-Their code is in the repo too, and it runs, so the comparison goes both ways.
-`third_party/ngo/` holds it (MIT, fifteen `print` statements converted to
-Python 3 and nothing else), and `scripts/build_web_data.py` runs it over every
-CMUdict word so the playground can show their reading for anything, not only
-the 2,400 they published.
+Their repo also ships their own system's output for those words, so the
+comparison is like for like on the same 2,391:
 
-Each system wins on the task it was built for, by a wide margin both times:
+| | agreement with their reference |
+|---|---|
+| Ngo et al.'s system | **0.354** |
+| this, either reading | 0.269 |
+| this, letters | 0.213 |
+| this, heard | 0.125 |
 
-| | their 2,391 names | our 181 loanwords |
-|---|---|---|
-| Ngo et al.'s system | **0.354** | 0.213 |
-| this, heard | 0.125 | **0.742** |
-| this, letters | 0.213 | 0.265 |
+Their system was built for that task and this one was not, so the gap is the
+expected shape rather than a verdict.
 
-Theirs is name transliteration for ASR; this is everyday loanwords as written
-bồi. Neither number is a target for the other.
-
-One caveat the page carries too. Their input is one phone symbol per letter,
-and their own lexicon had pronunciations CMUdict does not list, so for words
-outside their 2,400 the input is rebuilt here from CMUdict by an aligner that
-reproduces their own alignment on 82% of held-out words. Those readings are
-labelled "rebuilt"; the 2,391 published ones are not.
+Their code is vendored in `third_party/ngo/` and it runs, but **this project's
+Python 3 port of it does not reproduce their results**: on their own input it
+matches their own shipped output 28.4% of the time, and on the example in
+their paper, disneyland, the paper gives `đi sờ ni len` where this copy gives
+`đi ni lan`. So nothing in `app/` comes from running it, and there is no
+figure here for their system on the loanword set. Only their published
+readings are shown or scored.
 
 Reproduce:
 
