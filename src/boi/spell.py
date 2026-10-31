@@ -215,6 +215,16 @@ def align_vowels(word, phones):
 
     vowels = [p for p in phones if p[:-1] in VOWEL_PHONES and p[-1].isdigit()]
 
+    # A syllabic consonant is a vowel phone with no vowel letter: the schwa
+    # of -sm, -thm and -ble is written nowhere. It is left out of the count
+    # below and given an empty group afterwards, so the letters before it
+    # still line up rather than the whole word losing its alignment.
+    syllabic = (len(groups) < len(vowels) and len(vowels) > 1
+                and vowels[-1] == "AH0" and phones[-1] in ("M", "N", "L")
+                and word[-1] not in VOWELS)
+    if syllabic:
+        vowels = vowels[:-1]
+
     # A run of vowel letters can be more than one syllable: the ia of
     # encyclopedia is two phones, the eo of video is two. Split a run when the
     # phones ask for more, leaving the known digraphs (ea, ee, oo) whole.
@@ -229,6 +239,8 @@ def align_vowels(word, phones):
             return None
     if len(groups) != len(vowels):
         return None
+    if syllabic:
+        groups.append("")
     # A word-final w belongs to the vowel before it: show and snow are sâu
     # where hello and video are lô and ô, and only the w says so. Appended
     # after the counting above so it cannot be split as a run of letters.

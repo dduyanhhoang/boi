@@ -47,7 +47,7 @@ rules and is tried first when it is installed.
 | exact match on `vi_form` | 0.809 | 0.847 | 0.720 |
 | match on `vi_form` or an `alt_form` | 0.824 | 0.863 | 0.800 |
 | gold form in the top 5 | 0.893 | 0.908 | 0.860 |
-| syllable error rate | 0.126 | 0.103 | 0.142 |
+| syllable error rate | 0.123 | 0.099 | 0.136 |
 
 The test column is not clean. `scripts/mine_rules.py` read the whole of
 `eval_v0.csv` rather than the dev split when it was written, and a later

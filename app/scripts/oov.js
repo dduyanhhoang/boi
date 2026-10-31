@@ -409,6 +409,12 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   }
   // /ɑ/ takes the letter it is written with: com men and xóp against
   // ma két tinh and gia va.
+  // A reduced vowel closed by m: ư after the fricative of -sm and -thm
+  // (dừm), â otherwise (tầm). Both take huyền.
+  if (phone === "AH" && stress === "0" && joinKey(nextCoda) === "M" && final) {
+    const last = onset.length ? onset[onset.length - 1] : "";
+    return P.fricatives.includes(last) ? P.ahBeforeMFricative : P.ahBeforeM;
+  }
   if (phone === "AA" && letter === "o") return P.aaSpelledO;
   // /eɪ/ before an s is ây with the s unheard: phây búc, đa ta bây.
   if (phone === "EY" && joinKey(nextCoda) === "S") return P.eyBeforeS;
@@ -474,6 +480,9 @@ function toneOf(s, syl, T) {
   if (s.final) {
     if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "L") {
       return "huyen";
+    }
+    if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "M") {
+      return "huyen";   // -sm/-thm/-em: dừm, tầm
     }
     // A final -er is mostly ờ; these are the consonants observed to take ơ.
     if (s.nucleus === "ER" && s.stress === "0") {

@@ -84,6 +84,8 @@ def main():
             "eyBeforeS": phonemap.EY_BEFORE_S,
             "aaSpelledO": phonemap.AA_SPELLED_O,
             "eseEnding": phonemap.ESE_ENDING,
+            "ahBeforeMFricative": phonemap.AH_BEFORE_M_FRICATIVE,
+            "ahBeforeM": phonemap.AH_BEFORE_M,
             "owBeforeFinalSibilant": phonemap.OW_BEFORE_FINAL_SIBILANT,
             "ehEaBeforeD": phonemap.EH_EA_BEFORE_D,
             "schwaOpen": phonemap.SCHWA_OPEN,
