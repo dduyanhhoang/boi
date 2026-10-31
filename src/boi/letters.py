@@ -106,8 +106,11 @@ def _chunks(word):
             run = groups[group_index - 1][1]
             # One consonant opens the next syllable; a longer run gives its
             # first letter to the syllable before, unless the rest is a
-            # cluster English can open with, which keeps it whole.
-            if n and len(run) > 1 and run[-2:] not in ONSET_CLUSTERS:
+            # cluster English can open with, which keeps it whole. A doubled
+            # letter is one sound whatever follows it, so its first copy
+            # always goes back: offline is óp lin, not ô phờ phờ lin.
+            if n and len(run) > 1 and (run[0] == run[1]
+                                       or run[-2:] not in ONSET_CLUSTERS):
                 run = run[1:]
         coda = ""
         last_of_group = place == len(_vowel_runs(groups[group_index][1])) - 1
@@ -115,7 +118,8 @@ def _chunks(word):
             tail = groups[group_index + 1][1]
             if n == len(nuclei) - 1:
                 coda = tail
-            elif len(tail) > 1 and tail[-2:] not in ONSET_CLUSTERS:
+            elif len(tail) > 1 and (tail[0] == tail[1]
+                                    or tail[-2:] not in ONSET_CLUSTERS):
                 # Exactly the letter the next syllable's onset gave up.
                 coda = tail[:1]
         out.append((run, piece, coda))

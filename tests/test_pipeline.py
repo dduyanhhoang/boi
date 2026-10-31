@@ -264,3 +264,29 @@ def test_dev_exact_match_floor():
 def test_owner_corrections(word, expected):
     got = generate.candidates(word, limit=5)
     assert got and got[0] == expected, f"{word}: got {got}"
+
+
+@pytest.mark.parametrize("misspelt,word", [
+    ("dissneeland", "disneyland"),   # both doubled, one run at a time
+    ("informattion", "information"),
+    ("offliine", "offline"),         # only the ii is the mistake, not the ff
+    ("scheedule", "schedule"),       # a lexicon entry keeps its reading
+    ("taxxi", "taxi"),
+    ("commeent", "comment"),
+])
+def test_a_doubled_letter_keeps_the_reading(misspelt, word):
+    """A doubled letter is the commonest misspelling and the cheapest to undo.
+
+    Without this the word falls past CMUdict to the spelling reader, which
+    answers so differently that one stray letter changes the whole reading:
+    scripts/check_robustness.py put that at 0.207 of 368 misspellings before
+    g2p.undoubled and 0.935 after.
+    """
+    assert generate.candidates(misspelt, 1) == generate.candidates(word, 1)
+
+
+def test_undoubled_only_answers_for_real_words():
+    assert g2p.undoubled("informattion") == "information"
+    assert g2p.undoubled("offliine") == "offline"
+    assert g2p.undoubled("mousse") is None      # a word in its own right
+    assert g2p.undoubled("disneyland") is None  # nothing doubled

@@ -148,6 +148,21 @@ and this generator disagrees with it. Run against all three slots it is
 currently empty, so what is left is either lexical or a context the gold
 itself splits on.
 
+`scripts/check_robustness.py` measures something the eval cannot: every row
+in the eval is spelled correctly, so none of it says what happens when a
+reader mistypes. It doubles letters the way people do and asks whether the
+reading survives.
+
+| | misspellings reading as the word does |
+|---|---|
+| before | 0.207 |
+| after `g2p.undoubled` | **0.962** |
+
+What is left is mostly right: `mousse`, `shoop`, `buus` and `hottel` are all
+words CMUdict lists in their own right, so reading them as themselves is the
+answer. `livestream` is not in CMUdict at all, so its variants go through
+compound splitting and land on different splits.
+
 Reproduce:
 
 ```sh

@@ -13,6 +13,8 @@ Three sources, in order of how much they can be trusted:
    the reason no word comes back empty.
 """
 
+import re
+
 import cmudict
 
 from . import spell
@@ -55,6 +57,21 @@ def _split(word, _cache={}):
     return _cache[word]
 
 
+def _citation(piece):
+    """The pronunciation a piece has when said alone.
+
+    CMUdict lists the reduced form of a function word first, so and is
+    AH0 N D before AE1 N D. A compound is a sequence of words said one after
+    another, not a sentence, so each piece takes the stressed form it would
+    have on its own: dissneeland ends in len, not lon.
+    """
+    entries = _DICT[piece]
+    for entry in entries:
+        if any(phone.endswith("1") for phone in entry):
+            return entry
+    return entries[0]
+
+
 def _compound(word):
     """Phones for a split, with only the first piece keeping primary stress."""
     pieces = _split(word)
@@ -62,7 +79,7 @@ def _compound(word):
         return None
     out = []
     for n, piece in enumerate(pieces):
-        for phone in _DICT[piece][0]:
+        for phone in _citation(piece):
             out.append(phone.replace("1", "2") if n and phone.endswith("1") else phone)
     return out
 
@@ -79,6 +96,29 @@ def _predicted(word):
     return [p for p in _G2P(word) if p[0].isalpha()] or None
 
 
+def undoubled(word):
+    """The word with each doubled letter collapsed, if that is a known word.
+
+    A doubled letter is one sound, and doubling one is the commonest way a
+    word gets misspelt: informattion, scheedule, dissney. Without this they
+    fall past CMUdict to the spelling reader, which answers so differently
+    that one stray letter changes the whole reading.
+    """
+    if word in _DICT:
+        return None             # mousse is a word, not a misspelt mouse
+    runs = [m.start() for m in re.finditer(r"(.)\1", word)]
+    if not runs:
+        return None
+    # One run at a time first: offliine is offline, not ofline, and only the
+    # doubled i was the mistake.
+    for i in runs:
+        candidate = word[:i] + word[i + 1:]
+        if candidate in _DICT:
+            return candidate
+    collapsed = re.sub(r"(.)\1+", r"\1", word)
+    return collapsed if collapsed != word and collapsed in _DICT else None
+
+
 def phones(word, predict=True):
     """Phones for any word. None only when there are no letters to read."""
     w = word.lower()
@@ -88,6 +128,9 @@ def phones(word, predict=True):
         return COMPOUNDS[w].split()
     if not predict:
         return None
+    plain = undoubled(w)
+    if plain:
+        return _DICT[plain][0]
     return _compound(w) or _predicted(w) or spell.phones(w)
 
 
@@ -98,6 +141,8 @@ def source(word):
         return "cmudict"
     if w in COMPOUNDS:
         return "compound"
+    if undoubled(w):
+        return "cmudict"
     if _split(w):
         return "compound"
     if _predicted(w):

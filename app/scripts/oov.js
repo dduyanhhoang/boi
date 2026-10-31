@@ -599,6 +599,18 @@ const MIN_PIECE = 3;
  * Fewest, longest known words this word is made of, or null.
  * Mirrors g2p._split; tests/test_js_conformance.py pins the two together.
  */
+/** g2p.undoubled: the word with one doubled letter collapsed, if known. */
+export function undoubled(word, known) {
+  for (let i = 0; i + 1 < word.length; i += 1) {
+    if (word[i] === word[i + 1]) {
+      const candidate = word.slice(0, i) + word.slice(i + 1);
+      if (known(candidate)) return candidate;
+    }
+  }
+  const collapsed = word.replace(/(.)\1+/g, "$1");
+  return collapsed !== word && known(collapsed) ? collapsed : null;
+}
+
 export function splitInto(word, known) {
   const go = (i, depth) => {
     if (i === word.length) return [];
@@ -693,7 +705,10 @@ function letterChunks(word, T) {
     let run = "";
     if (place === 0 && groupIndex && groups[groupIndex - 1][0] === "c") {
       run = groups[groupIndex - 1][1];
-      if (n && run.length > 1 && !L.onsetClusters.includes(run.slice(-2))) {
+      // A doubled letter is one sound whatever follows it, so its first
+      // copy always goes back: offline is óp lin, not ô phờ phờ lin.
+      if (n && run.length > 1
+          && (run[0] === run[1] || !L.onsetClusters.includes(run.slice(-2)))) {
         run = run.slice(1);
       }
     }
@@ -702,7 +717,9 @@ function letterChunks(word, T) {
     if (lastOfGroup && groupIndex + 1 < groups.length) {
       const tail = groups[groupIndex + 1][1];
       if (n === nuclei.length - 1) coda = tail;
-      else if (tail.length > 1 && !L.onsetClusters.includes(tail.slice(-2))) {
+      else if (tail.length > 1
+               && (tail[0] === tail[1]
+                   || !L.onsetClusters.includes(tail.slice(-2)))) {
         coda = tail.slice(0, 1);
       }
     }

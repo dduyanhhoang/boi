@@ -253,6 +253,15 @@ async function show(word, { push = true } = {}) {
     renderLoading();
     const { module, tables, known } = await loadOov();
 
+    // A doubled letter is the commonest misspelling, and collapsing it often
+    // lands on a word we already have: dissneeland reads as disneyland does.
+    const plain = module.undoubled(w, (c) => c in shard);
+    if (plain) {
+      const [phones, readings, theirs, method] = shard[plain].split("|");
+      renderResult(w, phones, readings.split(";"), false, null, theirs, method);
+      return;
+    }
+
     // A compound of known words beats reading the letters: poweroff is
     // power plus off, with real phones for each half.
     const pieces = module.splitInto(w, known);
