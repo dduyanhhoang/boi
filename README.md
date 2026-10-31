@@ -44,10 +44,14 @@ rules and is tried first when it is installed.
 
 | | dev, rules only | dev, with lexicon | test |
 |---|---|---|---|
-| exact match on `vi_form` | 0.809 | 0.847 | 0.720 |
-| match on `vi_form` or an `alt_form` | 0.824 | 0.863 | 0.800 |
-| gold form in the top 5 | 0.893 | 0.908 | 0.860 |
-| syllable error rate | 0.123 | 0.099 | 0.136 |
+| exact match on `vi_form` | 0.809 | 0.847 | 0.740 |
+| match on `vi_form` or an `alt_form` | 0.824 | 0.863 | 0.820 |
+| gold form in the top 5 | 0.893 | 0.908 | 0.880 |
+| syllable error rate | 0.123 | 0.099 | 0.118 |
+
+Two test rows are lexicon entries, `schedule` and `system`, so **0.700** is
+the figure to read for the test column: that is what the rules alone get, and
+`run_eval.py` prints it beside every number and names the entries.
 
 The test column is not clean. `scripts/mine_rules.py` read the whole of
 `eval_v0.csv` rather than the dev split when it was written, and a later

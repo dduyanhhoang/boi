@@ -68,8 +68,7 @@ AE_BEFORE_D = [("e", "", 0), ("a", "", 1)]
 EY_BEFORE_S = [("â", "y", 0), ("ê", "", 1)]
 AA_SPELLED_O = [("o", "", 0), ("ô", "", 1), ("a", "", 2)]
 ESE_ENDING = [("i", "t", 0), ("ê", "", 1)]
-AH_BEFORE_M_FRICATIVE = [("ư", "", 0), ("â", "", 1)]
-AH_BEFORE_M = [("â", "", 0), ("ư", "", 1)]
+AH_BEFORE_M = [("ư", "", 0), ("â", "", 1)]
 OW_BEFORE_FINAL_SIBILANT = [("â", "u", 0), ("ô", "", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
@@ -244,12 +243,10 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # /ɑ/ takes the letter it is written with, and the dev rows never cross:
     # an a is a in all nine of ma két tinh, pát ti, gia va and the rest, an o
     # is o or ô in all ten of com men, xóp, mo đồ, láp tốp.
-    # A reduced vowel closed by m: ư after the fricative of -sm and -thm,
-    # which is ao go ri dừm and en thu di a dừm, â otherwise, which is
-    # xít tầm. tone.py gives both of them huyền.
+    # A reduced vowel closed by m is ừm: ao go ri dừm, en thu di a dừm,
+    # xít từm. tone.py gives it the huyền.
     if phone == "AH" and stress == "0" and next_coda == ("M",) and final:
-        return (AH_BEFORE_M_FRICATIVE if onset and onset[-1] in _FRICATIVES
-                else AH_BEFORE_M)
+        return AH_BEFORE_M
     if phone == "AA" and letter == "o":
         return AA_SPELLED_O
     if phone == "EY" and next_coda == ("S",):

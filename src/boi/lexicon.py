@@ -20,5 +20,8 @@ LEXICON = {
     # The country's own name, so it is read as Vietnamese rather than
     # transliterated: no rule gets iê out of IY0 EH2, or mít out of -mese.
     "vietnamese": "việt nam mít",
+    # Nothing predicts the x: shop is xóp where shopping is sóp, the same
+    # onset and nucleus in the same morpheme. The ừm is a rule.
+    "system": "xít từm",
     "taxi": "tắc xi",         # AE + k is a in action, bách, nách, lách; s is x in 3 of 37
 }

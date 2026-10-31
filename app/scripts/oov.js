@@ -409,11 +409,9 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   }
   // /ɑ/ takes the letter it is written with: com men and xóp against
   // ma két tinh and gia va.
-  // A reduced vowel closed by m: ư after the fricative of -sm and -thm
-  // (dừm), â otherwise (tầm). Both take huyền.
+  // A reduced vowel closed by m is ừm: dừm, từm. tone gives it the huyền.
   if (phone === "AH" && stress === "0" && joinKey(nextCoda) === "M" && final) {
-    const last = onset.length ? onset[onset.length - 1] : "";
-    return P.fricatives.includes(last) ? P.ahBeforeMFricative : P.ahBeforeM;
+    return P.ahBeforeM;
   }
   if (phone === "AA" && letter === "o") return P.aaSpelledO;
   // /eɪ/ before an s is ây with the s unheard: phây búc, đa ta bây.

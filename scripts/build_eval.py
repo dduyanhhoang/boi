@@ -102,7 +102,7 @@ player|pờ lây ờ||cluster|m
 click|cờ líc|cờ lích|cluster;coda_k|h
 link|linh||coda_nk|h
 version|vơ dừn||tion|h
-system|xít tầm|sít tem|coda_m;coda_s|m
+system|xít từm|xít tầm;sít tem|coda_m;coda_s|h
 network|nét guốc||coda_k|h
 cloud|cờ lao||cluster;coda_d|h
 machine|mơ sin||stress2|h

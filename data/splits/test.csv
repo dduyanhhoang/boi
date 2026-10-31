@@ -20,7 +20,7 @@ id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
 064,share,SH EH1 R,se,,,coda_r,h,approved
 067,livestream,L AY1 V S T R IY1 M,lai sờ trim,,,cluster3,h,approved
 069,level,L EH1 V AH0 L,le vồ,le ven,,coda_l,h,approved
-074,system,S IH1 S T AH0 M,xít tầm,sít tem,,coda_m;coda_s,m,approved
+074,system,S IH1 S T AH0 M,xít từm,xít tầm;sít tem,,coda_m;coda_s,h,approved
 077,machine,M AH0 SH IY1 N,mơ sin,,,stress2,h,corrected
 080,python,P AY1 TH AA0 N,pai thừn,pai thon,,coda_n,m,corrected
 087,presentation,P R EH2 Z AH0 N T EY1 SH AH0 N,pờ ri den tây sừn,pre zen tây sừn,,cluster;tion,m,corrected

@@ -72,7 +72,7 @@ id,word,arpabet,vi_form,alt_forms,vi_native,tags,confidence,status
 071,click,K L IH1 K,cờ líc,cờ lích,,cluster;coda_k,h,approved
 072,link,L IH1 NG K,linh,,,coda_nk,h,approved
 073,version,V ER1 ZH AH0 N,vơ dừn,,,tion,h,corrected
-074,system,S IH1 S T AH0 M,xít tầm,sít tem,,coda_m;coda_s,m,approved
+074,system,S IH1 S T AH0 M,xít từm,xít tầm;sít tem,,coda_m;coda_s,h,approved
 075,network,N EH1 T W ER2 K,nét guốc,,,coda_k,h,approved
 076,cloud,K L AW1 D,cờ lao,,,cluster;coda_d,h,approved
 077,machine,M AH0 SH IY1 N,mơ sin,,,stress2,h,corrected

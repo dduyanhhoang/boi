@@ -264,6 +264,7 @@ def test_dev_exact_match_floor():
     ("java", "gia va"),             # an a stays a
     ("marketing", "ma két tinh"),
     ("vietnamese", "việt nam mít"),  # lexicon: read as Vietnamese
+    ("system", "xít từm"),          # lexicon for the x, rule for the ừm
     ("enthusiasm", "en thu di a dừm"),  # -sm is dừm, and the m is syllabic
     ("sarcasm", "sa ca dừm"),
     ("rhythm", "ri dừm"),
