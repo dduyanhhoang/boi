@@ -264,7 +264,10 @@ def test_dev_exact_match_floor():
     ("java", "gia va"),             # an a stays a
     ("marketing", "ma két tinh"),
     ("vietnamese", "việt nam mít"),  # lexicon: read as Vietnamese
-    ("mechanic", "mê ca ních"),     # no doubling into a stop-closed syllable
+    ("mechanic", "mê ca ních"),     # /ɪ/ never takes a doubled nasal
+    ("mechanical", "mê ca ni cồ"),  # open or closed makes no difference
+    ("comment", "com men"),         # /ɛ/ always does
+    ("camera", "ca mê ra"),         # a schwa only where an i is written
     ("ticket", "tích két"),         # a doubled k after i is ch
     ("speaker", "sờ pích cơ"),
     ("netflix", "nét phờ lích"),    # and so is a cluster

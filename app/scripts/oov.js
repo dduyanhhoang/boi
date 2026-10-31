@@ -295,7 +295,7 @@ function geminate(slots, T) {
       // front letter: com men, lơn ninh, pham mi li, sinh gờ.
       || (T.syllabify.nasalCodas.includes(phone) && !left.coda.length
           && left.stress === "1" && ["", "0"].includes(right.stress)
-          && nasalDoublesBefore(right, T));
+          && nasalDoublesBefore(right));
     if (!ok) continue;
     // A doubled /tʃ/ is only the stop closure, so it returns as t.
     out[i] = { ...left, coda: [...left.coda, phone === "CH" ? "T" : phone],
@@ -338,14 +338,12 @@ function repair(slots, keepClusters, T) {
   return out;
 }
 
-/** A nasal doubles unless a stop closes the syllable; an e also needs it
- *  closed or final, an open mid-word one keeping camera at ca mê ra. */
-function nasalDoublesBefore(right, T) {
-  if (right.coda.length && !T.syllabify.nasalCodas.includes(right.coda[0])) {
-    return false;
-  }
-  if (right.letter === "i" || right.letter === "y") return true;
-  return right.letter === "e" && (right.coda.length > 0 || right.final);
+/** The reduced vowel alone decides: /ɛ/ and /ɚ/ always take the doubled
+ *  nasal, /ɪ/ never does, and a schwa only where an i is written. */
+function nasalDoublesBefore(right) {
+  if (right.nucleus === "EH" || right.nucleus === "ER") return true;
+  return right.nucleus === "AH"
+    && (right.letter === "i" || right.letter === "y");
 }
 
 function variants(phones, letters, T) {

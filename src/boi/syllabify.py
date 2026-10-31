@@ -183,18 +183,19 @@ def _slots(phones, letters=None):
 def _nasal_doubles_before(right):
     """Whether a nasal doubles into this reduced syllable.
 
-    Two conditions, fitted to the nine rows with a nasal between a
-    primary-stressed vowel and a reduced one. The syllable must not be closed
-    by a stop, which is what keeps mechanic at mê ca ních against com men;
-    and it must be written i or y, or else be closed or end the word, an open
-    mid-word e being what keeps camera at ca mê ra. An a or u never takes it:
-    đờ ra ma, i mịt, ba na na, đô nất.
+    The ten rows this decides split on the reduced vowel alone, with nothing
+    to say about the coda or the end of the word: /ɛ/ and /ɚ/ always take it,
+    com men and sinh gờ; /ɪ/ never does, mê ca ních and mê ca ních cồ; and a
+    schwa takes it only where an i is written, pham mi li against ca mê ra,
+    đờ ra ma, i mịt, ba na na and đô nất.
+
+    It is a table fitted to ten words, not a rule derived from anything. Two
+    earlier versions of it keyed on the coda and on whether the syllable
+    ended the word, and both were coincidences of a smaller sample.
     """
-    if right.coda and right.coda[0] not in _NASAL_CODAS:
-        return False
-    if right.letter in ("i", "y"):
+    if right.nucleus in ("EH", "ER"):
         return True
-    return right.letter == "e" and bool(right.coda or right.final)
+    return right.nucleus == "AH" and right.letter in ("i", "y")
 
 
 def _geminate(slots):
