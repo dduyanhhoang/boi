@@ -236,7 +236,7 @@ def test_dev_exact_match_floor():
     ("server", "sơ vơ"),
     ("burger", "bơ gơ"),
     ("super", "súp pơ"),
-    ("accurate", "a cu rét"),       # nothing doubles into a yod
+    ("accurate", "a cu rét"),   # ê would need the silent-e rule an a cannot have       # nothing doubles into a yod
     ("taxi", "tắc xi"),             # lexicon: no rule predicts ă or x here
     ("bag", "bác"),                 # ch after a is for a plain k, not a g
     ("bug", "bắc"),
@@ -278,6 +278,10 @@ def test_dev_exact_match_floor():
     ("sarcasm", "sa ca dừm"),
     ("rhythm", "ri dừm"),
     ("capitalism", "cáp pi ta li dừm"),
+    ("these", "di"),                # -ese is a suffix, not a whole word
+    ("album", "ao bum"),            # a plain letter before m reads as itself
+    ("problem", "pờ ro bờ lừm"),    # lexicon: the cluster, not the reading
+    ("image", "i mịt"),             # the silent e of -age lengthens nothing
     ("chinese", "chai nít"),        # but -ese is a rule, not a lexicon entry
     ("japanese", "gia pa nít"),
     ("cheese", "chi"),              # ee keeps its z silent

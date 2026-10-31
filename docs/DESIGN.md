@@ -68,13 +68,19 @@ Nothing else on the page animates beyond its own state change.
 ## The derivation
 
 Three stages on one 1px thread, a dot per stage, the last dot in `accent`:
-the word, its sounds as ARPAbet chips, the reading. Not three cards — a
-stack of same-shaped boxes would make the sequence look like three unrelated
-facts, and the thread is what says one thing became the next.
+the word, its sounds as ARPAbet chips, and which sounds became which
+syllable. Not three cards — a stack of same-shaped boxes would make the
+sequence look like three unrelated facts, and the thread is what says one
+thing became the next.
 
-It does not claim which phone became which syllable. The slots that would say
-so are internal to `candidatesFromPhones`, and an alignment drawn by eye
-would be a guess wearing the clothes of a derivation.
+The grouping is the one the generator actually chose, not an alignment drawn
+by eye: `candidatesFromPhones` takes a `collect` map and hands back the slots
+behind the winning reading. It needs the browser pipeline, which loads after
+the first paint, so the stage fills in behind the answer rather than holding
+it up. A memorised reading has no slots behind it and says so.
+
+There is no replay control. The sequence plays once on arrival; a button to
+watch it again is a control for a thing nobody asked to repeat.
 
 ## Emphasis
 
@@ -85,7 +91,15 @@ and `warning` wash for a reviewed word whose gold reading differs from the
 generated one. Both carry their meaning as text in the pill, so colour is never
 the only channel.
 
-## The second reading
+## The second reading (removed 2026-10-31)
+
+The letter reading and the Ngo comparison used to sit on a line under the
+syllables. The owner removed them: on a page whose job is one answer, three
+competing readings is the demo arguing with itself. `docs/PRODUCT.md` still
+wants the disagreements visible, and the reviewed-reading note under the
+syllables is where that now lives.
+
+## How it used to work
 
 A word carries two readings: the heard one, from CMUdict, and the letter one.
 The page leads with the heard reading and puts the letter reading on a quiet

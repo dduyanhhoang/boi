@@ -136,10 +136,9 @@ export function spellPhones(word, T) {
 /** spell.align_vowels: which letters each vowel phone was written with. */
 export function alignVowels(word, phones, T) {
   word = [...word.toLowerCase()].filter((c) => /[a-z]/.test(c)).join("");
-  if (word.length > 2 && word.endsWith("e")
-      && !T.spell.vowels.includes(word[word.length - 2])) {
-    word = word.slice(0, -1);
-  }
+  const lengthened = word.length > 2 && word.endsWith("e")
+    && !T.spell.vowels.includes(word[word.length - 2]);
+  if (lengthened) word = word.slice(0, -1);
   const groups = [];
   let i = 0;
   while (i < word.length) {
@@ -150,9 +149,29 @@ export function alignVowels(word, phones, T) {
       i = j;
     } else i += 1;
   }
-  const vowels = phones.filter((p) => T.spell.vowelPhones.includes(p.slice(0, -1))
+  let vowels = phones.filter((p) => T.spell.vowelPhones.includes(p.slice(0, -1))
     && /\d$/.test(p));
+  // A syllabic consonant is a vowel phone with no vowel letter: the schwa of
+  // -sm and -ble is written nowhere. Left out of the count, given an empty
+  // group afterwards, so the letters before it still line up.
+  const syllabic = groups.length < vowels.length && vowels.length > 1
+    && vowels[vowels.length - 1] === "AH0"
+    && ["M", "N", "L"].includes(phones[phones.length - 1])
+    && !T.spell.vowels.includes(word[word.length - 1]);
+  if (syllabic) vowels = vowels.slice(0, -1);
+  while (groups.length < vowels.length) {
+    let index = groups.findIndex((g) => g.length > 1 && !(g in T.spell.digraphs));
+    if (index < 0) index = groups.findIndex((g) => g.length > 1);
+    if (index < 0) return null;
+    groups.splice(index, 1, ...groups[index].split(""));
+  }
   if (groups.length !== vowels.length) return null;
+  if (syllabic) groups.push("");
+  // A silent e lengthens the vowel before it: these is di, not dê.
+  else if (lengthened && groups.length
+           && groups[groups.length - 1].length === 1) {
+    groups[groups.length - 1] += T.spell.lengthened;
+  }
   // A word-final w belongs to the vowel before it: sâu and sờ nâu against
   // hê lô and vi đi ô. Appended after the counting so it cannot be split.
   if (groups.length && word.endsWith("w") && word.length > 1
@@ -399,8 +418,9 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
   }
   // -ese is ít: chai nít, việt nam mít. The plain e separates it from chi
   // and pờ li, whose ee and ea keep their z silent.
-  if (phone === "IY" && letter === "e" && final
-      && ["Z", "S"].includes(joinKey(nextCoda))) return P.eseEnding;
+  // -ese is a suffix, so it cannot be the whole word: these keeps di.
+  if (phone === "IY" && letter.replace(T.spell.lengthened, "") === "e" && final
+      && !first && ["Z", "S"].includes(joinKey(nextCoda))) return P.eseEnding;
   // A single plain vowel letter takes its Vietnamese value when the syllable
   // is stressed or closed: en and pê in encyclopedia, but i ven in event.
   // A word-initial open one is a prefix read as the English letter name.
@@ -414,7 +434,10 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
     return P.ehEaBeforeD;
   }
   // A reduced vowel closed by m is ừm: dừm, từm. tone gives it the huyền.
-  if (phone === "AH" && stress === "0" && joinKey(nextCoda) === "M" && final) {
+  // ừm only where the m is syllabic or written with an e: dừm, từm, lừm.
+  // A plain letter is read as itself, which keeps album at ao bum.
+  if (phone === "AH" && stress === "0" && joinKey(nextCoda) === "M" && final
+      && ["", "e"].includes(letter)) {
     return P.ahBeforeM;
   }
   // /ɑ/ takes the letter it is written with: com men and xóp against
@@ -427,9 +450,12 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset, le
       && nextCoda[nextCoda.length - 1] === "D") return P.aeBeforeD;
   if (phone === "AH" && stress === "0") {
     const byLetter = letter && P.schwaByLetter[letter[0]];
+    if (letter.endsWith(T.spell.lengthened) && P.longByLetter[letter[0]]) {
+      return P.longByLetter[letter[0]];
+    }
     if (!closed) return byLetter ? byLetter[0] : P.schwaOpen;
     // Before a coda n the letter decides: development is lắp men, not mon.
-    if (nextCoda[0] === "N" && P.singleLetters.includes(letter)) {
+    if (["N", "M"].includes(nextCoda[0]) && P.singleLetters.includes(letter)) {
       const byLetterN = P.schwaByLetter[letter];
       if (byLetterN) return byLetterN[1];
     }
@@ -491,8 +517,10 @@ function toneOf(s, syl, T) {
     if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "L") {
       return "huyen";
     }
-    if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "M") {
-      return "huyen";   // -sm/-thm/-em: dừm, tầm
+    // The huyền goes with the ư, not with the m: ao bum does not take it.
+    if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "M"
+        && syl.nucleus === "ư") {
+      return "huyen";
     }
     // A final -er is mostly ờ; these are the consonants observed to take ơ.
     if (s.nucleus === "ER" && s.stress === "0") {
@@ -595,7 +623,10 @@ function score(syls, tablePenalty, structural, T) {
 }
 
 /** Ranked readings for phones the shards did not supply. */
-export function candidatesFromPhones(phones, T, limit = 5, letters = null) {
+/** `collect`, when given, is filled with reading -> the slots that made it,
+ *  so the page can show which phones became which syllable without guessing. */
+export function candidatesFromPhones(phones, T, limit = 5, letters = null,
+                                     collect = null) {
   const scored = new Map();
   for (const [slots, structural] of variants(phones, letters, T)) {
     const options = slots.map((s) => slotOptions(s, T));
@@ -608,7 +639,17 @@ export function candidatesFromPhones(phones, T, limit = 5, letters = null) {
         const syls = chosen.map((syl, n) => ({ ...syl, tone: toneOf(slots[n], syl, T) }));
         const text = syls.map((s) => render(s, T)).join(" ");
         const total = score(syls, penalty, structural, T);
-        if (!scored.has(text) || total < scored.get(text)) scored.set(text, total);
+        if (!scored.has(text) || total < scored.get(text)) {
+          scored.set(text, total);
+          if (collect) {
+            collect.set(text, slots.map((sl, n) => ({
+              phones: [...sl.onset, sl.nucleus ? sl.nucleus + sl.stress : "",
+                       ...sl.coda].filter(Boolean),
+              syllable: render(syls[n], T),
+              tone: syls[n].tone,
+            })));
+          }
+        }
         return;
       }
       for (const [syl, p] of options[i]) walk(i + 1, [...chosen, syl], penalty + p);

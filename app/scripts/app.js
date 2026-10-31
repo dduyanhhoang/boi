@@ -104,60 +104,11 @@ function renderLoading() {
   el.result.innerHTML = '<div class="skeleton"></div>';
 }
 
-/** The other readings, offered next to the main one rather than buried. */
-function otherReadings(word, best, asLetters, theirsRaw, methodRaw) {
-  const rows = [];
-  // Their reading rides along in the shard entry. A leading ~ means their
-  // system run on input rebuilt from CMUdict rather than their own lexicon.
-  const rebuilt = (theirsRaw || "").startsWith("~");
-  const theirsAll = (theirsRaw || "").split(";").filter(Boolean)
-    .map((r) => r.replace(/^~/, ""));
-  // Only merge the two when the letters row is actually being shown; if the
-  // letter reading is the main one, their row still has to say it agrees.
-  const lettersShown = Boolean(asLetters) && asLetters !== best;
-  const shared = lettersShown && theirsAll.includes(asLetters);
-  if (lettersShown) {
-    rows.push([shared
-      ? `as letters, and <a href="https://github.com/ngohgia/transliteration"
-          rel="noopener">Ngo et al.</a>${rebuilt ? ", rebuilt" : ""}`
-      : "as letters", asLetters]);
-  }
-  // A second opinion from outside this project, for the words it covers.
-  // Their notation cannot separate s from x or d from gi, so a reading that
-  // differs only there is agreement, and repeating it would read as a
-  // disagreement that is not there.
-  const link = `<a href="https://github.com/ngohgia/transliteration" rel="noopener"
-    >Ngo et al.</a>${rebuilt ? ", rebuilt" : ""}`;
-  if (theirsAll.length && !shared) {
-    rows.push([link, theirsAll.includes(best) ? null : theirsAll[0]]);
-  }
-
-  // Their method as reimplemented from the paper, which is not the same
-  // thing as their system's output and says so.
-  const method = (methodRaw || "").split(";").filter(Boolean);
-  if (method.length && !theirsAll.includes(method[0])) {
-    rows.push([`<a href="https://arxiv.org/abs/1810.03184" rel="noopener"
-      >their method</a>, reimplemented`,
-      method.includes(best) ? null : method[0]]);
-  }
-
-  if (!rows.length) return '<div class="second" hidden></div>';
-  return `<div class="second">${rows.map(([label, reading]) => `
-    <span class="pair"><span class="label">${label}</span>
-      ${reading
-        ? `<button type="button" data-swap="${escapeHtml(reading)}" lang="vi">${
-            escapeHtml(reading)}</button>`
-        : '<span class="agrees">agrees</span>'}</span>`).join("")}</div>`;
-}
-
-
-/** The derivation, as the three things the generator actually knows.
- *
- * It does not claim which phone became which syllable: the slots that would
- * say so are internal to the pipeline, and inventing an alignment would be a
- * guess dressed as a derivation.
+/** The derivation: the word, its sounds, and which sounds became which
+ *  syllable. The grouping is the one the generator actually chose, read back
+ *  out of the pipeline rather than drawn by eye.
  */
-function trace(word, phones, best, spelled) {
+function trace(word, phones, spelled) {
   const sounds = (phones || "").split(" ").filter(Boolean);
   const stages = [
     ["The word", `<p class="stage-text">${escapeHtml(word)}</p>`],
@@ -166,23 +117,44 @@ function trace(word, phones, best, spelled) {
        ? `<p class="stage-sounds">${sounds
            .map((ph, i) => `<span style="--j:${i}">${escapeHtml(ph)}</span>`).join("")}</p>`
        : `<p class="stage-text stage-text--quiet">no phones to show</p>`],
-    ["Read in Vietnamese",
-     `<p class="stage-text stage-text--reading" lang="vi">${escapeHtml(best)}</p>`],
+    ["Grouped into syllables", `<div class="stage-groups"></div>`],
   ];
   return `<section class="trace" data-playing>
     <ol class="stages">
       ${stages.map(([label, body], i) => `<li class="stage" style="--i:${i}">
         <h2>${label}</h2>${body}</li>`).join("")}
     </ol>
-    <button type="button" class="replay" id="replay">Play again</button>
   </section>`;
+}
+
+/** Fill the last stage once the pipeline is loaded. */
+function fillGrouping(word, phones, best, module, tables) {
+  const host = el.result.querySelector(".stage-groups");
+  if (!host) return;
+  const list = (phones || "").split(" ").filter(Boolean);
+  const collect = new Map();
+  try {
+    module.candidatesFromPhones(list, tables, 5,
+                                module.alignVowels(word, list, tables), collect);
+  } catch { return; }
+  const groups = collect.get(best);
+  if (!groups) {              // a lexicon reading has no slots behind it
+    host.innerHTML = `<p class="stage-text stage-text--quiet">memorised, so
+      there is no derivation to show</p>`;
+    return;
+  }
+  host.innerHTML = groups.map((g, i) => `<div class="group" style="--j:${i}">
+      <span class="group-phones">${g.phones.map(escapeHtml).join(" ")}</span>
+      <span class="group-arrow" aria-hidden="true">${icon("chevron")}</span>
+      <span class="group-vi"><b lang="vi">${escapeHtml(g.syllable)}</b>
+        <span class="group-tone">${toneOf(g.syllable)}</span></span>
+    </div>`).join("");
 }
 
 function renderResult(word, phones, readings, spelled = false, pieces = null,
                       theirs = "", method = "") {
   current = { word, phones, readings, spelled, pieces, theirs, method };
   const [best, ...alts] = readings;
-  const asLetters = oovReady ? oovReady.module.readLetters(word, oovReady.tables) : null;
   const syllables = best.split(" ");
   const g = gold[word];
 
@@ -222,9 +194,8 @@ function renderResult(word, phones, readings, spelled = false, pieces = null,
       ${syllables.map((s, i) => `<li class="syllable" style="--i:${i}">
         <b lang="vi">${escapeHtml(s)}</b><span>${toneOf(s)}</span></li>`).join("")}
     </ul>
-    ${otherReadings(word, best, asLetters, theirs, method)}
     ${note}
-    ${trace(word, phones, best, spelled)}
+    ${trace(word, phones, spelled)}
     <details class="source">
       <summary>${icon("chevron")}More about this word</summary>
       <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
@@ -238,18 +209,12 @@ function renderResult(word, phones, readings, spelled = false, pieces = null,
   el.status.textContent = `${word} reads as ${best}, ${syllables.length} syllable${
     syllables.length === 1 ? "" : "s"}`;
 
-  // A word from the shards paints before the browser pipeline has loaded, so
-  // the second reading fills in behind it rather than holding up the first.
-  if (!asLetters) {
-    loadOov().then(({ module, tables }) => {
-      if (!current || current.word !== word) return;
-      const slot = el.result.querySelector(".second");
-      if (!slot) return;
-      slot.outerHTML = otherReadings(word, best,
-                                     module.readLetters(word, tables), theirs,
-                                     method);
-    });
-  }
+  // The syllable grouping needs the browser pipeline, which loads behind the
+  // first paint, so the reading is never held up waiting for it.
+  loadOov().then(({ module, tables }) => {
+    if (!current || current.word !== word) return;
+    fillGrouping(word, phones, best, module, tables);
+  });
 }
 
 /* Lookup --------------------------------------------------------------- */
@@ -431,12 +396,6 @@ document.addEventListener("click", (e) => {
   if (!el.form.contains(e.target)) closeSuggestions();
   const chip = e.target.closest("[data-word]");
   if (chip) show(chip.dataset.word);
-  if (e.target.closest("#replay")) {
-    const played = el.result.querySelector(".trace");
-    played.removeAttribute("data-playing");
-    void played.offsetWidth;          // restart the stages
-    played.setAttribute("data-playing", "");
-  }
   const swap = e.target.closest("[data-swap]");
   if (swap && current) {
     const reading = swap.dataset.swap;

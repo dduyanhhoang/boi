@@ -27,8 +27,10 @@ def tone_of(slot, syl):
         if slot.nucleus == "AH" and slot.stress == "0":
             if slot.coda == ("L",):
                 return "huyen"              # -le/-al: gu gồ, mo đồ, le vồ
-            if slot.coda == ("M",):
-                return "huyen"              # -sm/-thm/-em: dừm, tầm
+            # The huyền goes with the ư, not with the m: dừm and từm take it,
+            # ao bum does not.
+            if slot.coda == ("M",) and syl.nucleus == "ư":
+                return "huyen"
         # A final -er is mostly ờ and sometimes ơ. Across the eleven words
         # read so far the consonant before it partitions them without a
         # single conflict, so that is what this is: a list of the consonants

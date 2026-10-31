@@ -363,21 +363,26 @@ main {
   font-size: var(--text-footnote);
   color: var(--label-secondary);
 }
-.replay {
-  margin-top: var(--space-4);
-  min-height: 44px;
-  padding: var(--space-2) var(--space-4);
-  background: none;
-  border: 1px solid var(--separator);
-  border-radius: var(--radius-capsule);
-  color: var(--label-secondary);
-  font: inherit;
-  font-size: var(--text-subheadline);
-  cursor: pointer;
-  transition: background var(--duration-state) var(--ease),
-              color var(--duration-state) var(--ease);
+/* One row per syllable: the phones that made it, then the syllable. */
+.stage-groups { display: grid; gap: var(--space-2); }
+.group {
+  display: grid;
+  grid-template-columns: minmax(0, 7rem) auto 1fr;
+  align-items: baseline;
+  gap: var(--space-3);
 }
-.replay:hover { background: var(--accent-wash); color: var(--accent-text); }
+.group-phones {
+  justify-self: end;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-footnote);
+  color: var(--label-secondary);
+}
+.group-arrow { align-self: center; color: var(--label-tertiary); }
+.group-arrow svg { display: block; width: 14px; height: 14px; }
+.group-vi { display: flex; align-items: baseline; gap: var(--space-2); }
+.group-vi b { font-size: var(--text-title-3); font-weight: 600; color: var(--accent-text); }
+.group-tone { font-size: var(--text-caption-1); color: var(--label-tertiary); }
 
 /* Plays after the reading has landed, so the answer is read first. */
 .trace[data-playing] .stage {
@@ -388,9 +393,9 @@ main {
   animation: rise var(--duration-enter) var(--ease) both;
   animation-delay: calc(800ms + var(--j) * 45ms);
 }
-.trace[data-playing] .replay {
+.trace[data-playing] .group {
   animation: rise var(--duration-enter) var(--ease) both;
-  animation-delay: 1440ms;
+  animation-delay: calc(1180ms + var(--j) * 110ms);
 }
 
 .source { margin-top: var(--space-6); }

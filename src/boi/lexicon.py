@@ -22,6 +22,11 @@ LEXICON = {
     "vietnamese": "việt nam mít",
     # Nothing predicts the x: shop is xóp where shopping is sóp, the same
     # onset and nucleus in the same morpheme. The ừm is a rule.
+    # A checked vowel takes the first consonant of a cluster rather than
+    # leaving one to repair, which is ắp lốt, óp lai and đết lai. All three
+    # are compounds, where that consonant ends the first word; problem is not,
+    # and the syllabifier works on phones so it cannot tell them apart.
+    "problem": "pờ ro bờ lừm",
     "system": "xít từm",
     "taxi": "tắc xi",         # AE + k is a in action, bách, nách, lách; s is x in 3 of 37
 }

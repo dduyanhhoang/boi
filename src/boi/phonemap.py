@@ -6,6 +6,8 @@ set, named in the comment. scripts/report_coverage.py checks the table against
 the gold alignment and prints what it misses.
 """
 
+from . import spell
+
 # --- onsets ---------------------------------------------------------------
 ONSET = {
     "P": [("p", 0)],
@@ -103,6 +105,13 @@ SCHWA_BY_CODA = {
     "P": [("ă", "", 0), ("ơ", "", 1)],   # ắp đết
 }
 SCHWA_CLOSED = [("ơ", "", 0), ("e", "", 1), ("i", "", 1)]
+# A silent e lengthens the vowel before it, which is then read as the letter
+# is named: the a of accurate is ê, not the e its coda would give.
+# Only e. The same lengthening on an a would read image as i mệt and message
+# as mét sệt, against both gold rows, because the silent e of -age does not
+# lengthen anything. accurate wants ê by this rule and does not get it.
+LONG_BY_LETTER = {"e": [("i", "", 0)]}
+
 # A reduced vowel keeps the letter it was written with, which is the whole
 # difference between ra phờ ri and rê phờ ri. (open syllable, closed syllable)
 # Only a single plain vowel letter is read this way. A digraph is an English
@@ -172,7 +181,7 @@ CODA_L = {
     "â": [("u", 0)],
     "e": [("o", 0)],             # email -> i meo, hotel -> hô theo
     "ư": [("", 0)],
-    "a": [("", 0), ("u", 1)],
+    "a": [("o", 0), ("", 1), ("u", 2)],   # ao go ri dừm, ao bum
     "ă": [("", 0)],
 }
 # After a back vowel there is no glide to take, so the l either becomes n or
@@ -226,7 +235,9 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # -ese is ít: chai nít, việt nam mít. The z is heard, where a final z
     # after a tense vowel is usually not, and the plain e is what separates
     # this from chi and pờ li, whose ee and ea keep theirs silent.
-    if phone == "IY" and letter == "e" and final and next_coda in (("Z",), ("S",)):
+    # -ese is a suffix, so it cannot be the whole word: these keeps di.
+    if (phone == "IY" and letter.rstrip(spell.LENGTHENED) == "e" and final
+            and not first and next_coda in (("Z",), ("S",))):
         return ESE_ENDING
     # /ɪ/ and /i/ written with a single plain letter take that letter's
     # Vietnamese value: the e of encyclopedia is en and pê, not in and pi.
@@ -241,7 +252,11 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
             return by_letter[1] if closed else by_letter[0]
     # A reduced vowel closed by m is ừm: ao go ri dừm, en thu di a dừm,
     # xít từm. tone.py gives it the huyền.
-    if phone == "AH" and stress == "0" and next_coda == ("M",) and final:
+    # ừm only where the m is syllabic or written with an e: ao go ri dừm,
+    # en thu di a dừm, xít từm, pờ ro bờ lừm. A plain letter is read as
+    # itself, which is what keeps album at ao bum.
+    if (phone == "AH" and stress == "0" and next_coda == ("M",) and final
+            and letter in ("", "e")):
         return AH_BEFORE_M
     # /ɑ/ takes the letter it is written with, and the dev rows never cross:
     # an a is a in all nine of ma két tinh, pát ti, gia va and the rest, an o
@@ -259,6 +274,8 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     if phone == "AE" and closed and next_coda and next_coda[-1] == "D":
         return AE_BEFORE_D
     if phone == "AH" and stress == "0":
+        if letter.endswith(spell.LENGTHENED) and letter[0] in LONG_BY_LETTER:
+            return LONG_BY_LETTER[letter[0]]
         if not closed:
             if letter and letter[0] in SCHWA_BY_LETTER:
                 return SCHWA_BY_LETTER[letter[0]][0]
@@ -267,7 +284,7 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         # development is lắp men, not lắp mon, and presentation is den. The
         # two rules below only catch what the letters do not: -tion, whose
         # letters are io rather than one plain vowel, and the rest.
-        if next_coda[0] == "N" and letter in SINGLE_LETTERS:
+        if next_coda[0] in ("N", "M") and letter in SINGLE_LETTERS:
             by_letter = SCHWA_BY_LETTER.get(letter)
             if by_letter:
                 return by_letter[1]

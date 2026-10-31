@@ -12,6 +12,9 @@ the compound list both have nothing.
 """
 
 VOWELS = "aeiouy"
+# Appended to a vowel group that a silent e lengthens: "e" + this is the e
+# of these, not the e of event.
+LENGTHENED = "\u0304"
 
 # Longest match first. A tuple means the grapheme decides from context.
 CONSONANTS = {
@@ -199,7 +202,8 @@ def align_vowels(word, phones):
     this says which letters a phone came from.
     """
     word = "".join(c for c in word.lower() if c.isalpha())
-    if len(word) > 2 and word.endswith("e") and word[-2] not in VOWELS:
+    lengthened = len(word) > 2 and word.endswith("e") and word[-2] not in VOWELS
+    if lengthened:
         word = word[:-1]
 
     groups, i = [], 0
@@ -241,6 +245,11 @@ def align_vowels(word, phones):
         return None
     if syllabic:
         groups.append("")
+    # A silent e at the end lengthens the vowel before it, so that vowel is
+    # read as the letter is named: these is di, not dê. Marked rather than
+    # spelled out, so every other rule still sees the plain letter.
+    elif lengthened and groups and len(groups[-1]) == 1:
+        groups[-1] += LENGTHENED
     # A word-final w belongs to the vowel before it: show and snow are sâu
     # where hello and video are lô and ô, and only the w says so. Appended
     # after the counting above so it cannot be split as a run of letters.

@@ -41,6 +41,7 @@ def main():
         },
         "spell": {
             "vowels": spell.VOWELS,
+            "lengthened": spell.LENGTHENED,
             "consonants": {k: list(v) if isinstance(v, tuple) else [v]
                            for k, v in spell.CONSONANTS.items()},
             "soft": spell._SOFT,
@@ -83,6 +84,7 @@ def main():
             "eyBeforeS": phonemap.EY_BEFORE_S,
             "aaSpelledO": phonemap.AA_SPELLED_O,
             "eseEnding": phonemap.ESE_ENDING,
+            "longByLetter": phonemap.LONG_BY_LETTER,
             "ahBeforeM": phonemap.AH_BEFORE_M,
             "ehEaBeforeD": phonemap.EH_EA_BEFORE_D,
             "schwaOpen": phonemap.SCHWA_OPEN,
