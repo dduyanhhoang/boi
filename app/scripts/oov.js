@@ -281,7 +281,11 @@ function geminate(slots, T) {
           && !(right.letter === T.syllabify.tionLetters && right.final)
           && !right.yod
           && left.stress === "1" && ["", "0"].includes(right.stress)
-          && !T.syllabify.keepsOffglide.includes(left.nucleus));
+          && !T.syllabify.keepsOffglide.includes(left.nucleus))
+      // A doubled velar nasal stays the coda; phonemap reads the onset copy
+      // as g, so singer is sinh gờ.
+      || (phone === "NG" && !left.coda.length
+          && left.stress === "1" && ["", "0"].includes(right.stress));
     if (!ok) continue;
     // A doubled /tʃ/ is only the stop closure, so it returns as t.
     out[i] = { ...left, coda: [...left.coda, phone === "CH" ? "T" : phone] };
@@ -422,8 +426,11 @@ function toneOf(s, syl, T) {
     if (s.nucleus === "AH" && s.stress === "0" && joinKey(s.coda) === "L") {
       return "huyen";
     }
-    // A final -er is always ờ.
-    if (s.nucleus === "ER" && s.stress === "0") return "huyen";
+    // A final -er is mostly ờ; these are the consonants observed to take ơ.
+    if (s.nucleus === "ER" && s.stress === "0") {
+      const before = s.onset.length ? s.onset[s.onset.length - 1] : "";
+      return T.tone.ngangBeforeEr.includes(before) ? "ngang" : "huyen";
+    }
   }
   if (T.tone.stopCodas.includes(syl.coda)) {
     if (s.final && T.tone.nangCodas.includes(joinKey(s.coda))) return "nang";

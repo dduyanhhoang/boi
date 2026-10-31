@@ -201,6 +201,11 @@ def _geminate(slots):
               and left.stress == "1" and right.stress in ("", "0")
               and left.nucleus not in _KEEPS_OFFGLIDE):
             pass
+        elif (phone == "NG" and not left.coda
+              and left.stress == "1" and right.stress in ("", "0")):
+            # The nasal stays as the coda; phonemap reads the onset copy
+            # as g, so singer is sinh gờ and not si ngờ.
+            pass
         else:
             continue
         # Keep a replaced r in the run: ("R", "K") still maps to c and still

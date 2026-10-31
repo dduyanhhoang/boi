@@ -10,6 +10,7 @@ _STOP_CODAS = {"p", "t", "c", "ch"}
 _SIBILANTS = {"SH", "ZH", "CH"}
 # Word-final -rt and -ge come out glottalised: rì pọt, sờ pọt, i mịt, mét sịt.
 _NANG_CODAS = {("R", "T"), ("JH",)}
+_NGANG_BEFORE_ER = {"T", "V", "G", "P", "K"}
 
 
 def tone_of(slot, syl):
@@ -26,12 +27,17 @@ def tone_of(slot, syl):
         if slot.nucleus == "AH" and slot.stress == "0":
             if slot.coda == ("L",):
                 return "huyen"              # -le/-al: gu gồ, mo đồ, le vồ
-        # A final -er is always ờ. docs/brief.md says so and the owner
-        # confirms it; the five dev rows reading it as ngang (com piu tơ, sơ
-        # vơ, sờ pích cơ, bơ gơ, súp pơ) are transcription, not evidence
-        # against the rule.
+        # A final -er is mostly ờ and sometimes ơ. Across the eleven words
+        # read so far the consonant before it partitions them without a
+        # single conflict, so that is what this is: a list of the consonants
+        # observed to take ngang, not a feature of them. t, v, g, p and k
+        # give com piu tơ, sơ vơ, bơ gơ, súp pơ and sờ pích cơ; d, gi, ng,
+        # ch and nothing at all give phâu đờ, ma na giờ, sinh gờ, tít chờ,
+        # o đờ and pờ lây ờ. Voicing is not it: t and d split but g does not
+        # go with d.
         if slot.nucleus == "ER" and slot.stress == "0":
-            return "huyen"
+            before = slot.onset[-1] if slot.onset else ""
+            return "ngang" if before in _NGANG_BEFORE_ER else "huyen"
     if syl.coda in _STOP_CODAS:
         if slot.final and slot.coda in _NANG_CODAS:
             return "nang"                   # rì pọt, i mịt

@@ -103,6 +103,7 @@ def main():
             "stopCodas": sorted(tone._STOP_CODAS),
             "sibilants": sorted(tone._SIBILANTS),
             "nangCodas": sorted(key(t) for t in tone._NANG_CODAS),
+            "ngangBeforeEr": sorted(tone._NGANG_BEFORE_ER),
         },
         "rank": {
             "illegalOnset": rank._ILLEGAL_ONSET,

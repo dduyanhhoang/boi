@@ -26,7 +26,9 @@ ONSET = {
     "JH": [("gi", 0), ("d", 1)], # gia va, giút / pờ rô dếch
     "M": [("m", 0)],
     "N": [("n", 0)],
-    "NG": [("ng", 0)],
+    # An onset ŋ only ever comes from an intervocalic ng, where the nasal is
+    # already carried by the coda the gemination left behind: sinh gờ.
+    "NG": [("g", 0)],
     "L": [("l", 0)],
     "R": [("r", 0)],
     "W": [("g", 0)],             # w -> g: sóp goe, goai, guốc

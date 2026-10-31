@@ -44,10 +44,10 @@ rules and is tried first when it is installed.
 
 | | dev, rules only | dev, with lexicon | test |
 |---|---|---|---|
-| exact match on `vi_form` | 0.748 | 0.786 | 0.600 |
-| match on `vi_form` or an `alt_form` | 0.771 | 0.809 | 0.680 |
-| gold form in the top 5 | 0.840 | 0.855 | 0.800 |
-| syllable error rate | 0.146 | 0.126 | 0.204 |
+| exact match on `vi_form` | 0.771 | 0.809 | 0.640 |
+| match on `vi_form` or an `alt_form` | 0.786 | 0.824 | 0.720 |
+| gold form in the top 5 | 0.855 | 0.870 | 0.840 |
+| syllable error rate | 0.146 | 0.123 | 0.173 |
 | tone accuracy | 0.956 | 0.956 | 0.942 |
 
 All four lexicon words are dev rows, so the lexicon column is partly
@@ -122,11 +122,6 @@ reports any context where the gold agrees with itself across two or more rows
 and this generator disagrees with it. Run against all three slots it is
 currently empty, so what is left is either lexical or a context the gold
 itself splits on.
-
-Four approved rows read a final `-er` as ngang (`com piu tơ`, `sơ vơ`,
-`bơ gơ`, `súp pơ`) against the rule that it is always `ờ`. The rule is what
-ships; those rows are left as they were recorded, so the dev figure above
-carries their cost rather than hiding it.
 
 Reproduce:
 
