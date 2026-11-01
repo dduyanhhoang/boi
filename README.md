@@ -17,7 +17,7 @@ Every syllable it writes is one a Vietnamese speaker can say. The dialect is Nor
 
 ## How it works
 
-![The pipeline, with schedule worked through it](docs/pipeline.png)
+![The pipeline, with schedule worked through it](docs/pipeline.png?v=2)
 
 The rules are written by hand, so every syllable traces back to the rule that produced it. A short lexicon covers the readings no rule predicts.
 
