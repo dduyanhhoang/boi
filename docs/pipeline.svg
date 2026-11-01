@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2300 404" width="2300" height="404">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1e1e1e" />
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="2300" height="404" fill="#ffffff" />
+  <rect x="40" y="154" width="160" height="108" rx="8" ry="8" fill="#a5d8ff" stroke="#1971c2" stroke-width="2" opacity="1" />
+  <rect x="280" y="40" width="310" height="156" rx="8" ry="8" fill="#b2f2bb" stroke="#2f9e44" stroke-width="2" opacity="1" />
+  <rect x="670" y="40" width="300" height="156" rx="8" ry="8" fill="#b2f2bb" stroke="#2f9e44" stroke-width="2" opacity="1" />
+  <rect x="1050" y="52" width="290" height="132" rx="8" ry="8" fill="#b2f2bb" stroke="#2f9e44" stroke-width="2" opacity="1" />
+  <rect x="1420" y="52" width="250" height="132" rx="8" ry="8" fill="#b2f2bb" stroke="#2f9e44" stroke-width="2" opacity="1" />
+  <rect x="1765" y="64" width="240" height="108" rx="8" ry="8" fill="#b2f2bb" stroke="#2f9e44" stroke-width="2" opacity="1" />
+  <rect x="2100" y="166" width="160" height="84" rx="8" ry="8" fill="#ffd8a8" stroke="#e8590c" stroke-width="2" opacity="1" />
+  <rect x="1750" y="232" width="270" height="132" rx="8" ry="8" fill="#d0bfff" stroke="#7048e8" stroke-width="2" opacity="1" />
+  <polyline points="200,208 280,118" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrowhead)" />
+  <polyline points="590,118 670,118" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrowhead)" />
+  <polyline points="970,118 1050,118" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrowhead)" />
+  <polyline points="1340,118 1420,118" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrowhead)" />
+  <polyline points="1670,118 1765,118" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrowhead)" />
+  <polyline points="2005,118 2100,208" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrowhead)" />
+  <polyline points="200,208 1750,298" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrowhead)" />
+  <polyline points="2020,298 2100,208" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="120" y="204" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="16" fill="#1971c2" text-anchor="middle">
+    <tspan x="120" dy="0">English word</tspan>
+    <tspan x="120" dy="20">schedule</tspan>
+  </text>
+  <text x="435" y="94" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="16" fill="#2f9e44" text-anchor="middle">
+    <tspan x="435" dy="0">Phones</tspan>
+    <tspan x="435" dy="20">S K EH JH UH L</tspan>
+    <tspan x="435" dy="20">(CMUdict, a compound split,</tspan>
+    <tspan x="435" dy="20">or the spelling)</tspan>
+  </text>
+  <text x="820" y="94" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="16" fill="#2f9e44" text-anchor="middle">
+    <tspan x="820" dy="0">Syllables</tspan>
+    <tspan x="820" dy="20">[S] [K EH] [JH UH L]</tspan>
+    <tspan x="820" dy="20">(onset, nucleus, coda;</tspan>
+    <tspan x="820" dy="20">clusters broken, doubling)</tspan>
+  </text>
+  <text x="1195" y="104" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="16" fill="#2f9e44" text-anchor="middle">
+    <tspan x="1195" dy="0">Vietnamese letters</tspan>
+    <tspan x="1195" dy="20">sờ · ke · đua</tspan>
+    <tspan x="1195" dy="20">(from sound and spelling)</tspan>
+  </text>
+  <text x="1545" y="104" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="16" fill="#2f9e44" text-anchor="middle">
+    <tspan x="1545" dy="0">Tones</tspan>
+    <tspan x="1545" dy="20">huyền · ngang · huyền</tspan>
+    <tspan x="1545" dy="20">(from syllable shape)</tspan>
+  </text>
+  <text x="1885" y="114" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="16" fill="#2f9e44" text-anchor="middle">
+    <tspan x="1885" dy="0">Rank</tspan>
+    <tspan x="1885" dy="20">legal syllables only</tspan>
+  </text>
+  <text x="2180" y="214" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="16" fill="#e8590c" text-anchor="middle">
+    <tspan x="2180" dy="0">sờ ke đùa</tspan>
+  </text>
+  <text x="1885" y="284" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="16" fill="#7048e8" text-anchor="middle">
+    <tspan x="1885" dy="0">Lexicon</tspan>
+    <tspan x="1885" dy="20">(a few memorised words)</tspan>
+    <tspan x="1885" dy="20">taxi → tắc xi</tspan>
+  </text>
+  <text x="975" y="258.25" font-family="Virgil, Segoe UI Emoji, Helvetica, Arial, sans-serif" font-size="14" fill="#1e1e1e" text-anchor="middle">
+    <tspan x="975" dy="0">if memorised</tspan>
+  </text>
+</svg>
