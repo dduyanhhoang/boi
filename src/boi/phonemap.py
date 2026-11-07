@@ -255,6 +255,10 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         if final and next_coda and next_coda[-1] in ("S", "Z"):
             return OW_FINAL
         if not closed:
+            # A word-initial stressed o before a v is the over- of overuse
+            # and overtime, which is âu vơ. okay keeps ô cây.
+            if first and not onset and stress != "0" and next_onset == ("V",):
+                return OW_FINAL
             # âu only where a w is written: sâu, sờ nâu, pho lâu against
             # hê lô and vi đi ô.
             return OW_FINAL if final and "w" in (letter or "") else OW_MID
@@ -290,8 +294,9 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
         return AH_BEFORE_M
     # /ɑ/ takes the letter it is written with, and the dev rows never cross:
     # an a is a in all nine of ma két tinh, pát ti, gia va and the rest, an o
-    # is o or ô in all ten of com men, xóp, mo đồ, láp tốp.
-    if phone == "AA" and letter == "o":
+    # is o or ô in all ten of com men, xóp, mo đồ, láp tốp. An aw is o too:
+    # CMUdict has raw as /ɑ/ where law is /ɔ/, and both are read lo, ro.
+    if phone == "AA" and letter in ("o", "aw"):
         return AA_SPELLED_O
     # /eɪ/ before an s is ây with the s unheard (phây búc, đa ta bây), not
     # ê closed by it. Only s: date and update keep đết.

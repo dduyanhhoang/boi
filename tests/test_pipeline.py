@@ -290,7 +290,7 @@ def test_dev_exact_match_floor():
     ("generation", "gie nơ rây sừn"),  # an r before a stressed front vowel opens it
     ("operation", "o pơ rây sừn"),
     ("poweroff", "pao ơ óp"),       # but not before a back one: a compound
-    ("overall", "ô vơ on"),
+    ("overall", "âu vờ ron"),       # over- is âu, and the r opens all
     ("schedule", "sờ ke đùa"),      # by rule now, not memorised
     ("module", "mo đùa"),
     ("education", "e đu cây sừn"),  # the same đ, from the gold
@@ -324,6 +324,10 @@ def test_dev_exact_match_floor():
     ("icecream", "ai sờ cờ rim"),   # only a v, an s still gives sờ
     ("friendly", "phờ ren li"),     # a stop after a nasal coda is unheard
     ("handle", "han đồ"),           # unless a vowel follows, making it an onset
+    ("raw", "ro"),                  # an aw is o, whichever vowel CMUdict lists
+    ("reuse", "rì iu"),             # a /j/ between vowels is unheard
+    ("overuse", "âu vờ iu"),        # and the syllable before it takes huyền
+    ("use", "diu"),                 # word-initially it stays
 ])
 def test_owner_corrections(word, expected):
     got = generate.candidates(word, limit=5)

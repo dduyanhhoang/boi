@@ -15,6 +15,10 @@ PER_SLOT = 4        # options kept per syllable
 _KEEPS_YOD = {"P", "B", "M", "F", "V", "Y"}
 
 
+def _hiatus_yod(slot):
+    return slot.yod and slot.onset == ("Y",) and slot.nucleus == "UW" and not slot.first
+
+
 def _nucleus_options(slot):
     if slot.yod and (not slot.onset or slot.onset[-1] in _KEEPS_YOD):
         return [("i", "u", 0)] if slot.nucleus == "UW" else [("i", "", 0)]
@@ -37,8 +41,13 @@ def _slot_options(slot):
                 for o, p in onsets][:PER_SLOT]
 
     out, illegal = {}, {}
-    for onset, p_on in phonemap.onset_options(slot.onset, slot.onset_doubled,
-                                              slot.nucleus, slot.stress):
+    onsets = phonemap.onset_options(slot.onset, slot.onset_doubled,
+                                    slot.nucleus, slot.stress)
+    # A /ju/ between vowels loses its /j/: reuse is rì iu, not ri diu. Only
+    # word-initially is it d, as in diu túp.
+    if _hiatus_yod(slot):
+        onsets = [("", 0)]
+    for onset, p_on in onsets:
         for nucleus, offglide, p_nu in _nucleus_options(slot):
             if offglide:
                 # Two codas are illegal, so the English coda goes.

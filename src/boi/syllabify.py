@@ -67,6 +67,7 @@ class Slot(NamedTuple):
     after_stress: bool = False    # the syllable before this one carries it
     after_nasal: bool = False     # the syllable before this one ends in a nasal
     next_onset: tuple = ()        # the onset of the syllable after this one
+    next_nucleus: str = ""        # and its vowel
 
 
 def _strip_stress(phones):
@@ -134,14 +135,16 @@ def _free_the_r(phones):
     out = []
     for i, phone in enumerate(phones):
         nxt = phones[i + 1] if i + 1 < len(phones) else ""
-        # Before a reduced vowel, and before a stressed front one: ao go ri
-        # dừm, and every -eration word, giê nơ rây sừn. Not before a stressed
-        # back vowel, which is where a compound boundary falls, the second
-        # word starting off or all: pao ơ óp, ô vơ ôn, not pao ơ róp.
+        prev = phones[i - 1] if i else ""
+        # Before a reduced vowel, and before a stressed one: ao go ri dừm,
+        # every -eration word, giê nơ rây sừn, and âu vờ ron. Not when the ER
+        # itself follows a vowel, which is where a compound boundary falls,
+        # power plus off: pao ơ óp, not pao ơ róp.
         if phone == "ER0" and nxt[:-1] in VOWELS and nxt[-1:] == "0":
             # The vowel left behind takes its letter: ca mê ra.
             out += ["AH0", "R"]
-        elif phone == "ER0" and nxt[:-1] in _FRONT_VOWELS:
+        elif phone == "ER0" and (nxt[:-1] in _FRONT_VOWELS
+                                 or nxt[:-1] in VOWELS and prev[:-1] not in VOWELS):
             # It stays ơ, the r only opening the next syllable: nơ rây.
             out += ["ER0", "R"]
         else:
@@ -324,5 +327,7 @@ def _mark_after_stress(slots):
                           after_nasal=i > 0 and slots[i - 1].coda[-1:]
                           and slots[i - 1].coda[-1] in _NASAL_CODAS,
                           next_onset=slots[i + 1].onset if i + 1 < len(slots)
-                          else ())
+                          else (),
+                          next_nucleus=slots[i + 1].nucleus if i + 1 < len(slots)
+                          else "")
             for i, slot in enumerate(slots)]

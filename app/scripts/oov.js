@@ -235,13 +235,15 @@ function freeTheR(phones, T) {
   const out = [];
   phones.forEach((phone, i) => {
     const next = phones[i + 1] ?? "";
+    const prev = phones[i - 1] ?? "";
+    const isVowel = (p) => T.syllabify.phoneVowels.includes(p.slice(0, -1));
     // Before a reduced vowel the vowel left behind takes its letter: ca mê ra.
-    // Before a stressed front vowel it stays ơ and the r opens the next
-    // syllable: nơ rây. Not before a stressed back vowel, where a compound
-    // boundary falls: pao ơ óp.
-    if (phone === "ER0" && T.syllabify.phoneVowels.includes(next.slice(0, -1))
-        && next.endsWith("0")) out.push("AH0", "R");
-    else if (phone === "ER0" && T.syllabify.frontVowels.includes(next.slice(0, -1))) {
+    // Before a stressed one it stays ơ and the r opens the next syllable:
+    // nơ rây, âu vờ ron. Not after a vowel, where a compound boundary
+    // falls: pao ơ óp.
+    if (phone === "ER0" && isVowel(next) && next.endsWith("0")) out.push("AH0", "R");
+    else if (phone === "ER0" && (T.syllabify.frontVowels.includes(next.slice(0, -1))
+                                 || (isVowel(next) && !isVowel(prev)))) {
       out.push("ER0", "R");
     } else out.push(phone);
   });
@@ -384,6 +386,7 @@ function markAfterStress(slots, T) {
     afterNasal: i > 0 && slots[i - 1].coda.length > 0
       && T.syllabify.nasalCodas.includes(slots[i - 1].coda.at(-1)),
     nextOnset: i + 1 < slots.length ? slots[i + 1].onset : [],
+    nextNucleus: i + 1 < slots.length ? slots[i + 1].nucleus : "",
   }));
 }
 
@@ -450,6 +453,9 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
     // are both cờ lâu. post keeps pốt, its coda ending in a stop.
     if (final && nextCoda.length
         && ["S", "Z"].includes(nextCoda[nextCoda.length - 1])) return P.owFinal;
+    // A word-initial stressed o before a v is over-: âu vơ. okay keeps ô cây.
+    if (!closed && first && !onset.length && stress !== "0"
+        && joinKey(nextOnset) === "V") return P.owFinal;
     // âu only where a w is written: sâu, pho lâu against hê lô, vi đi ô.
     if (!closed) return final && (letter || "").includes("w") ? P.owFinal : P.owMid;
   }
@@ -489,8 +495,8 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
     return P.ahBeforeM;
   }
   // /ɑ/ takes the letter it is written with: com men and xóp against
-  // ma két tinh and gia va.
-  if (phone === "AA" && letter === "o") return P.aaSpelledO;
+  // ma két tinh and gia va. An aw is o too: raw is ro like law.
+  if (phone === "AA" && (letter === "o" || letter === "aw")) return P.aaSpelledO;
   // /eɪ/ before an s is ây with the s unheard: phây búc, đa ta bây.
   if (phone === "EY" && joinKey(nextCoda) === "S") return P.eyBeforeS;
   // /æ/ is a, but e when a d closes the syllable: bét, sen, đít ni len.
@@ -576,6 +582,11 @@ function toneOf(s, syl, T) {
   if (s.nucleus === "AH" && s.stress === "0" && s.coda[0] === "N"
       && syl.nucleus === "ư"
       && (s.final || s.letter === T.syllabify.tionLetters)) return "huyen";
+  // An open reduced syllable is huyền before a back vowel that a /j/ or its
+  // own freed r opens: rì iu, âu vờ iu, âu vờ ron. Not before a front one.
+  const opener = joinKey(s.nextOnset || []);
+  if (s.stress === "0" && !syl.coda && T.tone.backVowels.includes(s.nextNucleus)
+      && (opener === "Y" || (opener === "R" && s.nucleus === "ER"))) return "huyen";
   if (s.final) {
     if (s.stress === "0" && joinKey(s.coda) === "L"
         && ["AH", "UH", "UW"].includes(s.nucleus)) {
@@ -657,8 +668,11 @@ function slotOptions(s, T) {
   const legal = new Map();
   const illegal = new Map();
   const schwa = s.nucleus === "AH" && s.stress === "0";
-  for (const [onset, pOn] of onsetOptions(s.onset, T, s.onsetDoubled,
-                                          s.nucleus, s.stress)) {
+  // A /ju/ between vowels loses its /j/: reuse is rì iu, not ri diu.
+  const hiatus = s.yod && joinKey(s.onset) === "Y" && s.nucleus === "UW" && !s.first;
+  const onsets = hiatus ? [["", 0]]
+    : onsetOptions(s.onset, T, s.onsetDoubled, s.nucleus, s.stress);
+  for (const [onset, pOn] of onsets) {
     for (const [nucleus, offglide, pNu] of slotNucleusOptions(s, T)) {
       const codas = offglide
         ? [[offglide, s.coda.length ? 1 : 0]]

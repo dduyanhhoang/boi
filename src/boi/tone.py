@@ -11,6 +11,7 @@ _SIBILANTS = {"SH", "ZH", "CH"}
 # Word-final -rt and -ge come out glottalised: rì pọt, sờ pọt, i mịt, mét sịt.
 _NANG_CODAS = {("R", "T"), ("JH",)}
 _NGANG_BEFORE_ER = {"T", "V", "G", "P", "K"}
+_BACK_VOWELS = {"UW", "UH", "AO", "AA", "OW"}
 
 
 def tone_of(slot, syl):
@@ -23,6 +24,13 @@ def tone_of(slot, syl):
     if (slot.nucleus == "AH" and slot.stress == "0" and slot.coda[:1] == ("N",)
             and syl.nucleus == "ư"
             and (slot.final or slot.letter == "io")):
+        return "huyen"
+    # An open reduced syllable is huyền before a back vowel that a /j/ or
+    # its own freed r opens: rì iu, âu vờ iu, âu vờ ron. Before a front
+    # vowel it is not: gie nơ rây sừn.
+    if (slot.stress == "0" and not syl.coda and slot.next_nucleus in _BACK_VOWELS
+            and (slot.next_onset == ("Y",)
+                 or slot.next_onset == ("R",) and slot.nucleus == "ER")):
         return "huyen"
     if slot.final:
         if slot.stress == "0" and slot.coda == ("L",) \

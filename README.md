@@ -49,7 +49,7 @@ Seven test rows were seen during development. Over the other 43, the rules alone
 ## Develop
 
 ```sh
-uv run pytest                          # 740 tests
+uv run pytest                          # 744 tests
 uv run eval/run_eval.py dev --errors   # what dev still gets wrong
 uv run scripts/build_web_data.py       # data for the playground, then:
 python3 -m http.server --directory app # localhost:8000

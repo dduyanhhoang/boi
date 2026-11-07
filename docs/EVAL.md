@@ -42,7 +42,7 @@ uv run scripts/make_splits.py       # rebuild the dev and test splits
 uv run scripts/build_rhymes.py      # recount src/boi/rhymes.py from dev
 uv run scripts/mine_rules.py        # contexts where dev agrees and the rules do not
 uv run scripts/check_robustness.py  # whether a misspelling reads like the word
-uv run pytest                       # 740 tests
+uv run pytest                       # 744 tests
 ```
 
 `data/eval_v0.csv` has one row per word: `word`, `arpabet`, `vi_form`, `alt_forms`, `vi_native` (the Vietnamese word for the thing, where one exists), `tags`, `confidence` and `status`. Change a reading in `scripts/build_eval.py`, which generates the CSV, not in the CSV itself.
