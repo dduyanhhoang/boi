@@ -98,7 +98,10 @@ def main():
     size += write(OUT / "index.json", {
         "words": total,
         "counts": counts,
-        "examples": [[w, generate.candidates(w, limit=1)[0]] for w in EXAMPLES],
+        # The phones let the empty page's demo group each example as the
+        # generator does.
+        "examples": [[w, generate.candidates(w, limit=1)[0], " ".join(g2p.phones(w))]
+                     for w in EXAMPLES],
         "gold": len(gold),
         "agree": agree,
     })

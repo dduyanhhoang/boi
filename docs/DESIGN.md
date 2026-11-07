@@ -85,7 +85,28 @@ the one thing a static list cannot show. It replaces the `How it got there`
 disclosure, which hid the derivation behind a click nobody made. `Play again`
 replays it; under reduced motion all three stages are simply present.
 
-Nothing else on the page animates beyond its own state change.
+Beyond these two and the empty page's demonstration below, nothing on the
+page animates beyond its own state change.
+
+## The demonstration
+
+The empty page shows the tool working before anyone types: under the search
+field, an example word is taken through the pipeline, then the next, round
+and round. The word rises in, its sounds fade in one at a time, then 1px rules
+divide them into syllables, which rise in the data hue with their tones
+under them. Each word holds for 2.6s and fades out.
+
+The ledger allows no decorative animation and no effect on page load. This is
+neither: it is the tool's real output, the same grouping the derivation
+shows, built from the browser pipeline with the examples' phones, and it uses
+only the page's own motion, a fade or an 8px rise at 120 to 200ms. The owner
+asked for it.
+
+It pauses while the pointer or keyboard focus is on it, while it is off
+screen and while the tab is hidden. Its pause button is there because WCAG
+2.2.2 asks for one on anything that moves for longer than five seconds.
+Under reduced motion it starts paused on a finished word. Clicking the word
+opens it.
 
 ## The derivation
 

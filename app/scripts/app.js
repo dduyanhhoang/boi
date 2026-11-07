@@ -2,6 +2,8 @@
 // scripts/build_web_data.py, so this file only looks them up, works out the
 // tone of each syllable, and keeps the URL in step with what is on screen.
 
+import { startDemo } from "./demo.js";
+
 const TONE_MARKS = {
   "̀": "huyền",
   "́": "sắc",
@@ -43,14 +45,21 @@ function toneOf(syllable) {
   return "ngang";
 }
 
+/** The pipeline and its tables, without the 325 KB word list, for the demo. */
+let pipeline = null;
+function loadPipeline() {
+  pipeline ??= Promise.all([import("./oov.js"), fetch("./data/tables.json").then((r) => r.json())])
+    .then(([module, tables]) => ({ module, tables }));
+  return pipeline;
+}
+
 async function loadOov() {
   if (!oov) {
     oov = Promise.all([
-      import("./oov.js"),
-      fetch("./data/tables.json").then((r) => r.json()),
+      loadPipeline(),
       fetch("./data/words.txt").then((r) => r.text())
         .then((t) => new Set(t.split("\n"))),
-    ]).then(([module, tables, known]) => {
+    ]).then(([{ module, tables }, known]) => {
       oovReady = { module, tables, known };
       return oovReady;
     });
@@ -497,6 +506,8 @@ async function boot() {
     .map(([w, vi]) => `<li><button type="button" class="chip" data-word="${escapeHtml(w)}">
         <span class="chip-en">${escapeHtml(w)}</span>
         <span class="chip-vi" lang="vi">${escapeHtml(vi)}</span></button></li>`).join("");
+  startDemo(document.querySelector("#demo"), index.examples, loadPipeline(),
+            { toneOf, onPick: (w) => show(w) });
   // Read from the data rather than hard-coded, so the footer cannot go stale.
   el.count.textContent = index.words.toLocaleString("en-US");
   if (el.gold) el.gold.textContent = index.gold;
