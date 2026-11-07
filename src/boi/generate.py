@@ -88,6 +88,21 @@ def _acronym(word):
     return " ".join(spoken) if all(spoken) else None
 
 
+def _hints(word, phones):
+    """Which letters each vowel phone came from.
+
+    A word built from pieces lines up piece by piece: across the whole of
+    pneumonoultra the spelling sees one vowel in oul where the phones have
+    two, and every letter after it would be one vowel out.
+    """
+    pieces = g2p.parts(word)
+    if pieces:
+        groups = [spell.align_vowels(text, said) for text, said in pieces]
+        if all(g is not None for g in groups):
+            return [letter for g in groups for letter in g]
+    return spell.align_vowels(g2p.undoubled(word.lower()) or word, phones)
+
+
 def candidates(word, limit=5):
     """Ranked readings for one word. Empty list if the word has no phones."""
     # A memorised reading is about the word, not its spelling, so a doubled
@@ -102,7 +117,7 @@ def candidates(word, limit=5):
     # The letters have to be the ones the phones came from, or the two
     # disagree: commeent takes comment's phones and must take its letters
     # too, or the ee is read as a vowel of its own.
-    hints = spell.align_vowels(g2p.undoubled(word.lower()) or word, phones)
+    hints = _hints(word, phones)
     scored = {}
     for slots, structural in syllabify.variants(phones, hints):
         options = [_slot_options(s) for s in slots]

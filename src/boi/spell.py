@@ -27,6 +27,13 @@ CONSONANTS = {
 }
 # c and g soften before e, i and y: logitech, cinema.
 _SOFT = {"c": "S", "g": "JH"}
+# Silent only where the word starts: pneumonia, pterodactyl, against the p
+# of hypnosis and captain.
+WORD_INITIAL = {"pn": "N", "pt": "T"}
+# Two vowel letters that are no digraph are two syllables, ra-di-o and
+# co-ni-o-sis, except an i after these, which is only a glide: na-tion,
+# vi-sion, spe-cial, re-gion.
+_GLIDE_I_AFTER = "cstxg"
 
 # Vowel graphemes. (stressed, unstressed) ARPAbet, before an r-colour check.
 DIGRAPHS = {
@@ -88,8 +95,16 @@ def _graphemes(word):
             if j < len(word) and word[j] in _GLIDE_LETTERS \
                     and word[i : j + 1] in DIGRAPHS:
                 j += 1
-            out.append(("v", word[i:j]))
+            if _hiatus(word, i, j):
+                out += [("v", word[i]), ("v", word[i + 1])]
+            else:
+                out.append(("v", word[i:j]))
             i = j
+            continue
+
+        if i == 0 and word[:2] in WORD_INITIAL:
+            out.append(("c", WORD_INITIAL[word[:2]]))
+            i = 2
             continue
 
         for size in (3, 2, 1):
@@ -113,6 +128,14 @@ def _graphemes(word):
         else:
             i += 1  # a letter with no rule
     return out
+
+
+def _hiatus(word, i, j):
+    """Whether the vowel letters word[i:j] are two syllables rather than one."""
+    pair = word[i:j]
+    if len(pair) != 2 or pair in DIGRAPHS or pair in IRREGULAR:
+        return False
+    return not (pair[0] == "i" and i and word[i - 1] in _GLIDE_I_AFTER)
 
 
 def _syllables(parts):

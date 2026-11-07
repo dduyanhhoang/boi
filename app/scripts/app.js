@@ -170,6 +170,14 @@ function fillGrouping(word, phones, best, module, tables, named) {
     </div>`).join("");
 }
 
+/** Where a word built from pieces got each one. */
+function fromParts(pieces) {
+  const list = (want) => escapeHtml(pieces.filter(([, isWord]) => isWord === want)
+    .map(([text]) => text).join(" + "));
+  const spelled = list(false);
+  return `${list(true)}, from CMUdict${spelled ? `; ${spelled}, off the spelling` : ""}`;
+}
+
 function renderResult(word, phones, readings, spelled = false, pieces = null, named = false) {
   current = { word, phones, readings, spelled, pieces, named };
   const [best, ...alts] = readings;
@@ -184,8 +192,9 @@ function renderResult(word, phones, readings, spelled = false, pieces = null, na
     note = `<p class="note note--spelled"><span class="note-label">Read off the
       spelling</span> CMUdict does not list this word</p>`;
   } else if (pieces) {
-    note = `<p class="note note--spelled"><span class="note-label">Read as a
-      compound</span> ${escapeHtml(pieces.join(" + "))}</p>`;
+    note = `<p class="note note--spelled"><span class="note-label">Read as ${
+      pieces.every(([, isWord]) => isWord) ? "a compound" : "its parts"}</span>
+      ${escapeHtml(pieces.map(([text]) => text).join(" + "))}</p>`;
   } else if (g) {
     const matches = [g.vi, ...g.alt].includes(best);
     note = matches
@@ -197,7 +206,7 @@ function renderResult(word, phones, readings, spelled = false, pieces = null, na
   const rows = [
     ["From", named ? "the names of its capitals"
       : spelled ? "the spelling, letter by letter"
-      : pieces ? `${escapeHtml(pieces.join(" + "))}, from CMUdict` : "CMUdict"],
+      : pieces ? fromParts(pieces) : "CMUdict"],
     alts.length
       ? ["Also", `<span class="alts">${alts
           .map((a) => `<button type="button" data-swap="${escapeHtml(a)}">${escapeHtml(a)}</button>`)
@@ -264,21 +273,26 @@ async function lookup(w) {
     return { phones, readings: readings.split(";") };
   }
 
-  // A compound of known words beats reading the letters: poweroff is
-  // power plus off, with real phones for each half.
-  const pieces = module.splitInto(w, known);
+  // Known words beat reading the letters: poweroff is power plus off, with
+  // real phones for each half, and a long word that is mostly known words
+  // reads those and spells only what lies between them.
+  const pieces = module.splitInto(w, known)?.map((p) => [p, true])
+    ?? module.knownParts(w, known, tables);
   if (pieces) {
-    const shardsFor = await Promise.all(pieces.map((p) => shardFor(p[0])));
-    const phonesOf = (piece) => {
-      const found = shardsFor[pieces.indexOf(piece)][piece];
+    const words = pieces.filter(([, isWord]) => isWord).map(([text]) => text);
+    const shardsFor = new Map(await Promise.all(
+      words.map(async (text) => [text, await shardFor(text[0])])));
+    const phonesOf = (text) => {
+      const found = shardsFor.get(text)[text];
       return found ? found.split("|")[0].split(" ") : null;
     };
-    const phones = module.compoundPhones(pieces, phonesOf, tables);
     // The letters have to go with the phones or every rule keyed on
     // spelling reads blind: in phô mây sừn, not in phơ mây sa.
-    const readings = module.candidatesFromPhones(
-      phones, tables, 5, module.alignVowels(w, phones, tables));
-    if (readings.length) return { phones: phones.join(" "), readings, pieces };
+    const { phones, letters } = module.partsPhones(w, pieces, phonesOf, tables);
+    const readings = module.candidatesFromPhones(phones, tables, 5, letters);
+    if (readings.length) {
+      return { phones: phones.join(" "), readings, pieces };
+    }
   }
 
   const { phones, readings } = module.readUnknown(w, tables, 5);

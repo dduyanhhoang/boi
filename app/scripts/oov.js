@@ -37,8 +37,15 @@ function graphemes(word, T) {
           && word.slice(i, j + 1) in T.spell.digraphs) {
         j += 1;
       }
-      out.push(["v", word.slice(i, j)]);
+      if (hiatus(word, i, j, T)) out.push(["v", word[i]], ["v", word[i + 1]]);
+      else out.push(["v", word.slice(i, j)]);
       i = j;
+      continue;
+    }
+
+    if (i === 0 && word.slice(0, 2) in T.spell.wordInitial) {
+      out.push(["c", [T.spell.wordInitial[word.slice(0, 2)]]]);
+      i = 2;
       continue;
     }
 
@@ -64,6 +71,13 @@ function graphemes(word, T) {
     if (!matched) i += 1;
   }
   return out;
+}
+
+/** spell._hiatus: two vowel letters that are no digraph are two syllables. */
+function hiatus(word, i, j, T) {
+  const pair = word.slice(i, j);
+  if (pair.length !== 2 || pair in T.spell.digraphs || pair in T.spell.irregular) return false;
+  return !(pair[0] === "i" && i > 0 && T.spell.glideIAfter.includes(word[i - 1]));
 }
 
 function spellSyllables(parts, T) {
@@ -443,6 +457,9 @@ function nucleusOptions(phone, stress, closed, nextCoda, final, glide, onset,
   if (phone === "AH" && stress === "1" && ["S", "V"].includes(nextCoda[0])) {
     return P.ahBeforeSV;
   }
+  if (phone === "AH" && ["1", "2"].includes(stress) && letter === "u" && nextCoda[0] === "L") {
+    return P.ahSpelledUBeforeL;
+  }
   // An unstressed u closed by an l takes the l as an a: sờ ke đùa. Stressed
   // it does not, which is cu and sờ cun.
   if (["UH", "UW"].includes(phone) && stress === "0"
@@ -786,20 +803,55 @@ export function splitInto(word, known) {
   return pieces && pieces.length > 1 ? pieces : null;
 }
 
-/** Phones for a split; only the first piece keeps primary stress. */
-export function compoundPhones(pieces, phonesOf, T) {
+/**
+ * g2p._known_parts: a word nobody lists as the known words in it, of
+ * T.g2p.minKnown letters or more, and the letters between them. Null unless
+ * the known words make up at least half the word.
+ */
+export function knownParts(word, known, T) {
   const out = [];
-  pieces.forEach((piece, n) => {
+  let gap = "", i = 0;
+  while (i < word.length) {
+    let j = word.length;
+    // A known word may not end inside a vowel digraph: shope out of shopee.
+    while (j >= i + T.g2p.minKnown
+           && (!known.has(word.slice(i, j)) || word.slice(j - 1, j + 1) in T.spell.digraphs)) j -= 1;
+    if (j >= i + T.g2p.minKnown) {
+      if (gap) out.push([gap, false]);
+      out.push([word.slice(i, j), true]);
+      gap = "";
+      i = j;
+    } else {
+      gap += word[i];
+      i += 1;
+    }
+  }
+  if (gap) out.push([gap, false]);
+  const knownLetters = out.reduce((n, [text, isWord]) => n + (isWord ? text.length : 0), 0);
+  return 2 * knownLetters >= word.length && out.length > 1 ? out : null;
+}
+
+/**
+ * g2p.parts and generate._hints: the phones of a word built from pieces, each
+ * known piece said as it is alone and each gap read off its spelling, with
+ * only the first keeping primary stress; and its letters, lined up piece by
+ * piece, since across a join the spelling and the phones count vowels apart.
+ */
+export function partsPhones(word, pieces, phonesOf, T) {
+  const phones = [], letters = [];
+  let aligned = true;
+  pieces.forEach(([text, isWord], n) => {
     // A compound is words said one after another, so each piece takes the
     // form it has alone. CMUdict lists and reduced first, as AH0 N D.
-    const cited = T?.g2p?.citation?.[piece];
-    const phones = cited ? cited.split(" ") : phonesOf(piece);
-    if (!phones) return;
-    for (const phone of phones) {
-      out.push(n && phone.endsWith("1") ? phone.replace("1", "2") : phone);
-    }
+    const cited = isWord ? T.g2p.citation[text] : null;
+    const said = (cited ? cited.split(" ") : isWord ? phonesOf(text) : spellPhones(text, T)) || [];
+    const demoted = said.map((p) => (n && p.endsWith("1") ? p.replace("1", "2") : p));
+    phones.push(...demoted);
+    const groups = alignVowels(text, demoted, T);
+    if (groups) letters.push(...groups);
+    else aligned = false;
   });
-  return out;
+  return { phones, letters: aligned ? letters : alignVowels(word, phones, T) };
 }
 
 /** Read a word the shards do not have, off its spelling. */

@@ -34,6 +34,7 @@ def dict_keys(d):
 def main():
     tables = {
         "g2p": {
+            "minKnown": g2p._MIN_KNOWN,
             # The nine words CMUdict lists reduced-first; a compound piece
             # takes the form it has when said alone.
             "citation": {w: " ".join(ph)
@@ -46,6 +47,8 @@ def main():
             "consonants": {k: list(v) if isinstance(v, tuple) else [v]
                            for k, v in spell.CONSONANTS.items()},
             "soft": spell._SOFT,
+            "wordInitial": spell.WORD_INITIAL,
+            "glideIAfter": spell._GLIDE_I_AFTER,
             "digraphs": spell.DIGRAPHS,
             "single": {k: list(v) for k, v in spell.SINGLE.items()},
             "rColoured": spell.R_COLOURED,
@@ -93,6 +96,7 @@ def main():
             "longABeforeT": phonemap.LONG_A_BEFORE_T,
             "uBeforeL": phonemap.U_BEFORE_L,
             "ahBeforeSV": phonemap.AH_BEFORE_S_V,
+            "ahSpelledUBeforeL": phonemap.AH_SPELLED_U_BEFORE_L,
             "ayBeforeM": phonemap.AY_BEFORE_M,
             "jhBeforeBack": phonemap.JH_BEFORE_BACK,
             "jhTakesD": sorted(phonemap._JH_TAKES_D),

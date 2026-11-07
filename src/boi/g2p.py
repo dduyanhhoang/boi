@@ -5,7 +5,9 @@ Three sources, in order of how much they can be trusted:
 1. CMUdict, plus the handful of compounds it lacks.
 2. A split into CMUdict words, for the compounds nobody lists: poweroff is
    power plus off, grabfood is grab plus food. Real phones, so this beats
-   reading the letters whenever it finds a split.
+   reading the letters whenever it finds a split. Failing a whole split, a
+   long word that is mostly known words is read as those words, with only
+   the letters between them read off the spelling.
 3. g2p_en, if it is installed (`uv sync --extra oov`). docs/brief.md allows it
    only as this fallback; it pulls in numpy and nltk and downloads a tagger on
    first use, so it stays optional.
@@ -37,6 +39,9 @@ COMPOUNDS = {
 
 # A piece shorter than this makes for junk splits: shopee is not shop plus ee.
 _MIN_PIECE = 3
+# Inside a word that is only partly known, shorter words turn up by chance:
+# pneumono holds mono.
+_MIN_KNOWN = 5
 
 
 def _split(word, _cache={}):
@@ -87,16 +92,57 @@ def _citation(piece):
     return entries[0]
 
 
-def _compound(word):
-    """Phones for a split, with only the first piece keeping primary stress."""
-    pieces = _split(word)
+def _known_parts(word):
+    """The word as the known words in it and the letters between, or None.
+
+    For a long word nobody lists that is built from words somebody does:
+    pneumonoultramicroscopicsilicovolcanoconiosis holds pneumo, ultra,
+    microscopic and volcano. Longest word first, left to right. None unless
+    known words make up at least half the letters, so a name is not mined
+    for whatever dictionary words it happens to contain.
+    """
+    out, gap, i = [], "", 0
+    while i < len(word):
+        # A known word may not end inside a vowel digraph: shopee holds the
+        # surname shope, which would leave efood to spell out of shopeefood.
+        j = next((j for j in range(len(word), i + _MIN_KNOWN - 1, -1)
+                  if word[i:j] in _DICT and word[j - 1 : j + 1] not in spell.DIGRAPHS), None)
+        if j:
+            out += [(gap, False)] if gap else []
+            out.append((word[i:j], True))
+            gap, i = "", j
+        else:
+            gap, i = gap + word[i], i + 1
+    out += [(gap, False)] if gap else []
+    known = sum(len(text) for text, is_word in out if is_word)
+    return out if 2 * known >= len(word) and len(out) > 1 else None
+
+
+def parts(word):
+    """The pieces an unlisted word's phones are built from, as (letters, phones).
+
+    A whole split into CMUdict words, or failing that its known words and the
+    letters between them, read off the spelling. Only the first piece keeps
+    primary stress. None for a word CMUdict lists, or one with neither.
+    """
+    w = word.lower()
+    if w in _DICT or w in COMPOUNDS or undoubled(w):
+        return None
+    pieces = [(p, True) for p in _split(w)] if _split(w) else _known_parts(w)
     if not pieces:
         return None
     out = []
-    for n, piece in enumerate(pieces):
-        for phone in _citation(piece):
-            out.append(phone.replace("1", "2") if n and phone.endswith("1") else phone)
+    for n, (text, is_word) in enumerate(pieces):
+        said = _citation(text) if is_word else spell.phones(text) or []
+        out.append((text, [p.replace("1", "2") if n and p.endswith("1") else p
+                           for p in said]))
     return out
+
+
+def _compound(word):
+    """Phones for a split, whole or partial."""
+    pieces = parts(word)
+    return [p for _, said in pieces for p in said] if pieces else None
 
 
 def _predicted(word):
@@ -216,7 +262,7 @@ def source(word):
         return "compound"
     if undoubled(w):
         return "cmudict"
-    if _split(w):
+    if _split(w) or _known_parts(w):
         return "compound"
     if _predicted(w):
         return "g2p_en"

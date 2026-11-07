@@ -32,7 +32,7 @@ pytestmark = pytest.mark.skipif(shutil.which("node") is None,
                                 reason="node is needed to run the browser pipeline")
 
 
-def python_reading(word, limit=3, phones=None):
+def python_reading(word, limit=3, phones=None, hints=None):
     """generate.candidates without the lexicon, on the phones given.
 
     Without phones it takes the spelling path, which is what the browser does
@@ -46,7 +46,7 @@ def python_reading(word, limit=3, phones=None):
     import itertools
 
     scored = {}
-    hints = spell.align_vowels(word, phones)
+    hints = hints if hints is not None else spell.align_vowels(word, phones)
     for slots, structural in syllabify.variants(phones, hints):
         options = [generate._slot_options(s) for s in slots]
         if not all(options):
@@ -76,6 +76,8 @@ def sample_words():
     words += ["logitech", "lazada", "zalopay", "vinfast", "momo", "shopee",
               "grabfood", "techcombank", "baemin", "gojek", "canva", "figma",
               "hmm", "shh", "zzz", "brrr", "qwerty", "xyzzy",
+              # a silent p, and vowel pairs that are two syllables or one
+              "pneumono", "pterosaur", "pneuvax", "coniosis", "radiola", "duophone",
               # compounds, which exercise splitInto
               "poweroff", "blackpink", "airpod", "facetime", "skincare",
               "screensaver", "keyboardwarrior", "icecream", "sunflower"]
@@ -109,6 +111,21 @@ def real_pairs():
     return [(w, g2p.phones(w)) for w in sorted(words) if g2p.phones(w)]
 
 
+def pieces(word):
+    """g2p.parts' pieces with whether each is a known word."""
+    split = g2p._split(word)
+    return [(p, True) for p in split] if split else g2p._known_parts(word)
+
+
+def built_words(words):
+    """Words read from pieces: the long ones nobody lists, then any sample word that splits."""
+    long = ["pneumonoultramicroscopicsilicovolcanoconiosis",
+            "supercalifragilisticexpialidocious", "floccinaucinihilipilification",
+            "hippopotomonstrosesquippedaliophobia", "electroencephalographically",
+            "ultramicroscopic", "radiotherapist", "pneumonovolcanic"]
+    return [w for w in long + words if g2p.parts(w)]
+
+
 def acronym_tokens():
     """Cased input, since the acronym rules are the only ones that read case."""
     rng = random.Random(SEED + 2)
@@ -133,7 +150,9 @@ def test_browser_pipeline_matches_python():
     known = sorted(w for w in cmudict.dict() if w.isalpha() and len(w) >= 3)
     payload = {"tables": json.loads(TABLES.read_text(encoding="utf-8")),
                "words": words, "known": known, "pairs": pairs,
-               "acronyms": acronym_tokens()}
+               "acronyms": acronym_tokens(),
+               "parts": [[w, {text: g2p.phones(text) for text, is_word in pieces(w) if is_word}]
+                         for w in built_words(words)]}
 
     done = subprocess.run(
         ["node", str(RUNNER)],
@@ -167,11 +186,23 @@ def test_browser_pipeline_matches_python():
         if got["letters"] != letters.read(word):
             mismatches.append(
                 f"{word} letters\n  py {letters.read(word)}\n  js {got['letters']}")
+        want_known = g2p._known_parts(word)
+        if got["known"] != ([list(p) for p in want_known] if want_known else None):
+            mismatches.append(f"{word} known parts\n  py {want_known}\n  js {got['known']}")
         if got["split"] != g2p._split(word):
             mismatches.append(
                 f"{word} split\n  py {g2p._split(word)}\n  js {got['split']}")
         if len(mismatches) >= 8:
             break
+
+    for word, _ in payload["parts"]:
+        said = g2p._compound(word)
+        want = python_reading(word, phones=said, hints=generate._hints(word, said))[1]
+        got = out["parts"][word]
+        if got["pieces"] != [list(p) for p in pieces(word)] or got["phones"] != said \
+                or got["readings"] != want:
+            mismatches.append(f"{word} parts\n  py {pieces(word)} {said} {want}"
+                              f"\n  js {got['pieces']} {got['phones']} {got['readings']}")
 
     assert not mismatches, (
         f"{len(mismatches)}+ disagreements between the Python pipeline and "

@@ -427,3 +427,34 @@ def test_letter_and_digit_names_are_legal_vietnamese(name):
     syls = vi.parse_word(name)
     assert all(vi.is_legal(s) for s in syls)
     assert vi.render_word(syls) == name
+
+
+def test_a_long_word_reads_the_words_inside_it():
+    word = "pneumonoultramicroscopicsilicovolcanoconiosis"
+    assert [text for text, _ in g2p.parts(word)] == [
+        "pneumo", "no", "ultra", "microscopic", "silico", "volcano", "coniosis"]
+    # mai from micro and cây from volcano are CMUdict's; un from the u of ultra.
+    assert generate.read(word).split()[:8] == ["nu", "mô", "nô", "un", "tra", "mai", "cờ", "rô"]
+    assert "cây nô" in generate.read(word)
+
+
+@pytest.mark.parametrize("word", ["logitech", "techcombank", "shopee", "zalopay"])
+def test_a_name_is_not_mined_for_dictionary_words(word):
+    assert g2p._known_parts(word) is None
+
+
+@pytest.mark.parametrize("word,phones", [
+    ("pneumono", "N UW1 M OW0 N OW2"),          # a word-initial pn drops its p
+    ("hypnosis", "HH IH1 P N OW0 S IH2 S"),     # and only there
+    ("coniosis", "K OW1 N IH0 OW0 S IH2 S"),    # io is two syllables
+    ("nation", "N AA1 T IH2 N"),                # but a glide after t
+    ("vision", "V AY1 S IH2 N"),
+])
+def test_spelling_silent_p_and_vowel_pairs(word, phones):
+    assert " ".join(spell.phones(word)) == phones
+
+
+@pytest.mark.parametrize("word,expected", [("ultra", "un tra"), ("multi", "mun ti"),
+                                           ("culture", "cun chờ")])
+def test_a_stressed_u_before_l_keeps_its_letter(word, expected):
+    assert generate.read(word) == expected

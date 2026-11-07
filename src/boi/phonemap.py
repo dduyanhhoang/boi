@@ -75,6 +75,7 @@ IOUS_ENDING = [("ơ", "", 0), ("i", "", 1)]
 A_BEFORE_TURE = [("â", "y", 0), ("a", "", 1)]
 U_BEFORE_L = [("uô", "", 0), ("u", "", 1)]
 AH_BEFORE_S_V = [("ơ", "", 0), ("ă", "", 1)]
+AH_SPELLED_U_BEFORE_L = [("u", "", 0), ("ơ", "", 1)]
 AY_BEFORE_M = [("a", "", 0), ("a", "i", 1)]
 EH_EA_BEFORE_D = [("ê", "", 0), ("e", "", 1)]
 
@@ -245,6 +246,9 @@ def nucleus_options(phone, stress, closed, next_coda, final=False, glide=False,
     # crush has one and takes ă. These are the two that were observed.
     if phone == "AH" and stress == "1" and next_coda[:1] in (("S",), ("V",)):
         return AH_BEFORE_S_V
+    # A stressed u before an l keeps its letter: un tra, mun ti, cun chờ.
+    if phone == "AH" and stress in ("1", "2") and letter == "u" and next_coda[:1] == ("L",):
+        return AH_SPELLED_U_BEFORE_L
     if phone in ("UH", "UW") and stress == "0" and next_coda == ("L",):
         return U_BEFORE_L
     if phone == "OW":
