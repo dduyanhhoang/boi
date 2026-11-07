@@ -30,6 +30,7 @@ uv sync
 uv run boi laptop wifi website
 uv run boi --all database      # ranked alternatives
 uv run boi --read ecology      # read off the letters: ê cô lô gi
+uv run boi USB ChatGPT MP3     # capitals name their letters: iu ét bi
 ```
 
 Any word works. 117,496 have a pronunciation in CMUdict, and the rest are read off their spelling.
@@ -48,7 +49,7 @@ Seven test rows were seen during development. Over the other 43, the rules alone
 ## Develop
 
 ```sh
-uv run pytest                          # 661 tests
+uv run pytest                          # 740 tests
 uv run eval/run_eval.py dev --errors   # what dev still gets wrong
 uv run scripts/build_web_data.py       # data for the playground, then:
 python3 -m http.server --directory app # localhost:8000

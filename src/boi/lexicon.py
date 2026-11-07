@@ -37,4 +37,11 @@ LEXICON = {
     "time": "tham",
     "system": "xít từm",
     "taxi": "tắc xi",         # AE + k is a in action, bách, nách, lách; s is x in 3 of 37
+    # Acronyms not said by naming their letters, so letters.NAMES cannot get
+    # them: OK would be âu cây, eSIM is not e-plus-letters and B2B has an
+    # English two where every other digit is Vietnamese.
+    "ok": "ô cây",
+    "vip": "víp",
+    "esim": "e xim",
+    "b2b": "bi tu bi",
 }

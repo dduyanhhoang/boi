@@ -10,9 +10,26 @@ beside it rather than in place of it.
 ecology is ê cô lô gi here, and medicine is mê đi xin.
 """
 
+import re
+
 from . import vi
 
 VOWELS = "aeiouy"
+
+# What each letter is called in an acronym, as the owner settled them: USB is
+# iu ét bi. Digits go one at a time and in Vietnamese: MP3 is em pi ba.
+NAMES = {
+    "a": "ây", "b": "bi", "c": "xi", "d": "đi", "e": "i", "f": "ép", "g": "gi",
+    "h": "ết", "i": "ai", "j": "giây", "k": "cây", "l": "eo", "m": "em",
+    "n": "en", "o": "âu", "p": "pi", "q": "kiu", "r": "a", "s": "ét", "t": "ti",
+    "u": "iu", "v": "vi", "w": "đáp bờ iu", "x": "ích", "y": "goai", "z": "di",
+}
+DIGITS = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"]
+# Where the rule in _spelled is wrong. CMUdict lacks the first group, though
+# people say them as words, and has the second as if they were words.
+AS_WORD = {"gif", "jpeg", "swot", "fomo", "zalo"}
+SPELL_OUT = {"gps", "ios"}
+_ACRONYM_MAX = 4        # past this a capitalised word is far likelier to be a word
 
 # Vowel groups. Single letters take their Vietnamese value: e is ê, o is ô.
 NUCLEUS = {
@@ -52,6 +69,53 @@ R_COLOURED = {"ê": "ơ", "i": "ơ", "u": "ơ", "ô": "ơ", "ơ": "ơ", "a": "a"
 # English allows these to open a syllable, so the whole run goes to the onset.
 ONSET_CLUSTERS = {"bl", "cl", "fl", "gl", "pl", "sl", "br", "cr", "dr", "fr",
                   "gr", "pr", "tr", "st", "sp", "sk", "sm", "sn", "sw", "tw"}
+
+
+def _spelled(run, ordinary):
+    """Whether a run of capitals is said letter by letter."""
+    word = run.lower()
+    if word in SPELL_OUT:
+        return True
+    if word in AS_WORD:
+        return False
+    if not any(c in VOWELS for c in word) or len(run) <= 2:
+        return True
+    return len(run) <= _ACRONYM_MAX and not ordinary(word)
+
+
+def _capital_parts(token, ordinary):
+    parts = []
+    for run in re.findall(r"[A-Z]+|[0-9]+", token):
+        if run.isdigit():
+            parts.append(("say", " ".join(DIGITS[int(d)] for d in run)))
+        elif len(run) == 1 or _spelled(run, ordinary):
+            parts.append(("say", " ".join(NAMES[c] for c in run.lower())))
+        else:
+            parts.append(("read", run.lower()))    # the COVID of COVID19
+    return parts
+
+
+def acronym_parts(word, ordinary):
+    """How to say a word written with capitals, or None if it is not an acronym.
+
+    Each part is ("say", the Vietnamese) or ("read", a word for the generator).
+    ordinary(word) says whether CMUdict has it as a word rather than its letters.
+    Only capitals count: usb and USB are different input on purpose.
+    """
+    head = ""
+    if re.fullmatch(r"[A-Z0-9]{2,}", word) and not word.isdigit():
+        tail = word
+    else:
+        match = re.fullmatch(r"([A-Za-z]*[a-z])([A-Z]{2,}[A-Z0-9]*)", word)
+        if not match:
+            return None
+        head, tail = match.groups()
+    parts = _capital_parts(tail, ordinary)
+    if all(kind == "read" for kind, _ in parts):
+        return None
+    if head:
+        parts.insert(0, ("say", NAMES[head]) if len(head) == 1 else ("read", head.lower()))
+    return parts
 
 
 def _vowel_runs(group):

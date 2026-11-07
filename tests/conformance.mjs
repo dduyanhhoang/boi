@@ -1,6 +1,7 @@
 // Reads {"tables": ..., "words": [...]} on stdin, prints the JS pipeline's
 // reading for each word. Used only by tests/test_js_conformance.py.
-import { readUnknown, readLetters, splitInto, candidatesFromPhones, alignVowels }
+import { readUnknown, readLetters, splitInto, candidatesFromPhones, alignVowels,
+         acronymParts }
   from "../app/scripts/oov.js";
 
 const input = JSON.parse(await new Promise((resolve) => {
@@ -24,4 +25,8 @@ for (const [word, phones] of input.pairs ?? []) {
   const letters = alignVowels(word, phones, input.tables);
   real[word] = { letters, readings: candidatesFromPhones(phones, input.tables, 3, letters) };
 }
-process.stdout.write(JSON.stringify({ spelled: out, real }));
+const acronyms = {};
+for (const word of input.acronyms ?? []) {
+  acronyms[word] = acronymParts(word, input.tables, known);
+}
+process.stdout.write(JSON.stringify({ spelled: out, real, acronyms }));

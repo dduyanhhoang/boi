@@ -109,6 +109,21 @@ def real_pairs():
     return [(w, g2p.phones(w)) for w in sorted(words) if g2p.phones(w)]
 
 
+def acronym_tokens():
+    """Cased input, since the acronym rules are the only ones that read case."""
+    rng = random.Random(SEED + 2)
+    upper, lower = string.ascii_uppercase, string.ascii_lowercase
+    words = ["USB", "IT", "OK", "NASA", "RAM", "GIF", "IOS", "GPS", "HTTPS", "UNESCO",
+             "ChatGPT", "iOS", "macOS", "eSIM", "iPhone", "MP3", "4G", "B2B", "A380",
+             "COVID19", "HTML5", "2024", "A", "usb", "mp3", "Chat", "ChatGPT4"]
+    for _ in range(300):
+        caps = "".join(rng.choice(upper) for _ in range(rng.randint(2, 6)))
+        words += [caps, caps + str(rng.randint(0, 99)),
+                  str(rng.randint(0, 9)) + caps,
+                  "".join(rng.choice(lower) for _ in range(rng.randint(1, 5))) + caps]
+    return sorted(set(words))
+
+
 def test_browser_pipeline_matches_python():
     assert TABLES.exists(), "run: uv run scripts/build_tables.py"
     words = sample_words()
@@ -117,7 +132,8 @@ def test_browser_pipeline_matches_python():
 
     known = sorted(w for w in cmudict.dict() if w.isalpha() and len(w) >= 3)
     payload = {"tables": json.loads(TABLES.read_text(encoding="utf-8")),
-               "words": words, "known": known, "pairs": pairs}
+               "words": words, "known": known, "pairs": pairs,
+               "acronyms": acronym_tokens()}
 
     done = subprocess.run(
         ["node", str(RUNNER)],
@@ -127,6 +143,11 @@ def test_browser_pipeline_matches_python():
     js, real = out["spelled"], out["real"]
 
     mismatches = []
+    for word in payload["acronyms"]:
+        want = letters.acronym_parts(word, g2p.ordinary_word)
+        want = [list(p) for p in want] if want else None
+        if out["acronyms"][word] != want:
+            mismatches.append(f"{word} acronym\n  py {want}\n  js {out['acronyms'][word]}")
     for word, phones in pairs:
         want = python_reading(word, phones=phones)[1]
         got = real[word]["readings"]

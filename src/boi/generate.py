@@ -70,12 +70,22 @@ def _slot_options(slot):
     return best[:PER_SLOT]
 
 
+def _acronym(word):
+    """The reading of a word written with capitals, or None if it is not one."""
+    parts = letters.acronym_parts(word, g2p.ordinary_word)
+    if not parts:
+        return None
+    spoken = [read(text) if kind == "read" else text for kind, text in parts]
+    return " ".join(spoken) if all(spoken) else None
+
+
 def candidates(word, limit=5):
     """Ranked readings for one word. Empty list if the word has no phones."""
     # A memorised reading is about the word, not its spelling, so a doubled
     # letter should not lose it: scheedule is sờ ke đùa too.
     fixed = (lexicon.LEXICON.get(word.lower())
-             or lexicon.LEXICON.get(g2p.undoubled(word.lower()) or ""))
+             or lexicon.LEXICON.get(g2p.undoubled(word.lower()) or "")
+             or _acronym(word))
     phones = g2p.phones(word)
     if phones is None:
         return [fixed] if fixed else []

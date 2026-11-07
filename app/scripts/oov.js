@@ -933,3 +933,36 @@ export function readLetters(word, T) {
   }
   return syllables.length ? syllables.map((s) => render(s, T)).join(" ") : null;
 }
+
+/* Acronyms: letters.acronym_parts ---------------------------------------- */
+
+function isSpelledRun(run, T, known) {
+  const word = run.toLowerCase();
+  if (T.letters.spellOut.includes(word)) return true;
+  if (T.letters.asWord.includes(word)) return false;
+  if (![...word].some((c) => T.letters.vowels.includes(c)) || run.length <= 2) return true;
+  return run.length <= T.letters.acronymMax
+    && (!known.has(word) || T.g2p.letterNamed.includes(word));
+}
+
+/** ["say", Vietnamese] and ["read", a word] parts, or null if not an acronym. */
+export function acronymParts(word, T, known) {
+  let head = "";
+  let tail = word;
+  if (!/^[A-Z0-9]{2,}$/.test(word) || /^[0-9]+$/.test(word)) {
+    const match = word.match(/^([A-Za-z]*[a-z])([A-Z]{2,}[A-Z0-9]*)$/);
+    if (!match) return null;
+    [, head, tail] = match;
+  }
+  const parts = tail.match(/[A-Z]+|[0-9]+/g).map((run) => {
+    if (/^[0-9]/.test(run)) {
+      return ["say", [...run].map((d) => T.letters.digits[Number(d)]).join(" ")];
+    }
+    return run.length === 1 || isSpelledRun(run, T, known)
+      ? ["say", [...run.toLowerCase()].map((c) => T.letters.names[c]).join(" ")]
+      : ["read", run.toLowerCase()];
+  });
+  if (parts.every(([kind]) => kind === "read")) return null;
+  if (head) parts.unshift(head.length === 1 ? ["say", T.letters.names[head]] : ["read", head.toLowerCase()]);
+  return parts;
+}

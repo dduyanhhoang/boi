@@ -128,9 +128,14 @@ function trace(word, phones, spelled) {
 }
 
 /** Fill the last stage once the pipeline is loaded. */
-function fillGrouping(word, phones, best, module, tables) {
+function fillGrouping(word, phones, best, module, tables, named) {
   const host = el.result.querySelector(".stage-groups");
   if (!host) return;
+  if (named) {
+    host.innerHTML = `<p class="stage-text stage-text--quiet">capitals name their letters,
+      so there is no derivation to show</p>`;
+    return;
+  }
   const list = (phones || "").split(" ").filter(Boolean);
   const collect = new Map();
   try {
@@ -156,14 +161,17 @@ function fillGrouping(word, phones, best, module, tables) {
     </div>`).join("");
 }
 
-function renderResult(word, phones, readings, spelled = false, pieces = null) {
-  current = { word, phones, readings, spelled, pieces };
+function renderResult(word, phones, readings, spelled = false, pieces = null, named = false) {
+  current = { word, phones, readings, spelled, pieces, named };
   const [best, ...alts] = readings;
   const syllables = best.split(" ");
   const g = gold[word];
 
   let note = "";
-  if (spelled) {
+  if (named) {
+    note = `<p class="note note--spelled"><span class="note-label">Read as an
+      acronym</span> capitals name their letters</p>`;
+  } else if (spelled) {
     note = `<p class="note note--spelled"><span class="note-label">Read off the
       spelling</span> CMUdict does not list this word</p>`;
   } else if (pieces) {
@@ -178,7 +186,8 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
   }
 
   const rows = [
-    ["From", spelled ? "the spelling, letter by letter"
+    ["From", named ? "the names of its capitals"
+      : spelled ? "the spelling, letter by letter"
       : pieces ? `${escapeHtml(pieces.join(" + "))}, from CMUdict` : "CMUdict"],
     alts.length
       ? ["Also", `<span class="alts">${alts
@@ -217,14 +226,72 @@ function renderResult(word, phones, readings, spelled = false, pieces = null) {
   // first paint, so the reading is never held up waiting for it.
   loadOov().then(({ module, tables }) => {
     if (!current || current.word !== word) return;
-    fillGrouping(word, phones, best, module, tables);
+    fillGrouping(word, phones, best, module, tables, named);
   });
 }
 
 /* Lookup --------------------------------------------------------------- */
 
+/** One lower-case word: precomputed, or worked out here. Null if unreadable. */
+async function lookup(w) {
+  const shard = await shardFor(w[0]);
+  const entry = shard[w];
+  if (entry) {
+    const [phones, readings] = entry.split("|");
+    return { phones, readings: readings.split(";") };
+  }
+
+  // Not one of the precomputed words, so run the pipeline here instead.
+  const { module, tables, known } = await loadOov();
+
+  // Shards hold CMUdict words only, and not every memorised word is one.
+  if (tables.lexicon[w]) return { phones: "", readings: [tables.lexicon[w]] };
+
+  // A doubled letter is the commonest misspelling, and collapsing it often
+  // lands on a word we already have: dissneeland reads as disneyland does.
+  const plain = module.undoubled(w, (c) => c in shard);
+  if (plain) {
+    const [phones, readings] = shard[plain].split("|");
+    return { phones, readings: readings.split(";") };
+  }
+
+  // A compound of known words beats reading the letters: poweroff is
+  // power plus off, with real phones for each half.
+  const pieces = module.splitInto(w, known);
+  if (pieces) {
+    const shardsFor = await Promise.all(pieces.map((p) => shardFor(p[0])));
+    const phonesOf = (piece) => {
+      const found = shardsFor[pieces.indexOf(piece)][piece];
+      return found ? found.split("|")[0].split(" ") : null;
+    };
+    const phones = module.compoundPhones(pieces, phonesOf, tables);
+    // The letters have to go with the phones or every rule keyed on
+    // spelling reads blind: in phô mây sừn, not in phơ mây sa.
+    const readings = module.candidatesFromPhones(
+      phones, tables, 5, module.alignVowels(w, phones, tables));
+    if (readings.length) return { phones: phones.join(" "), readings, pieces };
+  }
+
+  const { phones, readings } = module.readUnknown(w, tables, 5);
+  return readings.length
+    ? { phones: (phones || []).join(" "), readings, spelled: true }
+    : null;
+}
+
+/** The reading of a word typed with capitals, or null if it is not an acronym. */
+async function readAcronym(raw) {
+  const { module, tables, known } = await loadOov();
+  if (tables.lexicon[raw.toLowerCase()]) return null;
+  const parts = module.acronymParts(raw, tables, known);
+  if (!parts) return null;
+  const spoken = await Promise.all(parts.map(async ([kind, text]) =>
+    (kind === "say" ? text : (await lookup(text))?.readings[0])));
+  return spoken.every(Boolean) ? spoken.join(" ") : null;
+}
+
 async function show(word, { push = true } = {}) {
-  const w = word.trim().toLowerCase();
+  const raw = word.trim();
+  const w = raw.toLowerCase();
   closeSuggestions();
   if (!w) {
     renderEmpty();
@@ -235,55 +302,17 @@ async function show(word, { push = true } = {}) {
   el.clear.hidden = false;
   el.submit.disabled = false;
 
-  const pending = shardFor(w[0]);
   const timer = setTimeout(renderLoading, 120);
-  const shard = await pending;
+  // Only capitals can make an acronym, so lower case never waits for the pipeline.
+  const acronym = raw === w ? null : await readAcronym(raw);
+  const found = acronym ? null : await lookup(w);
   clearTimeout(timer);
 
-  const entry = shard[w];
-  if (entry) {
-    const [phones, readings] = entry.split("|");
-    renderResult(w, phones, readings.split(";"));
-  } else {
-    // Not one of the precomputed words, so run the pipeline here instead.
-    renderLoading();
-    const { module, tables, known } = await loadOov();
-
-    // A doubled letter is the commonest misspelling, and collapsing it often
-    // lands on a word we already have: dissneeland reads as disneyland does.
-    const plain = module.undoubled(w, (c) => c in shard);
-    if (plain) {
-      const [phones, readings] = shard[plain].split("|");
-      renderResult(w, phones, readings.split(";"));
-      return;
-    }
-
-    // A compound of known words beats reading the letters: poweroff is
-    // power plus off, with real phones for each half.
-    const pieces = module.splitInto(w, known);
-    if (pieces) {
-      const shardsFor = await Promise.all(pieces.map((p) => shardFor(p[0])));
-      const phonesOf = (piece) => {
-        const found = shardsFor[pieces.indexOf(piece)][piece];
-        return found ? found.split("|")[0].split(" ") : null;
-      };
-      const phones = module.compoundPhones(pieces, phonesOf, tables);
-      // The letters have to go with the phones or every rule keyed on
-      // spelling reads blind: in phô mây sừn, not in phơ mây sa.
-      const readings = module.candidatesFromPhones(
-        phones, tables, 5, module.alignVowels(w, phones, tables));
-      if (readings.length) {
-        renderResult(w, phones.join(" "), readings, false, pieces);
-        if (push) setUrl(w);
-        return;
-      }
-    }
-
-    const { phones, readings } = module.readUnknown(w, tables, 5);
-    if (!readings.length) renderMissing(w);
-    else renderResult(w, (phones || []).join(" "), readings, true);
-  }
-  if (push) setUrl(w);
+  if (acronym) renderResult(raw, "", [acronym], false, null, true);
+  else if (found) renderResult(w, found.phones, found.readings, found.spelled, found.pieces);
+  else renderMissing(w);
+  // The capitals are the input here, so a shared link has to keep them.
+  if (push) setUrl(acronym ? raw : w);
 }
 
 function setUrl(word) {
@@ -406,7 +435,7 @@ document.addEventListener("click", (e) => {
     if (reading === current.readings[0]) return;
     const reordered = [reading, ...current.readings.filter((r) => r !== reading)];
     renderResult(current.word, current.phones, reordered,
-                 current.spelled, current.pieces);
+                 current.spelled, current.pieces, current.named);
   }
 });
 

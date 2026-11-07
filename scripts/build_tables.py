@@ -38,6 +38,7 @@ def main():
             # takes the form it has when said alone.
             "citation": {w: " ".join(ph)
                          for w, ph in g2p.citation_table().items()},
+            "letterNamed": g2p.letter_named_words(),
         },
         "spell": {
             "vowels": spell.VOWELS,
@@ -145,6 +146,11 @@ def main():
             "onsetClusters": sorted(letters.ONSET_CLUSTERS),
             "glideLetters": letters._GLIDE_LETTERS,
             "stops": letters._STOPS,
+            "names": letters.NAMES,
+            "digits": letters.DIGITS,
+            "asWord": sorted(letters.AS_WORD),
+            "spellOut": sorted(letters.SPELL_OUT),
+            "acronymMax": letters._ACRONYM_MAX,
         },
         "lexicon": lexicon.LEXICON,
     }

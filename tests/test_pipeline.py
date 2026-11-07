@@ -354,3 +354,72 @@ def test_undoubled_only_answers_for_real_words():
     assert g2p.undoubled("offliine") == "offline"
     assert g2p.undoubled("mousse") is None      # a word in its own right
     assert g2p.undoubled("disneyland") is None  # nothing doubled
+
+
+@pytest.mark.parametrize("word,expected", [
+    ("USB", "iu ét bi"),            # letter-named in CMUdict
+    ("GPT", "gi pi ti"),            # not in CMUdict
+    ("IT", "ai ti"),                # two letters always spell, even a real word
+    ("AI", "ây ai"),
+    ("HR", "ết a"),
+    ("SMS", "ét em ét"),            # names stay whole, nothing resyllabifies
+    ("SQL", "ét kiu eo"),
+    ("KPI", "cây pi ai"),
+    ("CEO", "xi i âu"),
+    ("BMW", "bi em đáp bờ iu"),
+    ("XYZ", "ích goai di"),
+    ("HTML", "ết ti em eo"),
+    ("HTTPS", "ết ti ti pi ét"),    # no vowel, so past the length limit
+    ("GPS", "gi pi ét"),            # CMUdict has it as a word, wrongly
+    ("IOS", "ai âu ét"),
+    ("TV", "ti vi"),
+])
+def test_capitals_spell_out_letter_names(word, expected):
+    assert generate.read(word) == expected
+
+
+@pytest.mark.parametrize("word,expected", [
+    ("ChatGPT", "chát gi pi ti"),   # a known word, then a capital tail
+    ("iOS", "ai âu ét"),            # one lower-case letter takes its name
+    ("eSIM", "e xim"),              # memorised, against the rule above
+    ("MP3", "em pi ba"),
+    ("4G", "bốn gi"),
+    ("K8S", "cây tám ét"),
+    ("A380", "ây ba tám không"),    # digit by digit
+    ("HTML5", "ết ti em eo năm"),
+    ("B2B", "bi tu bi"),            # memorised
+    ("OK", "ô cây"),                # memorised: said as in okay, not âu cây
+    ("VIP", "víp"),                 # memorised
+])
+def test_capital_tails_digits_and_memorised_forms(word, expected):
+    assert generate.read(word) == expected
+
+
+@pytest.mark.parametrize("word", [
+    "NASA", "RAM", "DATA", "FREE",  # 3 or 4 letters CMUdict has as a word
+    "LASER", "HELLO", "UNESCO",     # past the length limit
+    "GIF", "JPEG", "ZALO",          # said as words, though CMUdict lacks them
+    "A",                            # one letter is not an acronym
+    "iPhone", "YouTube",            # capitals inside a word, not at its end
+])
+def test_capitals_that_are_read_as_words(word):
+    assert generate.read(word) == generate.read(word.lower())
+
+
+@pytest.mark.parametrize("word,expected", [
+    ("usb", "diu ét bi"),           # lower case keeps the phones path
+    ("it", "ít"),
+])
+def test_lower_case_is_not_an_acronym(word, expected):
+    assert generate.read(word) == expected
+
+
+def test_numbers_alone_are_not_acronyms():
+    assert generate.read("2024") is None
+
+
+@pytest.mark.parametrize("name", [*letters.NAMES.values(), *letters.DIGITS])
+def test_letter_and_digit_names_are_legal_vietnamese(name):
+    syls = vi.parse_word(name)
+    assert all(vi.is_legal(s) for s in syls)
+    assert vi.render_word(syls) == name

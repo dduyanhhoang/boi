@@ -165,6 +165,33 @@ def _spelled_out(word, entries):
     return None
 
 
+# What CMUdict says when it spells a word out: USB is Y UW EH S B IY.
+_LETTER_PHONES = {
+    "a": "EY", "b": "B IY", "c": "S IY", "d": "D IY", "e": "IY", "f": "EH F",
+    "g": "JH IY", "h": "EY CH", "i": "AY", "j": "JH EY", "k": "K EY", "l": "EH L",
+    "m": "EH M", "n": "EH N", "o": "OW", "p": "P IY", "q": "K Y UW", "r": "AA R",
+    "s": "EH S", "t": "T IY", "u": "Y UW", "v": "V IY", "w": "D AH B AH L Y UW",
+    "x": "EH K S", "y": "W AY", "z": "Z IY",
+}
+
+
+def _letter_named(word):
+    said = " ".join(_LETTER_PHONES[c] for c in word)
+    return any(" ".join(p.rstrip("012") for p in entry) == said
+               for entry in _DICT.get(word, []))
+
+
+def ordinary_word(word):
+    """CMUdict has this lower-case word, and not as the names of its letters."""
+    return word in _DICT and not _letter_named(word)
+
+
+def letter_named_words():
+    """The short words CMUdict spells out, for the browser, which has no phones."""
+    return sorted(w for w in _DICT if len(w) in (3, 4) and w.isascii() and w.isalpha()
+                  and _letter_named(w))
+
+
 def phones(word, predict=True):
     """Phones for any word. None only when there are no letters to read."""
     w = word.lower()
