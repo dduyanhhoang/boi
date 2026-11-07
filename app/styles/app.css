@@ -14,6 +14,7 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
+  font-variant-numeric: tabular-nums;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -27,29 +28,21 @@ body {
 }
 
 /* Browser surfaces belong to the design, not to the browser. */
-::selection { background: var(--accent-wash); color: var(--label); }
+::selection { background: var(--control); color: var(--label); }
 :where(input, textarea) { caret-color: var(--accent); }
 :where(a, button, input, [tabindex]):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: var(--radius-capsule);
 }
-* { scrollbar-width: thin; scrollbar-color: var(--label-tertiary) transparent; }
-::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-thumb {
-  background: var(--label-tertiary);
-  border: 3px solid transparent;
-  border-radius: var(--radius-capsule);
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--label-secondary); background-clip: content-box; }
+* { border-radius: 0; scrollbar-width: thin; scrollbar-color: var(--control) transparent; }
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px;
   padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
 
-/* Toolbar: the one glass element on the page ------------------------- */
+/* Toolbar: flat, on the page's ground; its rule appears once the page has
+   scrolled under it (app.js sets .scrolled). */
 .toolbar {
   position: sticky;
   top: 0;
@@ -58,52 +51,31 @@ body {
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
-  background: var(--material-opaque);
-  border-bottom: 1px solid var(--material-border);
+  background: var(--bg);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--duration-state) var(--ease);
 }
-
-@supports (backdrop-filter: blur(1px)) {
-  .toolbar {
-    background: var(--material);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .toolbar { background: var(--material-opaque); backdrop-filter: none; -webkit-backdrop-filter: none; }
-}
+.toolbar.scrolled { border-bottom-color: var(--separator); }
 
 /* The app's one h1, on every view: an app screen names itself in the shell,
    and the reading on a result is the content under it, not its title. */
 .wordmark {
   margin: 0 auto 0 0;
   font-size: var(--text-headline);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.01em;
 }
 .wordmark a {
   display: inline-block;
   margin-inline-start: calc(var(--space-2) * -1);
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-capsule);
   color: inherit;
   text-decoration: none;
   transition: background var(--duration-state) var(--ease),
               color var(--duration-state) var(--ease);
 }
-.wordmark a:hover { background: var(--accent-wash); color: var(--accent-text); }
-
-/* Scroll edge effect: content fades out under the bar. */
-.scroll-edge {
-  position: sticky;
-  top: calc(var(--space-3) * 2 + var(--leading-headline) * var(--text-headline));
-  z-index: 10;
-  height: var(--space-6);
-  margin-bottom: calc(var(--space-6) * -1);
-  background: linear-gradient(var(--bg), transparent);
-  pointer-events: none;
-}
+.wordmark a:hover { background: var(--rule); }
+.wordmark a:active { background: var(--bg-sunken); }
 
 /* Controls ----------------------------------------------------------- */
 .icon-button {
@@ -113,15 +85,14 @@ body {
   height: 44px;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-capsule);
   background: transparent;
   color: var(--label-secondary);
   cursor: pointer;
   transition: background var(--duration-state) var(--ease),
               color var(--duration-state) var(--ease);
 }
-.icon-button:hover { background: var(--accent-wash); color: var(--accent-text); }
-.icon-button:active { transform: scale(0.94); }
+.icon-button:hover { background: var(--rule); color: var(--label); }
+.icon-button:active { background: var(--bg-sunken); }
 .icon-button svg { width: 20px; height: 20px; }
 
 main {
@@ -141,16 +112,11 @@ main {
   gap: var(--space-2);
   padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
   background: var(--bg-elevated);
-  border: 1px solid var(--separator);
-  border-radius: var(--radius-input);
-  box-shadow: var(--shadow-1);
-  transition: border-color var(--duration-state) var(--ease),
-              box-shadow var(--duration-state) var(--ease);
+  border: 1px solid var(--control);
+  transition: border-color var(--duration-state) var(--ease);
 }
-.search-field:focus-within {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-1), 0 0 0 4px var(--accent-wash);
-}
+/* The field's border and a 1px outline make a 2px ink focus ring. */
+.search-field:focus-within { border-color: var(--accent); outline: 1px solid var(--accent); }
 .search-field > svg { flex: none; width: 20px; height: 20px; color: var(--label-secondary); }
 
 #word {
@@ -166,7 +132,6 @@ main {
 #word::placeholder { color: var(--label-secondary); }
 #word:focus { outline: none; }
 
-/* Concentric: field radius 28 minus 8 padding = 20 */
 .submit {
   flex: none;
   display: inline-grid;
@@ -174,15 +139,13 @@ main {
   width: 44px;
   height: 44px;
   border: 0;
-  border-radius: calc(var(--radius-input) - var(--space-2));
-  background: var(--accent-fill);
-  color: #fff;
+  background: var(--accent);
+  color: var(--accent-ink);
   cursor: pointer;
-  transition: opacity var(--duration-state) var(--ease),
-              transform var(--duration-state) var(--ease);
+  transition: opacity var(--duration-state) var(--ease);
 }
 .submit:hover { opacity: 0.88; }
-.submit:active { transform: scale(0.94); }
+.submit:active { opacity: 0.8; }
 .submit:disabled { background: var(--bg-sunken); color: var(--label-tertiary); cursor: default; }
 .submit svg { width: 20px; height: 20px; }
 
@@ -199,21 +162,18 @@ main {
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--bg-elevated);
-  border: 1px solid var(--popover-border);
-  border-radius: var(--radius-container);
-  box-shadow: var(--shadow-3);
+  border: 1px solid var(--control);
 }
 .suggestions:not([hidden]) { animation: lift var(--duration-enter) var(--ease); }
 .suggestions li {
   display: flex;
   align-items: baseline;
   gap: var(--space-3);
-  /* Concentric: container 20 minus 4 padding = 16 */
   padding: var(--space-2) var(--space-3);
-  border-radius: calc(var(--radius-container) - var(--space-1));
   cursor: pointer;
 }
-.suggestions li[aria-selected="true"] { background: var(--accent-wash); }
+.suggestions li:hover { background: var(--rule); }
+.suggestions li[aria-selected="true"] { background: var(--bg-sunken); }
 .suggestions .s-word { font-weight: 500; }
 .suggestions .s-read { margin-left: auto; color: var(--label-secondary); font-size: var(--text-subheadline); }
 
@@ -224,7 +184,7 @@ main {
   margin: 0 0 var(--space-6);
   font-size: var(--text-large-title);
   line-height: var(--leading-large-title);
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
@@ -241,10 +201,7 @@ main:has(#examples[hidden]) .lede { display: none; }
   gap: 2px;
   padding: var(--space-2) var(--space-4);
   min-height: 44px;           /* Apple's minimum target */
-  border: 1px solid var(--separator);
-  /* The card radius, not the capsule: with a reading under the word these
-     hold two lines, and a capsule turns a short one into a near-circle. */
-  border-radius: var(--radius-card);
+  border: 1px solid var(--control);
   background: var(--bg-elevated);
   color: var(--label);
   font: inherit;
@@ -253,10 +210,10 @@ main:has(#examples[hidden]) .lede { display: none; }
   transition: background var(--duration-state) var(--ease),
               border-color var(--duration-state) var(--ease);
 }
-.chip:hover { background: var(--accent-wash); border-color: var(--accent); }
+.chip:hover { background: var(--rule); }
+.chip:active { background: var(--bg-sunken); }
 .chip-en { font-size: var(--text-footnote); color: var(--label-secondary); }
-.chip-vi { font-weight: 600; color: var(--label); }
-.chip:hover .chip-vi { color: var(--accent-text); }
+.chip-vi { font-weight: 500; color: var(--label); }
 
 /* Result ------------------------------------------------------------- */
 .result { margin-top: var(--space-8); }
@@ -283,7 +240,7 @@ main:has(#examples[hidden]) .lede { display: none; }
   font-size: var(--text-display);
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-display);
-  font-weight: 600;
+  font-weight: 500;
   text-wrap: balance;
 }
 
@@ -298,14 +255,14 @@ main:has(#examples[hidden]) .lede { display: none; }
 .syllable {
   padding: var(--space-2) var(--space-4);
   background: var(--bg-elevated);
-  border: 1px solid var(--separator);
-  border-radius: var(--radius-card);
+  border: 1px solid var(--control);
   text-align: center;
   transition: background var(--duration-state) var(--ease),
               border-color var(--duration-state) var(--ease);
 }
-.syllable:hover { background: var(--accent-wash); border-color: var(--accent); }
-.syllable b { display: block; font-size: var(--text-title-3); font-weight: 600; }
+.syllable:hover { background: var(--data-wash); border-color: var(--data); }
+.syllable:hover b { color: var(--data); }
+.syllable b { display: block; font-size: var(--text-title-3); font-weight: 500; }
 .syllable span {
   display: block;
   margin-top: var(--space-1);
@@ -326,13 +283,12 @@ main:has(#examples[hidden]) .lede { display: none; }
 .second .pair { display: flex; align-items: center; gap: var(--space-3); }
 .second .label { white-space: nowrap; }
 .second .label a { color: inherit; text-underline-offset: 0.2em; }
-.second .label a:hover { color: var(--accent-text); }
-.second .agrees { color: var(--accent-text); font-size: var(--text-footnote); }
+.second .label a:hover { color: var(--label); }
+.second .agrees { color: var(--data); font-size: var(--text-footnote); }
 .second button {
   min-height: 36px;
   padding: var(--space-1) var(--space-4);
   border: 1px solid var(--separator);
-  border-radius: var(--radius-capsule);
   background: var(--bg-elevated);
   color: var(--label);
   font: inherit;
@@ -341,7 +297,7 @@ main:has(#examples[hidden]) .lede { display: none; }
   transition: background var(--duration-state) var(--ease),
               border-color var(--duration-state) var(--ease);
 }
-.second button:hover { background: var(--accent-wash); border-color: var(--accent); color: var(--accent-text); }
+.second button:hover { background: var(--rule); }
 
 /* Emphasis is a wash plus same-tone text, never a rule or a symbol. */
 .note {
@@ -351,13 +307,12 @@ main:has(#examples[hidden]) .lede { display: none; }
   gap: var(--space-2);
   margin-top: var(--space-6);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-card);
   font-size: var(--text-subheadline);
 }
-.note--agree { background: var(--accent-wash); color: var(--accent-text); }
-.note--differ { background: var(--warning-wash); color: var(--warning-label); }
+.note--agree { background: var(--data-wash); color: var(--data); }
+.note--differ { background: var(--warning-wash); color: var(--warning); }
 .note--spelled { background: var(--bg-sunken); color: var(--label-secondary); }
-.note b { font-weight: 600; }
+.note b { font-weight: 500; }
 .note .note-label { font-weight: 500; }
 
 /* Source panel ------------------------------------------------------- */
@@ -381,24 +336,22 @@ main:has(#examples[hidden]) .lede { display: none; }
   top: 0.5em;
   width: 5px;
   height: 5px;
-  border-radius: var(--radius-capsule);
   background: var(--label-tertiary);
 }
-.stage:last-child::before { background: var(--accent); }
+.stage:last-child::before { background: var(--data); }
 .stage h2 {
   margin: 0;
   font-size: var(--text-caption-1);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--label-secondary);
 }
-.stage-text { margin: 0; font-size: var(--text-title-3); font-weight: 600; }
+.stage-text { margin: 0; font-size: var(--text-title-3); font-weight: 500; }
 .stage-text--quiet { font-weight: 400; color: var(--label-tertiary); }
-.stage-text--reading { color: var(--accent-text); }
+.stage-text--reading { color: var(--data); }
 .stage-sounds { margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .stage-sounds span {
   padding: var(--space-1) var(--space-2);
   border: 1px solid var(--separator);
-  border-radius: var(--radius-card);
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-size: var(--text-footnote);
@@ -424,7 +377,7 @@ main:has(#examples[hidden]) .lede { display: none; }
 .group-arrow { align-self: center; color: var(--label-tertiary); }
 .group-arrow svg { display: block; width: 14px; height: 14px; }
 .group-vi { display: flex; align-items: baseline; gap: var(--space-2); }
-.group-vi b { font-size: var(--text-title-3); font-weight: 600; color: var(--accent-text); }
+.group-vi b { font-size: var(--text-title-3); font-weight: 500; color: var(--data); }
 .group-tone { font-size: var(--text-caption-1); color: var(--label-tertiary); }
 
 /* Plays after the reading has landed, so the answer is read first. */
@@ -454,7 +407,7 @@ main:has(#examples[hidden]) .lede { display: none; }
   list-style: none;
 }
 .source summary::-webkit-details-marker { display: none; }
-.source summary:hover { color: var(--accent-text); }
+.source summary:hover { color: var(--label); }
 .source summary svg { width: 16px; height: 16px; transition: transform var(--duration-state) var(--ease); }
 .source[open] summary svg { transform: rotate(90deg); }
 
@@ -466,7 +419,6 @@ main:has(#examples[hidden]) .lede { display: none; }
   padding: var(--space-4);
   background: var(--bg-elevated);
   border: 1px solid var(--separator);
-  border-radius: var(--radius-card);
   font-size: var(--text-subheadline);
 }
 .source dt { color: var(--label-secondary); }
@@ -476,14 +428,13 @@ main:has(#examples[hidden]) .lede { display: none; }
 .source .alts button {
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--separator);
-  border-radius: var(--radius-capsule);
   background: none;
   color: inherit;
   font: inherit;
   font-size: var(--text-footnote);
   cursor: pointer;
 }
-.source .alts button:hover { background: var(--accent-wash); border-color: var(--accent); color: var(--accent-text); }
+.source .alts button:hover { background: var(--rule); }
 .source .tags { color: var(--label-secondary); font-family: var(--font-mono); font-size: var(--text-footnote); }
 
 /* Empty, missing and loading ----------------------------------------- */
@@ -494,14 +445,11 @@ main:has(#examples[hidden]) .lede { display: none; }
   font-size: var(--text-callout);
   line-height: 1.5;
 }
-.state b { color: var(--label); font-weight: 600; }
+.state b { color: var(--label); font-weight: 500; }
 
 .skeleton {
   height: calc(var(--text-display) * var(--leading-display));
-  border-radius: var(--radius-card);
-  background: linear-gradient(90deg, var(--bg-sunken) 25%, var(--bg-elevated) 50%, var(--bg-sunken) 75%);
-  background-size: 200% 100%;
-  animation: sweep 1.2s linear infinite;
+  background: var(--bg-sunken);
 }
 
 footer {
@@ -530,7 +478,7 @@ footer #count { font-variant-numeric: tabular-nums; }
 footer a {
   display: inline-block;
   padding-block: var(--space-1);
-  color: var(--accent-text);
+  color: var(--label);
   text-underline-offset: 0.2em;
 }
 
@@ -540,14 +488,13 @@ footer a {
   to { opacity: 1; transform: none; }
 }
 @keyframes sharpen {
-  from { opacity: 0; filter: blur(6px); transform: translateY(6px); }
-  to { opacity: 1; filter: blur(0); transform: none; }
-}
-@keyframes lift {
-  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
-@keyframes sweep { to { background-position: -200% 0; } }
+@keyframes lift {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
 
 .result[data-fresh] .reading { animation: rise var(--duration-moment) var(--ease) both; }
 .result[data-fresh] .syllable {
@@ -567,8 +514,6 @@ footer a {
   @keyframes rise { from { opacity: 0; } to { opacity: 1; } }
   @keyframes sharpen { from { opacity: 0; } to { opacity: 1; } }
   @keyframes lift { from { opacity: 0; } to { opacity: 1; } }
-  .skeleton { animation: none; }
-  .icon-button:active, .submit:active { transform: none; }
 }
 
 @media (max-width: 30rem) {

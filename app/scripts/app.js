@@ -73,8 +73,8 @@ function icon(name) {
     arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     chevron: '<path d="m9 6 6 6-6 6"/>',
   };
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
-    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]}</svg>`;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+    stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${paths[name]}</svg>`;
 }
 
 const escapeHtml = (s) =>
@@ -386,6 +386,9 @@ function applyTheme(theme) {
 }
 
 /* Wiring --------------------------------------------------------------- */
+
+const toolbar = document.querySelector(".toolbar");
+addEventListener("scroll", () => toolbar.classList.toggle("scrolled", scrollY > 0), { passive: true });
 
 el.form.addEventListener("submit", (e) => {
   e.preventDefault();

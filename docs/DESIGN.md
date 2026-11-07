@@ -1,42 +1,63 @@
 # Design
 
-Visual authority is the owner's Notion spec, not this file. This file records
-the token values resolved from it, which that spec leaves as TBD, and the one
-place this project extends it.
+Behaviour follows the owner's Notion spec; this file records the look and the
+token values, which that spec leaves as TBD, and the places this project
+extends it.
 
-- SPEC-001 Core: Apple HIG, Liquid Glass, semantic tokens, concentric radii,
-  capsule controls, WCAG 2.2 AA floor.
-- SPEC-002 Web: archetype **web app**. Glass on the functional layer only
-  (toolbar and floating controls). Content is opaque. No glass on glass.
+- SPEC-001 Core: Apple HIG, semantic tokens, WCAG 2.2 AA floor.
+- SPEC-002 Web: archetype **web app**.
+
+The look is the owner's flat "achromatic ledger", the one their QE apps moved
+to on 2026-11-04 (`asr_qe_model`, `docs/superpowers/specs/2026-11-04-qe-tools-hub-design.md`).
+It replaces SPEC-001's Liquid Glass and rounded corners: square corners
+everywhere, 1px rules, no glass, no shadow, no blur, no gradient, chrome
+without colour, and one hue for data. Adopted here on 2026-11-07, keeping
+everything else on this page.
 
 Mode: Operate. The visitor types a word and reads an answer. Scanability and
 state handling outrank expression; the character lives in the detail.
 
 ## Tokens
 
-Values are Apple's published system colours and iOS text styles, resolved by
-the owner on 2026-10-30. Implemented in `app/styles/tokens.css`.
+Colour values are the ledger's, the same table as the QE apps' `ui.css`; type
+is Apple's iOS text styles, resolved by the owner on 2026-10-30. Implemented
+in `app/styles/tokens.css`.
 
 Colour, four variants per token (light, dark, light increased contrast, dark
-increased contrast): `bg`, `bg-grouped`, `bg-elevated`, `label`,
-`label-secondary`, `label-tertiary`, `separator`, `accent`, `accent-wash`,
-`destructive`, `success`, `warning`. Accent is systemBlue `#007AFF` / `#0A84FF`,
-and `#0040DD` / `#409CFF` at increased contrast.
+increased contrast), each written once as `light-dark()` so the appearance
+toggle and the system setting share one list: `bg` (ground `#f8f8f8` /
+`#000`), `bg-elevated` (surface), `bg-sunken` (raised), `rule` (the hover
+step), `separator`, `control` (a control's border), `label`,
+`label-secondary`, `label-tertiary`, `accent`, `accent-ink`, `data`,
+`data-wash`, and `destructive`, `success`, `warning` with a wash each.
+
+`accent` is ink, not a hue: `#141414`, inverted on dark. It draws focus rings,
+the primary button and anything selected. The one hue is `data`, `#1D5FBF` /
+`#5B94E8`, and it goes only on the reading's parts. Every text token measures
+4.5:1 or better on every ground it sits on, in all four variants.
 
 Type: Apple's iOS text styles by name, Large Title 34/41 down to Caption 2
-11/13, in rem against a 16px root. **One addition to the spec scale:** a
+11/13, in rem against a 16px root. Weights are the ledger's 400 and 500; 700
+is reserved for a headline number, which this page has none of. Figures are
+tabular everywhere. **One addition to the spec scale:** a
 `Display` step above Large Title, `clamp(2.5rem, 7.5vw, 4.25rem)` with -0.03em
 tracking, used only for the generated reading. The reading is the one thing on
 the page the visitor came for, and Large Title does not carry it.
 
 Spacing: base 4, rhythm 8, scale `4 8 12 16 24 32 48 64`.
 
-Radius: capsule for controls, 12 cards, 20 containers, 28 the input. Children
-are concentric: child radius = parent radius − the padding between them.
+Radius: none. Panels, controls, chips, pills, menus and the favicon are all
+square; `* { border-radius: 0 }` also stops the browser rounding its own.
 
-Motion: 180ms state, 280ms enter and exit, 420ms the one authored moment;
-`cubic-bezier(.32,.72,0,1)`. Under `prefers-reduced-motion` everything becomes
-a 120ms opacity fade.
+Depth is a step of ground, never a shadow: hover takes `rule`, press and
+selection `bg-sunken`. The toolbar sits on the page's ground and gains a 1px
+rule once the page has scrolled under it. The suggestion list is a 1px
+`control` border on the surface.
+
+Motion: 120ms state, 200ms for anything that opens, 280ms at most, the
+authored moment included; `cubic-bezier(.16,1,.3,1)`. Things that open come
+8px from their control. Under `prefers-reduced-motion` everything becomes a
+120ms opacity fade.
 
 ## Type stack
 
@@ -54,7 +75,8 @@ owner on 2026-10-30.
 ## The authored moment
 
 The result composes once per lookup: the reading rises 8px and fades in while
-the syllable chips stagger in from `blur(6px)`. Disabled under reduced motion.
+the syllable chips stagger in, each rising 6px. Disabled under reduced motion.
+The chips used to sharpen from a blur; the ledger has no blur, so they rise.
 
 A second moment follows it, and only one other: the derivation plays itself
 through from 480ms, a stage every 320ms, after the reading has landed. The
@@ -67,7 +89,7 @@ Nothing else on the page animates beyond its own state change.
 
 ## The derivation
 
-Three stages on one 1px thread, a dot per stage, the last dot in `accent`:
+Three stages on one 1px thread, a square dot per stage, the last in `data`:
 the word, its sounds as ARPAbet chips, and which sounds became which
 syllable. Not three cards — a stack of same-shaped boxes would make the
 sequence look like three unrelated facts, and the thread is what says one
@@ -86,9 +108,9 @@ watch it again is a control for a thing nobody asked to repeat.
 
 Per SPEC-001, emphasis is a wash background plus same-tone text, never an
 underline, a rule, or a symbol beside the word. Two kinds on this surface and
-no more: `accent-wash` for the syllable under the pointer or keyboard focus,
-and `warning` wash for a reviewed word whose gold reading differs from the
-generated one. Both carry their meaning as text in the pill, so colour is never
+no more: `data-wash` with `data` text for the syllable under the pointer and
+for a reviewed reading the generator matches, and `warning` wash for one it
+does not. Both carry their meaning as text in the pill, so colour is never
 the only channel.
 
 ## The second reading (removed 2026-10-31)
@@ -143,9 +165,8 @@ on a result is the content under that name, not its title. Making the
 reading the `h1` read better in the markup and broke that convention; the
 live region announces the reading to a screen reader either way.
 
-The example chips use the card radius, not the capsule. With a reading under
-the word they hold two lines, and a capsule turned a short one into a
-near-circle. They are 44px at the least, Apple's minimum target.
+The example chips hold two lines, the word over its reading, and are 44px at
+the least, Apple's minimum target.
 
 A shared link opens on a result, and the empty page used to paint first and
 then vanish when the script arrived. A line in the head marks the page before
@@ -161,6 +182,6 @@ state but the browser's own Back button.
 
 ## Icons
 
-Authored inline SVG on Lucide's geometry: 24px box, 1.75px stroke, round caps
-and joins. Six of them (search, clear, submit, theme, source, external). No
+Authored inline SVG on Lucide's geometry, drawn the ledger's way: 24px box,
+1.5px stroke, square caps, mitred joins. Six of them (search, clear, submit, theme, source, external). No
 emoji, no glyph substitutes. Each has a label for assistive tech.

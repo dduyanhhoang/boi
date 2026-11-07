@@ -186,4 +186,7 @@ async function boot() {
   show();
 }
 
+const toolbar = document.querySelector(".toolbar");
+addEventListener("scroll", () => toolbar.classList.toggle("scrolled", scrollY > 0), { passive: true });
+
 boot();

@@ -1,8 +1,9 @@
-/* Design tokens, resolved from the owner's Notion UIUX spec (SPEC-001 Core).
-   Values are Apple's published system colours and iOS text styles. Four
-   colour variants: light, dark, and each at increased contrast. See
-   docs/DESIGN.md. Nothing below is used directly by components except through
-   a semantic name. */
+/* Design tokens. Behaviour follows the owner's Notion UIUX spec (SPEC-001
+   Core, SPEC-002 Web); the look is the flat "achromatic ledger" the owner's
+   QE apps moved to, which replaces SPEC-001's glass and rounded corners:
+   square corners, 1px rules, no glass, no shadow, chrome without colour, one
+   hue for data. Four colour variants: light, dark, and each at increased
+   contrast. See docs/DESIGN.md. Components use only these semantic names. */
 
 :root {
   /* Type ------------------------------------------------------------ */
@@ -31,155 +32,64 @@
   --space-4: 1rem;     --space-6: 1.5rem;  --space-8: 2rem;
   --space-12: 3rem;    --space-16: 4rem;
 
-  /* Radius. Children are concentric: parent radius minus padding ----- */
-  --radius-capsule: 999px;
-  --radius-card: 0.75rem;
-  --radius-container: 1.25rem;
-  --radius-input: 1.75rem;
-
-  /* Motion ----------------------------------------------------------- */
-  --ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --duration-state: 180ms;
-  --duration-enter: 280ms;
-  --duration-moment: 420ms;
+  /* Motion: 120ms for state, 200ms for anything that opens, 280ms at most */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-state: 120ms;
+  --duration-enter: 200ms;
+  --duration-moment: 280ms;
 
   --measure: 42rem;
 }
 
-/* Light ------------------------------------------------------------- */
+/* Colour: light-dark() follows color-scheme, which the system sets and the
+   appearance toggle overrides, so one list serves both. */
+:root { color-scheme: light dark; }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
 :root {
-  color-scheme: light;
-  --bg: #f2f2f7;
-  --bg-elevated: #ffffff;
-  --bg-sunken: #e5e5ea;
-  --label: #000000;
-  /* Apple's secondaryLabel is 0.6, which measures 3.45:1 on white and fails
-     WCAG AA for body and placeholder text. SPEC-001 puts accessibility above
-     every other rule, so light mode uses 0.75 (5.2:1). Dark mode keeps
-     Apple's 0.6, which already measures 6.0:1 on #1C1C1E. */
-  --label-secondary: rgba(60, 60, 67, 0.75);
-  --label-tertiary: rgba(60, 60, 67, 0.42);
-  --separator: rgba(60, 60, 67, 0.29);
-  /* Three accent roles, split by what WCAG asks of each. --accent is
-     Apple's systemBlue and is used only for non-text UI (rings, borders),
-     where 3:1 is the bar. White text on that blue measures 4.02:1, and blue
-     text on white 4.02:1, so both fall to darker measured values. */
-  --accent: #007aff;
-  --accent-text: #0040dd;   /* 7.56:1 on white */
-  --accent-fill: #0062cc;   /* white on it, 5.80:1 */
-  --accent-wash: rgba(0, 122, 255, 0.1);
-  --destructive: #ff3b30;
-  --destructive-wash: rgba(255, 59, 48, 0.1);
-  --success: #34c759;
-  --warning: #ff9500;
-  --warning-wash: rgba(255, 149, 0, 0.14);
-  --warning-label: #8a4b00;
-
-  --material: rgba(255, 255, 255, 0.72);
-  --material-opaque: #f7f7fa;
-  --material-border: rgba(60, 60, 67, 0.12);
-  --popover-border: transparent;
-
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.03);
-  --shadow-2: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px -8px rgba(0, 0, 0, 0.1);
-  --shadow-3: 0 2px 6px rgba(0, 0, 0, 0.08), 0 16px 48px -12px rgba(0, 0, 0, 0.18);
+  --bg: light-dark(#f8f8f8, #000000);
+  --bg-elevated: light-dark(#ffffff, #111111);
+  --bg-sunken: light-dark(#eeeeee, #222222);
+  --rule: light-dark(#f0f0f0, #1a1a1a);
+  --separator: light-dark(#e6e6e6, #2e2e2e);
+  --control: light-dark(#d4d4d4, #444444);
+  --label: light-dark(#0a0a0a, #ffffff);
+  --label-secondary: light-dark(#3d3d3d, #b4b4b4);
+  --label-tertiary: light-dark(#6b6b6b, #949494);
+  /* Ink, not a hue: focus rings, the primary button, a selected control. */
+  --accent: light-dark(#141414, #ffffff);
+  --accent-ink: light-dark(#ffffff, #000000);
+  /* The one hue, for the reading and its parts. */
+  --data: light-dark(#1d5fbf, #5b94e8);
+  --data-wash: light-dark(#e8f0fb, #14243d);
+  --destructive: light-dark(#c4242a, #e55870);
+  --destructive-wash: light-dark(#ffedea, #2c1a20);
+  --success: light-dark(#2d7b31, #3fc07a);
+  --success-wash: light-dark(#dcfae5, #172a1d);
+  --warning: light-dark(#92400e, #dfa13e);
+  --warning-wash: light-dark(#fffbeb, #2a2013);
 }
 
 @media (prefers-contrast: more) {
   :root {
-    --label-secondary: rgba(60, 60, 67, 0.88);
-    --label-tertiary: rgba(60, 60, 67, 0.56);
-    --separator: rgba(60, 60, 67, 0.42);
-    --accent: #0040dd;
-    --accent-text: #00309f;
-    --accent-fill: #00309f;
-    --accent-wash: rgba(0, 64, 221, 0.12);
-    --destructive: #d70015;
-    --success: #248a3d;
-    --warning: #c93400;
-    --warning-label: #7a2000;
-    --material-border: rgba(60, 60, 67, 0.3);
-    --popover-border: rgba(60, 60, 67, 0.3);
+    --bg: light-dark(#ffffff, #000000);
+    --bg-elevated: light-dark(#ffffff, #000000);
+    --bg-sunken: light-dark(#e0e0e0, #2e2e2e);
+    --rule: light-dark(#c4c4c4, #404040);
+    --separator: light-dark(#767676, #8a8a8a);
+    --control: light-dark(#595959, #a6a6a6);
+    --label: light-dark(#000000, #ffffff);
+    --label-secondary: light-dark(#2b2b2b, #dcdcdc);
+    --label-tertiary: light-dark(#3d3d3d, #c8c8c8);
+    --accent: light-dark(#000000, #ffffff);
+    --data: light-dark(#174c99, #8ab4f8);
+    --data-wash: light-dark(#dfeafa, #14243d);
+    --destructive: light-dark(#9f1c21, #ff8a9c);
+    --destructive-wash: light-dark(#ffe3df, #2c1a20);
+    --success: light-dark(#1b5e20, #6fe3a2);
+    --success-wash: light-dark(#d3f5dd, #172a1d);
+    --warning: light-dark(#7a3408, #f5b35c);
+    --warning-wash: light-dark(#fff5d6, #2a2013);
   }
-}
-
-/* Dark -------------------------------------------------------------- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #000000;
-    --bg-elevated: #1c1c1e;
-    --bg-sunken: #2c2c2e;
-    --label: #ffffff;
-    --label-secondary: rgba(235, 235, 245, 0.6);
-    --label-tertiary: rgba(235, 235, 245, 0.3);
-    --separator: rgba(84, 84, 88, 0.65);
-    --accent: #0a84ff;
-    --accent-text: #0a84ff;   /* 4.66:1 on #1c1c1e */
-    --accent-fill: #0062cc;   /* white on it, 5.80:1 */
-    --accent-wash: rgba(10, 132, 255, 0.18);
-    --destructive: #ff453a;
-    --destructive-wash: rgba(255, 69, 58, 0.18);
-    --success: #30d158;
-    --warning: #ff9f0a;
-    --warning-wash: rgba(255, 159, 10, 0.18);
-    --warning-label: #ffc46b;
-
-    --material: rgba(28, 28, 30, 0.72);
-    --material-opaque: #161618;
-    --material-border: rgba(235, 235, 245, 0.12);
-    --popover-border: rgba(235, 235, 245, 0.14);
-
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
-    --shadow-2: 0 1px 3px rgba(0, 0, 0, 0.6), 0 8px 24px -8px rgba(0, 0, 0, 0.7);
-    --shadow-3: 0 2px 6px rgba(0, 0, 0, 0.7), 0 16px 48px -12px rgba(0, 0, 0, 0.8);
-  }
-
-  @media (prefers-contrast: more) {
-    :root {
-      --label-secondary: rgba(235, 235, 245, 0.74);
-      --label-tertiary: rgba(235, 235, 245, 0.48);
-      --separator: rgba(235, 235, 245, 0.78);
-      --accent: #409cff;
-      --accent-text: #409cff;
-      --accent-fill: #0052ab;
-      --accent-wash: rgba(64, 156, 255, 0.22);
-      --destructive: #ff6961;
-      --success: #30db5b;
-      --warning: #ffb340;
-      --warning-label: #ffd79a;
-      --material-border: rgba(235, 235, 245, 0.3);
-      --popover-border: rgba(235, 235, 245, 0.3);
-    }
-  }
-}
-
-/* Manual override from the toolbar, same values as the queries above. */
-:root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #000000;
-  --bg-elevated: #1c1c1e;
-  --bg-sunken: #2c2c2e;
-  --label: #ffffff;
-  --label-secondary: rgba(235, 235, 245, 0.6);
-  --label-tertiary: rgba(235, 235, 245, 0.3);
-  --separator: rgba(84, 84, 88, 0.65);
-  --accent: #0a84ff;
-  --accent-text: #0a84ff;
-  --accent-fill: #0062cc;
-  --accent-wash: rgba(10, 132, 255, 0.18);
-  --destructive: #ff453a;
-  --destructive-wash: rgba(255, 69, 58, 0.18);
-  --success: #30d158;
-  --warning: #ff9f0a;
-  --warning-wash: rgba(255, 159, 10, 0.18);
-  --warning-label: #ffc46b;
-  --material: rgba(28, 28, 30, 0.72);
-  --material-opaque: #161618;
-  --material-border: rgba(235, 235, 245, 0.12);
-  --popover-border: rgba(235, 235, 245, 0.14);
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-2: 0 1px 3px rgba(0, 0, 0, 0.6), 0 8px 24px -8px rgba(0, 0, 0, 0.7);
-  --shadow-3: 0 2px 6px rgba(0, 0, 0, 0.7), 0 16px 48px -12px rgba(0, 0, 0, 0.8);
 }
