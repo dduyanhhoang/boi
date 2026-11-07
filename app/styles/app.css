@@ -316,8 +316,10 @@ main:has(#examples[hidden]) .demo, .opening-word .demo { display: none; }
   .result {
     display: grid;
     /* The second column hugs the derivation rather than stretching, so the
-       page keeps its margins instead of growing an empty cell. */
-    grid-template-columns: minmax(0, 1fr) max-content;
+       page keeps its margins instead of growing an empty cell, but no wider
+       than 26rem: a long word's sounds would otherwise squeeze the reading
+       to one syllable a line. */
+    grid-template-columns: minmax(0, 1fr) fit-content(26rem);
     column-gap: var(--space-12);
     align-items: start;
   }
@@ -329,6 +331,7 @@ main:has(#examples[hidden]) .demo, .opening-word .demo { display: none; }
 }
 
 .reading {
+  overflow-wrap: anywhere;
   margin: 0;
   font-size: var(--text-display);
   line-height: var(--leading-display);
@@ -420,7 +423,7 @@ main:has(#examples[hidden]) .demo, .opening-word .demo { display: none; }
   display: grid;
   gap: var(--space-6);
 }
-.stage { position: relative; display: grid; gap: var(--space-1); }
+.stage { position: relative; display: grid; gap: var(--space-1); min-width: 0; }
 .stage::before {
   content: "";
   position: absolute;
@@ -438,7 +441,7 @@ main:has(#examples[hidden]) .demo, .opening-word .demo { display: none; }
   font-weight: 500;
   color: var(--label-secondary);
 }
-.stage-text { margin: 0; font-size: var(--text-title-3); font-weight: 500; }
+.stage-text { margin: 0; font-size: var(--text-title-3); font-weight: 500; overflow-wrap: anywhere; }
 .stage-text--quiet { font-weight: 400; color: var(--label-tertiary); }
 .stage-text--reading { color: var(--data); }
 .stage-sounds { margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
