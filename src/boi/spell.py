@@ -32,8 +32,16 @@ _SOFT = {"c": "S", "g": "JH"}
 WORD_INITIAL = {"pn": "N", "pt": "T"}
 # Two vowel letters that are no digraph are two syllables, ra-di-o and
 # co-ni-o-sis, except an i after these, which is only a glide: na-tion,
-# vi-sion, spe-cial, re-gion.
+# vi-sion, spe-cial, re-gion. After all but g the consonant turns palatal
+# too, which is the sừn of every -tion: ti, ci, si and xi before a vowel are
+# SH (ZH for a lone s after a vowel or r: vi-sion, ver-sion; CH for st:
+# ques-tion), and the glide itself is a schwa. In 1,697 of 1,697 CMUdict
+# words ending -tion or -sion the vowel is AH.
 _GLIDE_I_AFTER = "cstxg"
+_PALATAL = {"t": "SH", "c": "SH", "s": "SH", "x": ("K", "SH")}
+# A final y or i is /i/ in English, and in bồi: háp pi, su si, mơ ni. Only a
+# one-syllable word (fry, sky) and the -fy of fortify keep /aɪ/.
+_FINAL_I_LETTERS = {"y", "i", "ey"}
 
 # Vowel graphemes. (stressed, unstressed) ARPAbet, before an r-colour check.
 DIGRAPHS = {
@@ -97,6 +105,11 @@ def _graphemes(word):
                 j += 1
             if _hiatus(word, i, j):
                 out += [("v", word[i]), ("v", word[i + 1])]
+            elif _glide(word, i, j):
+                if out and out[-1][0] == "c":
+                    out[-1] = ("c", _palatal(word, i, out))
+                # The kind carries the palatal, which the vowel before wants.
+                out.append(("g" + _palatal_letters(word, i), word[i:j]))
             else:
                 out.append(("v", word[i:j]))
             i = j
@@ -135,19 +148,51 @@ def _hiatus(word, i, j):
     pair = word[i:j]
     if len(pair) != 2 or pair in DIGRAPHS or pair in IRREGULAR:
         return False
-    return not (pair[0] == "i" and i and word[i - 1] in _GLIDE_I_AFTER)
+    return not (pair[0] == "i" and i and (word[i - 1] in _GLIDE_I_AFTER
+                                          or word[i - 2 : i] in ("sh", "ch")))
+
+
+def _glide(word, i, j):
+    """Whether word[i:j] is an i-glide after a palatal: the io of nation, the
+    ia of special, the iou of delicious, the io of fashion."""
+    group = word[i:j]
+    if group[0] != "i" or len(group) not in (2, 3) or group in DIGRAPHS or group in IRREGULAR:
+        return False
+    return i > 0 and (word[i - 1] in _PALATAL or word[i - 2 : i] in ("sh", "ch"))
+
+
+def _palatal_letters(word, i):
+    """The palatal spelling before an i-glide at word[i]: t, st, c, s, ss, x, sh or ch."""
+    two = word[i - 2 : i]
+    return two if two in ("sh", "ch", "st", "ss") else word[i - 1]
+
+
+def _palatal(word, i, out):
+    """The phone the consonant before an i-glide at word[i] becomes."""
+    letter = word[i - 1]
+    if letter == "h":                       # sh and ch are palatal already
+        return out[-1][1]
+    if letter == "t" and word[i - 2 : i - 1] == "s":
+        return "CH"                         # question, digestion
+    if letter == "s" and word[i - 2 : i - 1] != "s" \
+            and (word[i - 2 : i - 1] in VOWELS or word[i - 2 : i - 1] == "r"):
+        return "ZH"                         # vision, version; not mission
+    return _PALATAL[letter]
 
 
 def _syllables(parts):
-    """One syllable per vowel group: (onset phones, vowel letters, coda phones)."""
-    vowels = [i for i, (kind, _) in enumerate(parts) if kind == "v"]
+    """One syllable per vowel group: [onset phones, vowel letters, coda phones, palatal].
+
+    palatal is the spelling before an i-glide group (t, st, c, s, ss, x, sh, ch), else "".
+    """
+    vowels = [i for i, (kind, _) in enumerate(parts) if kind[0] in "vg"]
     if not vowels:
         # No vowel at all (hmm, zzz). A reader still has to say something, so
         # the consonants get a schwa: the last one closes it, the rest open it.
         run = [p for _, p in parts]
         if not run:
             return []
-        return [[run[:-1], "", run[-1:]] if len(run) > 1 else [run, "", []]]
+        return [[run[:-1], "", run[-1:], False] if len(run) > 1 else [run, "", [], False]]
     syllables = []
     for n, i in enumerate(vowels):
         start = 0 if n == 0 else vowels[n - 1] + 1
@@ -159,7 +204,7 @@ def _syllables(parts):
             syllables[-1][2].extend(run[:1])
             run = run[1:]
         coda = [p for _, p in parts[i + 1 :]] if n == len(vowels) - 1 else []
-        syllables.append([run, parts[i][1], coda])
+        syllables.append([run, parts[i][1], coda, parts[i][0][1:]])
     return syllables
 
 
@@ -185,16 +230,27 @@ def phones(word):
     if silent_e:
         syllables[-1][2] = syllables[-1][2]  # the e only marks the vowel open
 
+    last = len(syllables) - 1
+    # English stresses the syllable before a palatal glide (in for MA tion),
+    # and the reader knows that much: the first syllable steps down to 2.
+    primary = next((n for n in range(1, last + 1) if syllables[n][3]), 1) - 1
     out = []
-    for n, (onset, letters, coda) in enumerate(syllables):
-        stress = "1" if n == 0 else ("2" if n == len(syllables) - 1 and n else "0")
+    for n, (onset, letters, coda, glide) in enumerate(syllables):
+        if n == primary:
+            stress = "1"
+        elif glide:
+            stress = "0"
+        else:
+            stress = "2" if n in (0, last) else "0"
         out += _flatten(onset)
 
         flat_coda = _flatten(coda)
         open_syllable = not flat_coda or (silent_e and n == len(syllables) - 1)
         base = letters[0] if letters else ""
 
-        if letters in IRREGULAR:
+        if glide:
+            vowel = "AH"
+        elif letters in IRREGULAR:
             vowel = IRREGULAR[letters]
         elif letters == "ow":
             vowel = _OW["final" if n == len(syllables) - 1 and not flat_coda
@@ -207,6 +263,18 @@ def phones(word):
             vowel = SINGLE[base][0 if open_syllable else 1]
         else:
             vowel = "AH"
+        # An open i with an onset and a syllable after it is short, in 70% of
+        # 7,554 CMUdict words (city, visit, silicon) and in bồi (vi rút, si li
+        # con, pi da). A bare one keeps /aɪ/: icon, and the i of iPhone.
+        if letters == "i" and open_syllable and onset and n < last:
+            vowel = "IH"
+        # An a before the t, c or lone s of a glide is /eɪ/ in 95% of 732
+        # words: ây sừn, ây sồ, ây giừn. Not before sh or ss: fashion, passion.
+        if letters == "a" and open_syllable and n < last and syllables[n + 1][3] in ("t", "c", "s"):
+            vowel = "EY"
+        if letters in _FINAL_I_LETTERS and n == last and open_syllable and last \
+                and not (letters == "y" and body.endswith("fy")):
+            vowel = "IY"
         # An unstressed open vowel reduces rather than lengthening: lo-gi.
         if stress == "0" and open_syllable and letters not in DIGRAPHS \
                 and letters not in IRREGULAR:

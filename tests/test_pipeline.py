@@ -447,8 +447,8 @@ def test_a_name_is_not_mined_for_dictionary_words(word):
     ("pneumono", "N UW1 M OW0 N OW2"),          # a word-initial pn drops its p
     ("hypnosis", "HH IH1 P N OW0 S IH2 S"),     # and only there
     ("coniosis", "K OW1 N IH0 OW0 S IH2 S"),    # io is two syllables
-    ("nation", "N AA1 T IH2 N"),                # but a glide after t
-    ("vision", "V AY1 S IH2 N"),
+    ("nation", "N EY1 SH AH0 N"),               # but a glide after t, a palatal one
+    ("vision", "V IH1 ZH AH0 N"),
 ])
 def test_spelling_silent_p_and_vowel_pairs(word, phones):
     assert " ".join(spell.phones(word)) == phones
@@ -458,3 +458,38 @@ def test_spelling_silent_p_and_vowel_pairs(word, phones):
                                            ("culture", "cun chờ")])
 def test_a_stressed_u_before_l_keeps_its_letter(word, expected):
     assert generate.read(word) == expected
+
+
+@pytest.mark.parametrize("word,phones", [
+    ("silico", "S IH1 L IH0 K OW2"),           # an open i with an onset and more to come is short
+    ("icono", "AY1 K OW0 N OW2"),               # a bare one is not
+    ("nike", "N AY1 K"),                        # nor one that ends the word
+    ("zorition", "Z OW2 R IH1 SH AH0 N"),       # -tion is a palatal and a schwa, stressed before
+    ("zorbation", "Z AO2 R B EY1 SH AH0 N"),    # the a before it is /eɪ/
+    ("zovision", "Z OW2 V IH1 ZH AH0 N"),       # a lone s after a vowel is voiced
+    ("zomission", "Z OW2 M IH1 SH AH0 N"),      # a doubled one is not
+    ("zoquestion", "Z OW2 K W EH1 S CH AH0 N"), # st is CH
+    ("zospecial", "Z OW2 S P IY1 SH AH0 L"),    # ia after c
+    ("zodelicious", "Z OW2 D IY0 L IH1 SH AH0 S"),
+    ("zofashion", "Z OW2 F AA1 SH AH0 N"),      # sh glides too, but the a stays short
+    ("zappy", "Z AA1 P IY2"),                   # a final y, i or ey is /i/
+    ("sushy", "S UW1 SH IY2"),
+    ("zoney", "Z OW1 N IY2"),
+    ("fry", "F R AY1"),                         # unless it is the whole word
+    ("fortify", "F AO1 R T IH0 F AY2"),         # or the -fy of fortify
+])
+def test_spelling_glides_short_i_and_final_i(word, phones):
+    assert " ".join(spell.phones(word)) == phones
+
+
+@pytest.mark.parametrize("word,expected", [
+    ("silico", "si li cô"), ("zorition", "dô ri sừn"), ("zorbation", "do bây sừn"),
+    ("zovision", "dô vi dừn"), ("zappy", "dóp pi"), ("sushy", "su si"),
+])
+def test_spelled_readings(word, expected):
+    assert generate.read(word) == expected
+
+
+def test_a_partial_split_leaves_no_vowelless_gap():
+    assert g2p._known_parts("zomission") is None     # not z + omission
+    assert generate.read("zomission") == "dô mi sừn"

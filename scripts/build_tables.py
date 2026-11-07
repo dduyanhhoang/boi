@@ -49,6 +49,8 @@ def main():
             "soft": spell._SOFT,
             "wordInitial": spell.WORD_INITIAL,
             "glideIAfter": spell._GLIDE_I_AFTER,
+            "palatal": {k: list(v) if isinstance(v, tuple) else [v] for k, v in spell._PALATAL.items()},
+            "finalILetters": sorted(spell._FINAL_I_LETTERS),
             "digraphs": spell.DIGRAPHS,
             "single": {k: list(v) for k, v in spell.SINGLE.items()},
             "rColoured": spell.R_COLOURED,

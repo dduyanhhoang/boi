@@ -78,6 +78,9 @@ def sample_words():
               "hmm", "shh", "zzz", "brrr", "qwerty", "xyzzy",
               # a silent p, and vowel pairs that are two syllables or one
               "pneumono", "pterosaur", "pneuvax", "coniosis", "radiola", "duophone",
+              # palatal glides, a short open i, a final i, and a cut that leaves a lone z
+              "zorition", "zorbation", "zovision", "zomission", "zoquestion", "zospecial",
+              "zodelicious", "zofashion", "silico", "zappy", "sushy", "zoney", "fortify", "zoccasion",
               # compounds, which exercise splitInto
               "poweroff", "blackpink", "airpod", "facetime", "skincare",
               "screensaver", "keyboardwarrior", "icecream", "sunflower"]

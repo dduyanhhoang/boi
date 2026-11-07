@@ -115,6 +115,10 @@ def _known_parts(word):
             gap, i = gap + word[i], i + 1
     out += [(gap, False)] if gap else []
     known = sum(len(text) for text, is_word in out if is_word)
+    # A gap with no vowel is a letter left over by a bad cut: zomission is
+    # not z plus omission.
+    if any(not is_word and not set(text) & set(spell.VOWELS) for text, is_word in out):
+        return None
     return out if 2 * known >= len(word) and len(out) > 1 else None
 
 

@@ -38,7 +38,11 @@ function graphemes(word, T) {
         j += 1;
       }
       if (hiatus(word, i, j, T)) out.push(["v", word[i]], ["v", word[i + 1]]);
-      else out.push(["v", word.slice(i, j)]);
+      else if (glide(word, i, j, T)) {
+        if (out.length && out[out.length - 1][0] === "c") out[out.length - 1] = ["c", palatal(word, i, out, T)];
+        // The kind carries the palatal, which the vowel before wants.
+        out.push(["g" + palatalLetters(word, i), word.slice(i, j)]);
+      } else out.push(["v", word.slice(i, j)]);
       i = j;
       continue;
     }
@@ -77,17 +81,41 @@ function graphemes(word, T) {
 function hiatus(word, i, j, T) {
   const pair = word.slice(i, j);
   if (pair.length !== 2 || pair in T.spell.digraphs || pair in T.spell.irregular) return false;
-  return !(pair[0] === "i" && i > 0 && T.spell.glideIAfter.includes(word[i - 1]));
+  return !(pair[0] === "i" && i > 0 && (T.spell.glideIAfter.includes(word[i - 1])
+                                         || ["sh", "ch"].includes(word.slice(i - 2, i))));
+}
+
+/** spell._glide: an i-glide after a palatal, the io of nation, ia of special, iou of delicious. */
+function glide(word, i, j, T) {
+  const group = word.slice(i, j);
+  if (group[0] !== "i" || ![2, 3].includes(group.length) || group in T.spell.digraphs
+      || group in T.spell.irregular) return false;
+  return i > 0 && (word[i - 1] in T.spell.palatal || ["sh", "ch"].includes(word.slice(i - 2, i)));
+}
+
+/** spell._palatal_letters: t, st, c, s, ss, x, sh or ch. */
+function palatalLetters(word, i) {
+  const two = word.slice(i - 2, i);
+  return ["sh", "ch", "st", "ss"].includes(two) ? two : word[i - 1];
+}
+
+/** spell._palatal: what the consonant before an i-glide becomes. */
+function palatal(word, i, out, T) {
+  const letter = word[i - 1], before = word.slice(i - 2, i - 1);
+  if (letter === "h") return out[out.length - 1][1];
+  if (letter === "t" && before === "s") return ["CH"];
+  if (letter === "s" && before !== "s" && (T.spell.vowels.includes(before) || before === "r")) return ["ZH"];
+  return T.spell.palatal[letter];
 }
 
 function spellSyllables(parts, T) {
-  const vowels = parts.map(([k], i) => (k === "v" ? i : -1)).filter((i) => i >= 0);
+  const vowels = parts.map(([k], i) => ("vg".includes(k[0]) ? i : -1)).filter((i) => i >= 0);
   if (!vowels.length) {
     const run = parts.map(([, p]) => p);
     if (!run.length) return [];
     return run.length > 1
-      ? [[run.slice(0, -1), "", run.slice(-1)]]
-      : [[run, "", []]];
+      ? [[run.slice(0, -1), "", run.slice(-1), ""]]
+      : [[run, "", [], ""]];
   }
   const syllables = [];
   vowels.forEach((i, n) => {
@@ -99,7 +127,7 @@ function spellSyllables(parts, T) {
       run = run.slice(1);
     }
     const coda = n === vowels.length - 1 ? parts.slice(i + 1).map(([, p]) => p) : [];
-    syllables.push([run, parts[i][1], coda]);
+    syllables.push([run, parts[i][1], coda, parts[i][0].slice(1)]);
   });
   return syllables;
 }
@@ -117,9 +145,13 @@ export function spellPhones(word, T) {
   const syllables = spellSyllables(graphemes(body, T), T);
   if (!syllables.length) return null;
 
+  const last = syllables.length - 1;
+  // English stresses the syllable before a palatal glide; the first steps down to 2.
+  let primary = syllables.findIndex((s, n) => n > 0 && s[3]);
+  primary = (primary < 0 ? 1 : primary) - 1;
   const out = [];
-  syllables.forEach(([onset, letters, coda], n) => {
-    const stress = n === 0 ? "1" : (n === syllables.length - 1 ? "2" : "0");
+  syllables.forEach(([onset, letters, coda, palatalBefore], n) => {
+    const stress = n === primary ? "1" : palatalBefore ? "0" : (n === 0 || n === last) ? "2" : "0";
     out.push(...onset.flat());
 
     const flatCoda = coda.flat();
@@ -127,7 +159,8 @@ export function spellPhones(word, T) {
     const base = letters ? letters[0] : "";
 
     let vowel;
-    if (letters in T.spell.irregular) vowel = T.spell.irregular[letters];
+    if (palatalBefore) vowel = "AH";
+    else if (letters in T.spell.irregular) vowel = T.spell.irregular[letters];
     else if (letters === "ow") {
       vowel = T.spell.ow[(n === syllables.length - 1 && !flatCoda.length)
         ? "final" : "other"];
@@ -137,6 +170,12 @@ export function spellPhones(word, T) {
     else if (base in T.spell.single) vowel = T.spell.single[base][open ? 0 : 1];
     else vowel = "AH";
 
+    // An open i with an onset and a syllable after it is short: si li cô.
+    if (letters === "i" && open && onset.length && n < last) vowel = "IH";
+    // An a before the t, c or lone s of a glide is /eɪ/: ây sừn.
+    if (letters === "a" && open && n < last && ["t", "c", "s"].includes(syllables[n + 1][3])) vowel = "EY";
+    if (T.spell.finalILetters.includes(letters) && n === last && open && last
+        && !(letters === "y" && body.endsWith("fy"))) vowel = "IY";
     if (stress === "0" && open && !(letters in T.spell.digraphs)
         && !(letters in T.spell.irregular)) {
       vowel = REDUCED[vowel] ?? vowel;
@@ -828,6 +867,8 @@ export function knownParts(word, known, T) {
   }
   if (gap) out.push([gap, false]);
   const knownLetters = out.reduce((n, [text, isWord]) => n + (isWord ? text.length : 0), 0);
+  // A gap with no vowel is a letter left over by a bad cut: zomission is not z + omission.
+  if (out.some(([text, isWord]) => !isWord && ![...text].some((c) => T.spell.vowels.includes(c)))) return null;
   return 2 * knownLetters >= word.length && out.length > 1 ? out : null;
 }
 
